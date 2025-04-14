@@ -19,7 +19,7 @@ export function Logo({
                        sx,
                        disabled,
                        className,
-                       href = '/',
+                       href = '/dashboard',
                        isSingle = true,
                        ...other
                      }: LogoProps) {
