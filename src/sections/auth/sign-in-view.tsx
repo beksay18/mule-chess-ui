@@ -122,13 +122,7 @@ export function SignInView() {
         }}
       >
         <IconButton color="inherit">
-          <Iconify width={22} icon="socials:google" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:github" />
-        </IconButton>
-        <IconButton color="inherit">
-          <Iconify width={22} icon="socials:twitter" />
+            <Iconify width={22} icon="socials:google" />
         </IconButton>
       </Box>
     </>
