@@ -4,14 +4,18 @@ import Typography from '@mui/material/Typography';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
+import {getCurrentUser} from "../../../api";
 
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
+
+  const user = getCurrentUser();
+
   return (
     <DashboardContent maxWidth="xl">
       <Typography variant="h4" sx={{ mb: { xs: 3, md: 5 } }}>
-        Hi, John 👋
+          {user ? `Hi, ${user.person.firstName} ${user.person.lastName} 👋` : 'Hi, Unknown User 👋'}
       </Typography>
 
       <Grid container spacing={3}>

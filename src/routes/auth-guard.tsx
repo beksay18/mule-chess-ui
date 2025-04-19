@@ -1,11 +1,14 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import {SessionStorage} from "../api";
 
 type Props = {
     children: React.ReactNode;
 };
 
-const isAuthenticated = (): boolean => Boolean(localStorage.getItem('accessToken'));
-
+const isAuthenticated = (): boolean => {
+    const token = SessionStorage.getJSONValue('access-token');
+    return Boolean(token?.['access-token']);
+};
 
 export default function AuthGuard({ children }: Props) {
     const location = useLocation();

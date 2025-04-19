@@ -10,19 +10,44 @@ import Typography from '@mui/material/Typography';
 import InputAdornment from '@mui/material/InputAdornment';
 
 import { useRouter } from 'src/routes/hooks';
-
 import { Iconify } from 'src/components/iconify';
+
+import { signIn } from '../../api/auth';
+import { SessionStorage } from '../../api';
 
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
 
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = useCallback(() => {
-    router.push('/dashboard');
-  }, [router]);
+  const handleSignIn = useCallback(async () => {
+      try {
+          console.log("SIGN IN PAYLOAD", { username, password });
+
+          const res = await signIn({
+              username: username,
+              password: password,
+          });
+
+          SessionStorage.setJSONValue('access-token', {
+              'access-token': res.accessToken,
+          });
+
+          SessionStorage.setJSONValue("current-user", {
+              username: res.username,
+              role: res.role,
+              person: res.person,
+          });
+
+          router.push('/dashboard');
+      } catch (error) {
+          console.error('Sign-in failed:', error);
+      }
+  }, [username, password, router]);
 
   const renderForm = (
     <Box
@@ -36,7 +61,7 @@ export function SignInView() {
         fullWidth
         name="email"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        onChange={(e) => setUsername(e.target.value)}
         sx={{ mb: 3 }}
         slotProps={{
           inputLabel: { shrink: true },
@@ -51,8 +76,8 @@ export function SignInView() {
         fullWidth
         name="password"
         label="Password"
-        defaultValue="@demo1234"
         type={showPassword ? 'text' : 'password'}
+        onChange={(e) => setPassword(e.target.value)}
         slotProps={{
           inputLabel: { shrink: true },
           input: {
