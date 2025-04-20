@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
-
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
     Box,
     Card,
@@ -9,7 +9,6 @@ import {
     Stack,
     Button, FormControlLabel,
 } from '@mui/material';
-
 import {Iconify} from 'src/components/iconify';
 import {createProductType, getProductTypeById, updateProductType} from '../../api/productType';
 import {DashboardContent} from "../../layouts/dashboard";
@@ -69,14 +68,25 @@ export default function ProductTypeForm() {
                             label="Active"
                         />
 
-                        <Button
-                            variant="contained"
-                            startIcon={<Iconify icon="mingcute:add-line"/>}
-                            onClick={handleSubmit}
-                            disabled={!name.trim()}
-                        >
-                            {id ? 'Update' : 'Create'}
-                        </Button>
+                        <Stack direction="row" spacing={2} justifyContent="flex-end">
+                            <Button
+                                variant="outlined"
+                                color="inherit"
+                                startIcon={<ArrowBackIcon />}
+                                onClick={() => navigate(-1)}
+                            >
+                                Cancel
+                            </Button>
+
+                            <Button
+                                variant="contained"
+                                startIcon={<Iconify icon="mingcute:add-line" />}
+                                onClick={handleSubmit}
+                                disabled={!name.trim()}
+                            >
+                                {id ? 'Update' : 'Create'}
+                            </Button>
+                        </Stack>
                     </Stack>
                 </Card>
             </Box>

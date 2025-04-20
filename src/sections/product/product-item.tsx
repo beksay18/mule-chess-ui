@@ -73,7 +73,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
                     {product.name}
                 </Typography>
 
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Label
                         variant="soft"
                         color={
