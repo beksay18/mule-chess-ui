@@ -48,7 +48,7 @@ export function ProductsView() {
     };
 
     const handleEdit = (id: number) => {
-        router.push(`/products/product-types-form/${id}`);
+        router.push(`/products-types/product-types-form/${id}`);
     };
 
     const handleDelete = async (id: number) => {

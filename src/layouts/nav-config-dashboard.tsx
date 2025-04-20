@@ -1,5 +1,7 @@
 import { Label } from 'src/components/label';
 import { SvgColor } from 'src/components/svg-color';
+import CategoryIcon from '@mui/icons-material/Category';
+import ExtensionIcon from '@mui/icons-material/Extension';
 
 // ----------------------------------------------------------------------
 
@@ -19,28 +21,28 @@ export const navData = [
     icon: icon('ic-analytics'),
   },
   {
+    title: 'Orders',
+    path: '/products',
+    icon: icon('ic-cart'),
+    info: (
+        <Label color="error" variant="inverted">
+          +3
+        </Label>
+    ),
+  },
+  {
     title: 'User',
     path: '/user',
     icon: icon('ic-user'),
   },
   {
-    title: 'Product',
+    title: 'Product Types',
+    path: '/products-types',
+    icon: <CategoryIcon />,
+  },
+  {
+    title: 'Products',
     path: '/products',
-    icon: icon('ic-cart'),
-    info: (
-      <Label color="error" variant="inverted">
-        +3
-      </Label>
-    ),
-  },
-  {
-    title: 'Sign in',
-    path: '/sign-in',
-    icon: icon('ic-lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic-disabled'),
+    icon: <ExtensionIcon/>,
   },
 ];
