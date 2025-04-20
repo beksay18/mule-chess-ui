@@ -6,10 +6,25 @@ import {Iconify} from "../../../components/iconify";
 import Box from "@mui/material/Box";
 import {getAllProductTypes, ProductType} from "../../../api/productType";
 import {useEffect, useState} from "react";
-import {useNavigate} from "react-router";
 import { useRouter} from 'src/routes/hooks';
+import { ProductItem, ProductItemProps } from '../product-item';
 
 // ----------------------------------------------------------------------
+
+
+function getRandomColor(): string {
+    const colors = ['#FFC107', '#8BC34A', '#03A9F4', '#E91E63', '#FF5722', '#9C27B0'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+function mapToProductItem(productType: ProductType): ProductItemProps {
+    return {
+        name: productType.name,
+        status: productType.isActive ? 'active' : 'inactive',
+        coverUrl: '',
+        color: getRandomColor(),
+    };
+}
 
 export function ProductsView() {
     const router = useRouter();
@@ -51,8 +66,10 @@ export function ProductsView() {
             </Box>
 
             <Grid container spacing={3}>
-                {productTypes.map((product) => (
-                    product.name
+                {productTypes.map((item) => (
+                    <Grid key={item.id} size={{ xs: 12, sm: 6, md: 2 }}>
+                        <ProductItem product={mapToProductItem(item)} />
+                    </Grid>
                 ))}
             </Grid>
         </DashboardContent>

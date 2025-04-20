@@ -1,81 +1,94 @@
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
-import { fCurrency } from 'src/utils/format-number';
-
 import { Label } from 'src/components/label';
-import { ColorPreview } from 'src/components/color-utils';
-
-// ----------------------------------------------------------------------
 
 export type ProductItemProps = {
-  id: string;
-  name: string;
-  price: number;
-  status: string;
-  coverUrl: string;
-  colors: string[];
-  priceSale: number | null;
+    name: string;
+    status: string;
+    coverUrl?: string;
+    color?: string;
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
+    const IMAGE_HEIGHT = 200;
 
-  const renderImg = (
-    <Box
-      component="img"
-      alt={product.name}
-      src={product.coverUrl}
-      sx={{
-        top: 0,
-        width: 1,
-        height: 1,
-        objectFit: 'cover',
-        position: 'absolute',
-      }}
-    />
-  );
-
-  const renderPrice = (
-    <Typography variant="subtitle1">
-      <Typography
-        component="span"
-        variant="body1"
-        sx={{
-          color: 'text.disabled',
-          textDecoration: 'line-through',
-        }}
-      >
-        {product.priceSale && fCurrency(product.priceSale)}
-      </Typography>
-      &nbsp;
-      {fCurrency(product.price)}
-    </Typography>
-  );
-
-  return (
-    <Card>
-      <Box sx={{ pt: '100%', position: 'relative' }}>
-        {renderImg}
-      </Box>
-
-      <Stack spacing={2} sx={{ p: 3 }}>
-        <Link color="inherit" underline="hover" variant="subtitle2" noWrap>
-          {product.name}
-        </Link>
-
+    const renderImage = product.coverUrl ? (
         <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
+            component="img"
+            alt={product.name}
+            src={product.coverUrl}
+            sx={{
+                width: '100%',
+                height: IMAGE_HEIGHT,
+                objectFit: 'cover',
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+            }}
+        />
+    ) : (
+        <Box
+            sx={{
+                width: '100%',
+                height: IMAGE_HEIGHT,
+                backgroundColor: product.color ?? '#E0E0E0',
+                borderTopLeftRadius: 12,
+                borderTopRightRadius: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 48,
+                color: '#fff',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+            }}
         >
-          {renderPrice}
+            {product.name.charAt(0)}
         </Box>
-      </Stack>
-    </Card>
-  );
+    );
+
+    return (
+        <Card
+            sx={{
+                borderRadius: 3,
+                boxShadow: 3,
+                transition: '0.3s',
+                '&:hover': {
+                    boxShadow: 6,
+                    transform: 'translateY(-4px)',
+                },
+            }}
+        >
+            {renderImage}
+
+            <Stack spacing={1.5} sx={{ p: 2 }}>
+                <Typography variant="h6" noWrap>
+                    {product.name}
+                </Typography>
+
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    <Label
+                        variant="soft"
+                        color={
+                            product.status === 'active'
+                                ? 'success'
+                                : product.status === 'inactive'
+                                    ? 'default'
+                                    : 'warning'
+                        }
+                        sx={{
+                            textTransform: 'capitalize',
+                            fontSize: 12,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 1.5,
+                        }}
+                    >
+                        {product.status}
+                    </Label>
+                </Box>
+            </Stack>
+        </Card>
+    );
 }
