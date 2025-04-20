@@ -54,8 +54,19 @@ export const routesSection: RouteObject[] = [
     children: [
       { path: 'dashboard', element: <DashboardPage /> },
       { path: 'user', element: <UserPage /> },
-      { path: 'products', element: <ProductsPage /> },
-      { path: 'products/product-types-form', element: <ProductTypeForm /> },
+        {
+            path: 'products',
+            children: [
+                { path: '', element: <ProductsPage /> },
+                {
+                    path: 'product-types-form',
+                    children: [
+                        { index: true, element: <ProductTypeForm /> },
+                        { path: ':id', element: <ProductTypeForm /> },
+                    ],
+                },
+            ],
+        },
     ],
   },
   {

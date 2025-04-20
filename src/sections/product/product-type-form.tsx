@@ -1,5 +1,5 @@
-import {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 
 import {
     Box,
@@ -11,21 +11,35 @@ import {
 } from '@mui/material';
 
 import {Iconify} from 'src/components/iconify';
-import {createProductType} from '../../api/productType';
+import {createProductType, getProductTypeById, updateProductType} from '../../api/productType';
 import {DashboardContent} from "../../layouts/dashboard";
 import Checkbox from "@mui/material/Checkbox";
 
 export default function ProductTypeForm() {
+    const { id } = useParams();
     const [name, setName] = useState('');
     const [isActive, setIsActive] = useState(true);
     const navigate = useNavigate();
 
+    useEffect(() => {
+        if (id) {
+            getProductTypeById(Number(id)).then((data) => {
+                setName(data.name);
+                setIsActive(data.isActive);
+            });
+        }
+    }, [id]);
+
     const handleSubmit = async () => {
         try {
-            await createProductType({name, isActive});
+            if (id) {
+                await updateProductType(Number(id), { name, isActive });
+            } else {
+                await createProductType({ name, isActive });
+            }
             navigate('/products');
         } catch (error) {
-            console.error('Failed to create product type:', error);
+            console.error('Failed to save product type:', error);
         }
     };
 
@@ -61,7 +75,7 @@ export default function ProductTypeForm() {
                             onClick={handleSubmit}
                             disabled={!name.trim()}
                         >
-                            Save
+                            {id ? 'Update' : 'Create'}
                         </Button>
                     </Stack>
                 </Card>

@@ -3,12 +3,18 @@ import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Label } from 'src/components/label';
+import IconButton from "@mui/material/IconButton";
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export type ProductItemProps = {
+    id: number;
     name: string;
     status: string;
     coverUrl?: string;
     color?: string;
+    onEdit?: (id: number) => void;
+    onDelete?: (id: number) => void;
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
@@ -87,6 +93,14 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
                     >
                         {product.status}
                     </Label>
+                    <Box>
+                        <IconButton onClick={() => product.onEdit?.(product.id)} size="small">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton onClick={() => product.onDelete?.(product.id)} size="small" color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Box>
                 </Box>
             </Stack>
         </Card>
