@@ -15,9 +15,21 @@ interface RetryableAxiosInstance extends AxiosInstance {
         url: string,
         config?: AxiosRequestConfig
     ) => Promise<AxiosResponse<T>>;
+
     postWithRetries: <T, K>(
         url: string,
         data?: K,
+        config?: AxiosRequestConfig
+    ) => Promise<AxiosResponse<T>>;
+
+    putWithRetries: <T, K>(
+        url: string,
+        data?: K,
+        config?: AxiosRequestConfig
+    ) => Promise<AxiosResponse<T>>;
+
+    deleteWithRetries: <T>(
+        url: string,
         config?: AxiosRequestConfig
     ) => Promise<AxiosResponse<T>>;
 }
@@ -72,5 +84,7 @@ const retryableAxiosRequest =
 
 instance.getWithRetries = retryableAxiosRequest("get");
 instance.postWithRetries = retryableAxiosRequest("post");
+instance.putWithRetries = retryableAxiosRequest("put");
+instance.deleteWithRetries = retryableAxiosRequest("delete");
 
 export default instance;
