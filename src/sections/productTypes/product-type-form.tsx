@@ -36,7 +36,7 @@ export default function ProductTypeForm() {
             } else {
                 await createProductType({ name, isActive });
             }
-            navigate('/products');
+            navigate('/product-types');
         } catch (error) {
             console.error('Failed to save product type:', error);
         }

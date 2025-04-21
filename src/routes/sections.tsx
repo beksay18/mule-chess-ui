@@ -17,8 +17,11 @@ export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
-export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const ProductForm = lazy(() => import('src/sections/products/product-form'));
+export const ProductTypesPage = lazy(() => import('src/pages/product-types'));
 export const ProductTypeForm = lazy(() => import('src/sections/productTypes/product-type-form'));
+export const Page404 = lazy(() => import('src/pages/page-not-found'));
+
 
 const renderFallback = () => (
   <Box
@@ -57,12 +60,25 @@ export const routesSection: RouteObject[] = [
         {
             path: 'products-types',
             children: [
-                { path: '', element: <ProductsPage /> },
+                { path: '', element: <ProductTypesPage /> },
                 {
                     path: 'product-types-form',
                     children: [
                         { index: true, element: <ProductTypeForm /> },
                         { path: ':id', element: <ProductTypeForm /> },
+                    ],
+                },
+            ],
+        },
+        {
+            path: 'products',
+            children: [
+                { path: '', element: <ProductsPage /> },
+                {
+                    path: 'product-form',
+                    children: [
+                        { index: true, element: <ProductForm /> },
+                        { path: ':id', element: <ProductForm /> },
                     ],
                 },
             ],

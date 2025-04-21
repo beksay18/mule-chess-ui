@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import {deleteProductType, getAllProductTypes, ProductType} from "../../../api/productType";
 import {useEffect, useState} from "react";
 import { useRouter} from 'src/routes/hooks';
-import { ProductTypeItem, ProductItemProps } from '../product-type-item';
+import { ProductTypeItem, ProductTypeItemProps } from '../product-type-item';
 
 // ----------------------------------------------------------------------
 
@@ -17,11 +17,11 @@ function getRandomColor(): string {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-function mapToProductItem(
+function mapToProductTypeItem(
     productType: ProductType,
     onEdit: (id: number) => void,
     onDelete: (id: number) => void
-): ProductItemProps {
+): ProductTypeItemProps {
     return {
         id: productType.id,
         name: productType.name,
@@ -87,7 +87,7 @@ export function ProductTypesView() {
             <Grid container spacing={3}>
                 {productTypes.map((item) => (
                     <Grid key={item.id} size={{ xs: 12, sm: 6, md: 3 }}>
-                        <ProductTypeItem product={mapToProductItem(item, handleEdit, handleDelete)} />
+                        <ProductTypeItem product={mapToProductTypeItem(item, handleEdit, handleDelete)} />
                     </Grid>
                 ))}
             </Grid>

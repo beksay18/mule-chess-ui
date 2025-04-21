@@ -27,4 +27,6 @@ export interface Product {
     description: string;
     isActive: boolean;
     productType: ProductType;
+    dimensions: ProductDimensionRequest[];
+    pricings: ProductPricingRequest[];
 }
