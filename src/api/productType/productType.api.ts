@@ -20,7 +20,7 @@ export const getAllProductTypes = (): Promise<ProductType[]> =>
 
 export const getProductTypeById = (id: number): Promise<ProductType> =>
     axios
-        .getWithRetries<ProductType>(ENDPOINTS.PRODUCT_TYPE.GET_PRODUCT_BY_ID(id))
+        .getWithRetries<ProductType>(ENDPOINTS.PRODUCT_TYPE.GET_PRODUCT_TYPE_BY_ID(id))
         .then(({ data }) => data);
 
 

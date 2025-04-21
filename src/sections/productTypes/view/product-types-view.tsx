@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import {deleteProductType, getAllProductTypes, ProductType} from "../../../api/productType";
 import {useEffect, useState} from "react";
 import { useRouter} from 'src/routes/hooks';
-import { ProductItem, ProductItemProps } from '../product-item';
+import { ProductTypeItem, ProductItemProps } from '../product-type-item';
 
 // ----------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ function mapToProductItem(
 }
 
 
-export function ProductsView() {
+export function ProductTypesView() {
     const router = useRouter();
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
@@ -87,7 +87,7 @@ export function ProductsView() {
             <Grid container spacing={3}>
                 {productTypes.map((item) => (
                     <Grid key={item.id} size={{ xs: 12, sm: 6, md: 3 }}>
-                        <ProductItem product={mapToProductItem(item, handleEdit, handleDelete)} />
+                        <ProductTypeItem product={mapToProductItem(item, handleEdit, handleDelete)} />
                     </Grid>
                 ))}
             </Grid>

@@ -17,7 +17,7 @@ export type ProductItemProps = {
     onDelete?: (id: number) => void;
 };
 
-export function ProductItem({ product }: { product: ProductItemProps }) {
+export function ProductTypeItem({ product }: { product: ProductItemProps }) {
     const IMAGE_HEIGHT = 200;
 
     const renderImage = product.coverUrl ? (
