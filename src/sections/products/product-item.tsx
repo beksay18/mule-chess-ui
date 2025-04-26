@@ -1,7 +1,7 @@
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -11,6 +11,7 @@ export type ProductItemProps = {
     id: number;
     name: string;
     description: string;
+    productType: string;
     status: string;
     coverUrl?: string;
     color?: string;
@@ -19,59 +20,42 @@ export type ProductItemProps = {
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
-    const avatarContent = product.coverUrl ? (
-        <Avatar
-            variant="rounded"
-            alt={product.name}
-            src={product.coverUrl}
-            sx={{ width: 64, height: 64, flexShrink: 0 }}
-        />
-    ) : (
-        <Avatar
-            variant="rounded"
-            sx={{
-                width: 64,
-                height: 64,
-                flexShrink: 0,
-                bgcolor: product.color ?? '#ccc',
-                fontSize: 28,
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-            }}
-        >
-            {product.name.charAt(0)}
-        </Avatar>
-    );
-
     return (
         <Box
             sx={{
                 display: 'flex',
                 alignItems: 'center',
-                px: 2,
+                px: 3,
                 py: 2,
                 gap: 2,
-                borderRadius: 2,
-                boxShadow: 2,
+                borderBottom: (theme) => `dashed 1px ${theme.palette.divider}`,
                 bgcolor: 'background.paper',
-                border: (theme) => `1px dashed ${theme.palette.divider}`,
             }}
         >
-            {avatarContent}
+            <Avatar
+                variant="rounded"
+                alt={product.name}
+                src={product.coverUrl}
+                sx={{
+                    width: 48,
+                    height: 48,
+                    flexShrink: 0,
+                    bgcolor: product.color ?? 'primary.main',
+                    fontSize: 20,
+                    fontWeight: 'bold',
+                }}
+            >
+                {!product.coverUrl && product.name.charAt(0)}
+            </Avatar>
 
             <ListItemText
                 primary={
-                    <Typography variant="subtitle1" noWrap>
+                    <Typography variant="subtitle2" noWrap>
                         {product.name}
                     </Typography>
                 }
                 secondary={
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        noWrap
-                        sx={{ mt: 0.5 }}
-                    >
+                    <Typography variant="body2" color="text.secondary" noWrap sx={{ mt: 0.5 }}>
                         {product.description}
                     </Typography>
                 }
@@ -79,6 +63,19 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
             />
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Label
+                    variant="soft"
+                    color="info"
+                    sx={{
+                        fontSize: 11,
+                        px: 1.2,
+                        py: 0.4,
+                        borderRadius: 1,
+                        textTransform: 'capitalize',
+                    }}
+                >
+                    {product.productType}
+                </Label>
                 <Label
                     variant="soft"
                     color={
@@ -98,9 +95,11 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
                 >
                     {product.status}
                 </Label>
+
                 <IconButton onClick={() => product.onEdit?.(product.id)} size="small">
                     <EditIcon fontSize="small" />
                 </IconButton>
+
                 <IconButton onClick={() => product.onDelete?.(product.id)} size="small" color="error">
                     <DeleteIcon fontSize="small" />
                 </IconButton>

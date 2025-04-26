@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import {deleteProductType, getAllProductTypes, ProductType} from "../../../api/productType";
 import {useEffect, useState} from "react";
 import { useRouter} from 'src/routes/hooks';
-import { ProductTypeItem, ProductTypeItemProps } from '../product-type-item';
+import { ProductTypeItem, ProductItemProps } from '../product-type-item';
 
 // ----------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ function mapToProductTypeItem(
     productType: ProductType,
     onEdit: (id: number) => void,
     onDelete: (id: number) => void
-): ProductTypeItemProps {
+): ProductItemProps {
     return {
         id: productType.id,
         name: productType.name,

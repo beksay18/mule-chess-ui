@@ -26,6 +26,7 @@ function mapToProductItem(
         id: product.id,
         name: product.name,
         description: product.description,
+        productType: product.productType.name,
         status: product.isActive ? 'active' : 'inactive',
         coverUrl: '',
         color: getRandomColor(),
@@ -86,7 +87,7 @@ export function ProductView() {
                 </Button>
             </Box>
 
-            <Grid container spacing={3}>
+            <Grid container>
                 {products.map((item) => (
                     <Grid key={item.id} size={{ xs: 12}}>
                         <ProductItem product={mapToProductItem(item, handleEdit, handleDelete)} />

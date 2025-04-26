@@ -7,7 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export type ProductTypeItemProps = {
+export type ProductItemProps = {
     id: number;
     name: string;
     status: string;
@@ -17,7 +17,7 @@ export type ProductTypeItemProps = {
     onDelete?: (id: number) => void;
 };
 
-export function ProductTypeItem({ product }: { product: ProductTypeItemProps }) {
+export function ProductTypeItem({ product }: { product: ProductItemProps }) {
     const IMAGE_HEIGHT = 200;
 
     const renderImage = product.coverUrl ? (

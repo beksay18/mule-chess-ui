@@ -3,7 +3,6 @@ import { ProductType } from '../productType';
 export interface ProductDimensionRequest {
     width: number;
     height: number;
-    isCustom: boolean;
 }
 
 export interface ProductPricingRequest {
@@ -16,7 +15,7 @@ export interface ProductRequest {
     name: string;
     description: string;
     isActive: boolean;
-    productTypeId: number;
+    productTypeId: number | null;
     dimensions: ProductDimensionRequest[];
     pricings: ProductPricingRequest[];
 }
