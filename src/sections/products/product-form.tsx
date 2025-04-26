@@ -171,7 +171,7 @@ export default function ProductForm() {
 
     return (
         <DashboardContent>
-            <Box>
+            <Stack>
                 <Typography variant="h4" sx={{ mb: 3 }}>
                     {id ? 'Edit Product' : 'Create Product'}
                 </Typography>
@@ -233,73 +233,87 @@ export default function ProductForm() {
                             }
                             label="Active"
                         />
-                        {formData.dimensions.length > 0 && (
-                            <>
-                        <Typography variant="h6">Dimensions</Typography>
 
-                        {formData.dimensions.map((dim, index) => (
-                            <Stack direction="row" spacing={2} alignItems="center" key={index}>
-                                <TextField
-                                    label="Width"
-                                    type="number"
-                                    value={dim.width}
-                                    onChange={(e) =>
-                                        handleDimensionChange(index, 'width', parseFloat(e.target.value))
-                                    }
-                                />
-                                <TextField
-                                    label="Height"
-                                    type="number"
-                                    value={dim.height}
-                                    onChange={(e) =>
-                                        handleDimensionChange(index, 'height', parseFloat(e.target.value))
-                                    }
-                                />
-                                <IconButton onClick={() => removeDimension(index)}>
-                                    <DeleteIcon />
-                                </IconButton>
-                            </Stack>
-                        ))}
-                            </>
-                        )}
+                        <Stack
+                            direction={{ xs: 'column', md: 'row' }}
+                            spacing={2}
+                            alignItems="flex-start"
+                        >
+                            <Box flex={1}>
+                                {formData.dimensions.length > 0 && (
+                                    <>
+                                <Typography sx={{ mb: 2 }} variant="h6">Dimensions</Typography>
 
-                        <Button variant="outlined" onClick={addDimension} sx={{ width: 'fit-content' }}>
-                            Add Dimension
-                        </Button>
-
-                        {formData.discounts.length > 0 && (
-                            <>
-                                <Typography variant="h6">Discounts</Typography>
-
-                                {formData.discounts.map((discount, index) => (
+                                {formData.dimensions.map((dim, index) => (
+                                    <Box key={index} sx={{ mb: 2 }}>
                                     <Stack direction="row" spacing={2} alignItems="center" key={index}>
                                         <TextField
-                                            label="Quantity"
+                                            label="Width"
                                             type="number"
-                                            value={discount.quantity}
+                                            value={dim.width}
                                             onChange={(e) =>
-                                                handleDiscountChange(index, 'quantity', parseFloat(e.target.value))
+                                                handleDimensionChange(index, 'width', parseFloat(e.target.value))
                                             }
                                         />
                                         <TextField
-                                            label="Discount %"
+                                            label="Height"
                                             type="number"
-                                            value={discount.percentage}
+                                            value={dim.height}
                                             onChange={(e) =>
-                                                handleDiscountChange(index, 'percentage', parseFloat(e.target.value))
+                                                handleDimensionChange(index, 'height', parseFloat(e.target.value))
                                             }
                                         />
-                                        <IconButton onClick={() => removeDiscount(index)}>
+                                        <IconButton onClick={() => removeDimension(index)}>
                                             <DeleteIcon />
                                         </IconButton>
                                     </Stack>
+                                    </Box>
                                 ))}
-                            </>
-                        )}
+                                    </>
+                                )}
 
-                        <Button variant="outlined" onClick={addDiscount} sx={{ width: 'fit-content' }}>
-                            Add Discount
-                        </Button>
+                                <Button variant="outlined" onClick={addDimension} sx={{ width: 'fit-content' }}>
+                                    Add Dimension
+                                </Button>
+                            </Box>
+                            <Box flex={1}>
+                                {formData.discounts.length > 0 && (
+                                    <>
+                                        <Typography sx={{ mb: 2 }} variant="h6">Discounts</Typography>
+
+                                        {formData.discounts.map((discount, index) => (
+                                            <Box key={index} sx={{ mb: 2 }}>
+                                            <Stack direction="row" spacing={2} alignItems="center" key={index}>
+                                                <TextField
+                                                    label="Quantity"
+                                                    type="number"
+                                                    value={discount.quantity}
+                                                    onChange={(e) =>
+                                                        handleDiscountChange(index, 'quantity', parseFloat(e.target.value))
+                                                    }
+                                                />
+                                                <TextField
+                                                    label="Discount %"
+                                                    type="number"
+                                                    value={discount.percentage}
+                                                    onChange={(e) =>
+                                                        handleDiscountChange(index, 'percentage', parseFloat(e.target.value))
+                                                    }
+                                                />
+                                                <IconButton onClick={() => removeDiscount(index)}>
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Stack>
+                                            </Box>
+                                        ))}
+                                    </>
+                                )}
+
+                                <Button variant="outlined" onClick={addDiscount} sx={{ width: 'fit-content' }}>
+                                    Add Discount
+                                </Button>
+                            </Box>
+                        </Stack>
 
                         <Stack direction="row" spacing={2} justifyContent="flex-end">
                             <Button
@@ -322,7 +336,7 @@ export default function ProductForm() {
                         </Stack>
                     </Stack>
                 </Card>
-            </Box>
+            </Stack>
         </DashboardContent>
     );
 }
