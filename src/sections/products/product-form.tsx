@@ -22,7 +22,7 @@ import { DashboardContent } from '../../layouts/dashboard';
 import {
     createProduct,
     getProductById,
-    ProductDimensionRequest,
+    ProductDimensionRequest, ProductDiscountRequest,
     ProductRequest,
     updateProduct,
 } from '../../api/product';
@@ -35,10 +35,11 @@ export default function ProductForm() {
     const [formData, setFormData] = useState<ProductRequest>({
         name: '',
         description: '',
+        price: null,
         isActive: true,
         productTypeId: null,
         dimensions: [],
-        pricings: [],
+        discounts: [],
     });
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
     const [loading, setLoading] = useState(false);
@@ -58,10 +59,11 @@ export default function ProductForm() {
         setFormData({
             name: data.name,
             description: data.description,
+            price: data.price,
             isActive: data.isActive,
             productTypeId: data.productType.id,
             dimensions: data.dimensions || [],
-            pricings: data.pricings || [],
+            discounts: data.discounts || [],
         });
     };
 
@@ -70,6 +72,16 @@ export default function ProductForm() {
     ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name!]: value }));
+    };
+
+    const handleNumberChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name!]: value === '' ? null : parseFloat(value),
+        }));
     };
 
     const handleSelectChange = (e: SelectChangeEvent<number>) => {
@@ -108,6 +120,29 @@ export default function ProductForm() {
         setFormData((prev) => ({ ...prev, dimensions: updated }));
     };
 
+    const handleDiscountChange = <K extends keyof ProductDiscountRequest>(
+        index: number,
+        field: K,
+        value: ProductDiscountRequest[K]
+    ) => {
+        const updated = [...formData.discounts];
+        updated[index][field] = value;
+        setFormData((prev) => ({ ...prev, discounts: updated }));
+    };
+
+    const addDiscount = () => {
+        setFormData((prev) => ({
+            ...prev,
+            discounts: [...prev.discounts, { quantity: 0, percentage: 0 }],
+        }));
+    };
+
+    const removeDiscount = (index: number) => {
+        const updated = [...formData.discounts];
+        updated.splice(index, 1);
+        setFormData((prev) => ({ ...prev, discounts: updated }));
+    };
+
     const handleSubmit = async () => {
         setLoading(true);
         try {
@@ -115,7 +150,11 @@ export default function ProductForm() {
                 (dim) => dim.width > 0 && dim.height > 0
             );
 
-            const updatedFormData = { ...formData, dimensions: filteredDimensions };
+            const filteredDiscounts = formData.discounts.filter(
+                (discount) => discount.quantity > 0 && discount.percentage > 0
+            );
+
+            const updatedFormData = { ...formData, dimensions: filteredDimensions, discounts: filteredDiscounts };
 
             if (id) {
                 await updateProduct(Number(id), updatedFormData);
@@ -175,6 +214,15 @@ export default function ProductForm() {
                             rows={4}
                         />
 
+                        <TextField
+                            label="Product Price"
+                            name="price"
+                            type="number"
+                            value={formData.price ?? ''}
+                            onChange={handleNumberChange}
+                            fullWidth
+                        />
+
                         <FormControlLabel
                             control={
                                 <Checkbox
@@ -217,6 +265,40 @@ export default function ProductForm() {
 
                         <Button variant="outlined" onClick={addDimension} sx={{ width: 'fit-content' }}>
                             Add Dimension
+                        </Button>
+
+                        {formData.discounts.length > 0 && (
+                            <>
+                                <Typography variant="h6">Discounts</Typography>
+
+                                {formData.discounts.map((discount, index) => (
+                                    <Stack direction="row" spacing={2} alignItems="center" key={index}>
+                                        <TextField
+                                            label="Quantity"
+                                            type="number"
+                                            value={discount.quantity}
+                                            onChange={(e) =>
+                                                handleDiscountChange(index, 'quantity', parseFloat(e.target.value))
+                                            }
+                                        />
+                                        <TextField
+                                            label="Discount %"
+                                            type="number"
+                                            value={discount.percentage}
+                                            onChange={(e) =>
+                                                handleDiscountChange(index, 'percentage', parseFloat(e.target.value))
+                                            }
+                                        />
+                                        <IconButton onClick={() => removeDiscount(index)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Stack>
+                                ))}
+                            </>
+                        )}
+
+                        <Button variant="outlined" onClick={addDiscount} sx={{ width: 'fit-content' }}>
+                            Add Discount
                         </Button>
 
                         <Stack direction="row" spacing={2} justifyContent="flex-end">

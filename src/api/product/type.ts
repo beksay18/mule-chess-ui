@@ -5,27 +5,28 @@ export interface ProductDimensionRequest {
     height: number;
 }
 
-export interface ProductPricingRequest {
+export interface ProductDiscountRequest {
     quantity: number;
-    basePrice: number;
-    discountPercent: number;
+    percentage: number;
 }
 
 export interface ProductRequest {
     name: string;
     description: string;
+    price: number | null;
     isActive: boolean;
     productTypeId: number | null;
     dimensions: ProductDimensionRequest[];
-    pricings: ProductPricingRequest[];
+    discounts: ProductDiscountRequest[];
 }
 
 export interface Product {
     id: number;
     name: string;
     description: string;
+    price: number;
     isActive: boolean;
     productType: ProductType;
     dimensions: ProductDimensionRequest[];
-    pricings: ProductPricingRequest[];
+    discounts: ProductDiscountRequest[];
 }

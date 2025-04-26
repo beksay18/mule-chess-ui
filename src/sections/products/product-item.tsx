@@ -47,7 +47,19 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
             >
                 {!product.coverUrl && product.name.charAt(0)}
             </Avatar>
-
+            <Label
+                variant="soft"
+                color="info"
+                sx={{
+                    fontSize: 11,
+                    px: 1.2,
+                    py: 0.4,
+                    borderRadius: 1,
+                    textTransform: 'capitalize',
+                }}
+            >
+                {product.productType}
+            </Label>
             <ListItemText
                 primary={
                     <Typography variant="subtitle2" noWrap>
@@ -63,19 +75,6 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
             />
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                <Label
-                    variant="soft"
-                    color="info"
-                    sx={{
-                        fontSize: 11,
-                        px: 1.2,
-                        py: 0.4,
-                        borderRadius: 1,
-                        textTransform: 'capitalize',
-                    }}
-                >
-                    {product.productType}
-                </Label>
                 <Label
                     variant="soft"
                     color={
