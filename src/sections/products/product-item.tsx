@@ -11,6 +11,7 @@ export type ProductItemProps = {
     id: number;
     name: string;
     description: string;
+    price: number
     productType: string;
     status: string;
     coverUrl?: string;
@@ -75,6 +76,19 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
             />
 
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Label
+                    variant="soft"
+                    color="primary"
+                    sx={{
+                        fontSize: 11,
+                        px: 1.2,
+                        py: 0.4,
+                        borderRadius: 1,
+                        textTransform: 'capitalize',
+                    }}
+                >
+                     $ {product.price}
+                </Label>
                 <Label
                     variant="soft"
                     color={

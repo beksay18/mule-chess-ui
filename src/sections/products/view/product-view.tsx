@@ -26,6 +26,7 @@ function mapToProductItem(
         id: product.id,
         name: product.name,
         description: product.description,
+        price: product.price,
         productType: product.productType.name,
         status: product.isActive ? 'active' : 'inactive',
         coverUrl: '',
