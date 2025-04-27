@@ -21,7 +21,6 @@ export type UserProps = {
   role: string;
   status: string;
   company: string;
-  avatarUrl: string;
   isVerified: boolean;
 };
 
@@ -45,10 +44,6 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
   return (
     <>
       <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
-        <TableCell padding="checkbox">
-          <Checkbox disableRipple checked={selected} onChange={onSelectRow} />
-        </TableCell>
-
         <TableCell component="th" scope="row">
           <Box
             sx={{
@@ -57,7 +52,6 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
               alignItems: 'center',
             }}
           >
-            <Avatar alt={row.name} src={row.avatarUrl} />
             {row.name}
           </Box>
         </TableCell>
