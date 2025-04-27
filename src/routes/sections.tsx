@@ -10,6 +10,7 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import { AuthLayout } from 'src/layouts/auth';
 import { DashboardLayout } from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
+import {HomeView} from "../sections/home/view";
 
 // ----------------------------------------------------------------------
 
@@ -93,6 +94,10 @@ export const routesSection: RouteObject[] = [
       </AuthLayout>
     ),
   },
+    {
+        path: '',
+        element: <HomeView />,
+    },
   {
     path: '404',
     element: <Page404 />,
