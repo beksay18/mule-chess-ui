@@ -14,6 +14,7 @@ import { Iconify } from 'src/components/iconify';
 
 import { signIn } from '../../api/auth';
 import { SessionStorage } from '../../api';
+import Header from "../home/header";
 
 // ----------------------------------------------------------------------
 
@@ -26,8 +27,6 @@ export function SignInView() {
 
   const handleSignIn = useCallback(async () => {
       try {
-          console.log("SIGN IN PAYLOAD", { username, password });
-
           const res = await signIn({
               username: username,
               password: password,

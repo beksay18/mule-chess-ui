@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { styled, alpha } from '@mui/material/styles';
+import {styled, alpha} from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
@@ -11,119 +10,129 @@ import MenuItem from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
+import Typography from "@mui/material/Typography";
+import Menu from '@mui/material/Menu';
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const StyledToolbar = styled(Toolbar)(({ theme }) => ({
+const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexShrink: 0,
-    borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
     backdropFilter: 'blur(24px)',
-    border: '1px solid',
-    borderColor: (theme.vars || theme).palette.divider,
-    backgroundColor: theme.vars
-        ? `rgba(${theme.vars.palette.background.defaultChannel} / 0.4)`
-        : alpha(theme.palette.background.default, 0.4),
-    boxShadow: (theme.vars || theme).shadows[1],
-    padding: '8px 12px',
+    padding: '15px 12px',
 }));
 
 export default function Header() {
+    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const openMenu = Boolean(anchorEl);
     const [open, setOpen] = React.useState(false);
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
     };
 
+    const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+        setAnchorEl(null);
+    };
+
     return (
-        <AppBar
-            position="fixed"
-            enableColorOnDark
-            sx={{
-                boxShadow: 0,
-                bgcolor: 'transparent',
-                backgroundImage: 'none',
-                mt: 'calc(var(--template-frame-height, 0px) + 28px)',
-            }}
-        >
-            <Container maxWidth="xl">
-                <StyledToolbar variant="dense" disableGutters>
-                    <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', px: 0 }}>
-                        <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            <Button variant="text" size="small">
-                                Features
-                            </Button>
-                            <Button variant="text" size="small">
-                                Testimonials
-                            </Button>
-                            <Button variant="text" size="small">
-                                Highlights
-                            </Button>
-                            <Button variant="text" size="small">
-                                Pricing
-                            </Button>
-                            <Button variant="text" size="small" sx={{ minWidth: 0 }}>
-                                FAQ
-                            </Button>
-                            <Button variant="text" size="small" sx={{ minWidth: 0 }}>
-                                Blog
-                            </Button>
-                        </Box>
-                    </Box>
-                    <Box
+        <Container>
+            <StyledToolbar variant="dense">
+                <Box sx={{flexGrow: 1, display: 'flex', alignItems: 'center', px: 0}}>
+                    <Typography
+                        component="a"
+                        href="/"
+                        variant="h5"
                         sx={{
-                            display: { xs: 'none', md: 'flex' },
-                            gap: 1,
-                            alignItems: 'center',
+                            fontWeight: 600,
+                            letterSpacing: 1,
+                            color: 'primary.main',
+                            textDecoration: 'none',
+                            '&:hover': {textDecoration: 'none', color: 'primary.dark'},
                         }}
                     >
-                        <Button color="primary" variant="text" size="small">
-                            Sign in
+                        CG Stickers
+                    </Typography>
+                    <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, ml: 2}}>
+                        <Button
+                            size="medium"
+                            sx={{color: 'text.primary', fontWeight: 500}}
+                            onClick={handleOpenMenu}
+                            endIcon={<ArrowDropDownIcon/>}
+                        >
+                            Products
+                        </Button>
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={openMenu}
+                            onClose={handleCloseMenu}
+                            MenuListProps={{'aria-labelledby': 'products-button'}}
+                        >
+                            <MenuItem onClick={handleCloseMenu}>Stickers</MenuItem>
+                            <MenuItem onClick={handleCloseMenu}>Banners</MenuItem>
+                            <MenuItem onClick={handleCloseMenu}>Popular</MenuItem>
+                        </Menu>
+
+                        <Button size="medium" sx={{color: 'text.primary', fontWeight: 500}}>
+                            For Businesses
                         </Button>
                     </Box>
-                    <Box sx={{ display: { xs: 'flex', md: 'none' }, gap: 1 }}>
-                        <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
-                            <MenuIcon />
-                        </IconButton>
-                        <Drawer
-                            anchor="top"
-                            open={open}
-                            onClose={toggleDrawer(false)}
-                            PaperProps={{
-                                sx: {
-                                    top: 'var(--template-frame-height, 0px)',
-                                },
-                            }}
-                        >
-                            <Box sx={{ p: 2, backgroundColor: 'background.default' }}>
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'flex-end',
-                                    }}
-                                >
-                                    <IconButton onClick={toggleDrawer(false)}>
-                                        <CloseRoundedIcon />
-                                    </IconButton>
-                                </Box>
-
-                                <MenuItem>Features</MenuItem>
-                                <MenuItem>Testimonials</MenuItem>
-                                <MenuItem>Highlights</MenuItem>
-                                <MenuItem>Pricing</MenuItem>
-                                <MenuItem>FAQ</MenuItem>
-                                <MenuItem>Blog</MenuItem>
-                                <Divider sx={{ my: 3 }} />
-                                <MenuItem>
-                                    <Button color="primary" variant="outlined" fullWidth>
-                                        Sign in
-                                    </Button>
-                                </MenuItem>
+                </Box>
+                <Box
+                    sx={{
+                        display: {xs: 'none', md: 'flex'},
+                        gap: 1,
+                        alignItems: 'center',
+                    }}
+                >
+                    <Button color="primary" variant="text" size="medium" component="a"
+                            href="/sign-in">
+                        Sign in
+                    </Button>
+                </Box>
+                <Box sx={{display: {xs: 'flex', md: 'none'}, gap: 1}}>
+                    <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
+                        <MenuIcon/>
+                    </IconButton>
+                    <Drawer
+                        anchor="top"
+                        open={open}
+                        onClose={toggleDrawer(false)}
+                        PaperProps={{
+                            sx: {
+                                top: 'var(--template-frame-height, 0px)',
+                            },
+                        }}
+                    >
+                        <Box sx={{p: 2, backgroundColor: 'background.default'}}>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                }}
+                            >
+                                <IconButton onClick={toggleDrawer(false)}>
+                                    <CloseRoundedIcon/>
+                                </IconButton>
                             </Box>
-                        </Drawer>
-                    </Box>
-                </StyledToolbar>
-            </Container>
-        </AppBar>
+
+                            <MenuItem>Products</MenuItem>
+                            <MenuItem>For Businesses</MenuItem>
+                            <Divider sx={{my: 3}}/>
+                            <MenuItem>
+                                <Button color="primary" variant="outlined" fullWidth>
+                                    Sign in
+                                </Button>
+                            </MenuItem>
+                        </Box>
+                    </Drawer>
+                </Box>
+            </StyledToolbar>
+        </Container>
     );
 }
