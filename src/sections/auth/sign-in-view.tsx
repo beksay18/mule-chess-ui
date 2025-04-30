@@ -42,7 +42,11 @@ export function SignInView() {
               person: res.person,
           });
 
-          router.push('/dashboard');
+          if (res.role === 'ROLE_ADMIN') {
+              router.push('/dashboard');
+          } else {
+              router.push('/');
+          }
       } catch (error) {
           console.error('Sign-in failed:', error);
       }

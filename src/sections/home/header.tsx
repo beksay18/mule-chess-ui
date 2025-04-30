@@ -6,13 +6,19 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
-import MenuItem from '@mui/material/MenuItem';
+import MenuItem, {menuItemClasses} from '@mui/material/MenuItem';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Typography from "@mui/material/Typography";
 import Menu from '@mui/material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import {getCurrentUser, logout} from "../../api";
+import Avatar from "@mui/material/Avatar";
+import {useCallback, useState} from "react";
+import {useRouter} from "../../routes/hooks";
+import MenuList from "@mui/material/MenuList";
+import Popover from "@mui/material/Popover";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -24,9 +30,12 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
 }));
 
 export default function Header() {
+    const user = getCurrentUser();
+    const router = useRouter();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
     const [open, setOpen] = React.useState(false);
+    const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
@@ -39,6 +48,27 @@ export default function Header() {
     const handleCloseMenu = () => {
         setAnchorEl(null);
     };
+
+    const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+        setOpenPopover(event.currentTarget);
+    }, []);
+
+    const handleClosePopover = useCallback(() => {
+        setOpenPopover(null);
+    }, []);
+
+    const handleClickItem = useCallback(
+        (path: string) => {
+            handleClosePopover();
+            router.push(path);
+        },
+        [handleClosePopover, router]
+    );
+
+    const handleLogout = useCallback(() => {
+        logout();
+        router.push('/sign-in');
+    }, [router]);
 
     return (
         <Container>
@@ -90,10 +120,20 @@ export default function Header() {
                         alignItems: 'center',
                     }}
                 >
-                    <Button color="primary" variant="text" size="medium" component="a"
-                            href="/sign-in">
-                        Sign in
-                    </Button>
+                    {user ? (
+                        <>
+                            <IconButton onClick={handleOpenPopover}>
+                                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                                    {user?.person?.firstName?.[0]?.toUpperCase()}
+                                    {user?.person?.lastName?.[0]?.toUpperCase()}
+                                </Avatar>
+                            </IconButton>
+                        </>
+                    ) : (
+                        <Button color="primary" variant="text" size="medium" href="/sign-in">
+                            Sign in
+                        </Button>
+                    )}
                 </Box>
                 <Box sx={{display: {xs: 'flex', md: 'none'}, gap: 1}}>
                     <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
@@ -132,6 +172,59 @@ export default function Header() {
                         </Box>
                     </Drawer>
                 </Box>
+                <Popover
+                    open={Boolean(openPopover)}
+                    anchorEl={openPopover}
+                    onClose={handleClosePopover}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                    slotProps={{
+                        paper: {
+                            sx: { width: 220, mt: 1.5, p: 0 },
+                        },
+                    }}
+                >
+                    <Box sx={{ p: 2 }}>
+                        <Typography variant="subtitle2" noWrap>
+                            {user?.person?.firstName} {user?.person?.lastName}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                            {user?.username}
+                        </Typography>
+                    </Box>
+
+                    <Divider sx={{ borderStyle: 'dashed' }} />
+
+                    <MenuList
+                        disablePadding
+                        sx={{
+                            p: 1,
+                            gap: 0.5,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            [`& .${menuItemClasses.root}`]: {
+                                px: 1.5,
+                                py: 1,
+                                borderRadius: 0.75,
+                                fontWeight: 500,
+                                '&:hover': { bgcolor: 'action.hover' },
+                            },
+                        }}
+                    >
+                        <MenuItem onClick={() => handleClickItem('/profile')}>
+                            Profile
+                        </MenuItem>
+                        <MenuItem onClick={() => handleClickItem('/my-orders')}>
+                            My Orders
+                        </MenuItem>
+                    </MenuList>
+                    <Divider sx={{ borderStyle: 'dashed' }} />
+                    <Box sx={{ p: 1 }}>
+                        <Button fullWidth color="error" onClick={handleLogout}>
+                            Logout
+                        </Button>
+                    </Box>
+                </Popover>
             </StyledToolbar>
         </Container>
     );
