@@ -20,6 +20,6 @@ export const ENDPOINTS = {
         CREATE_PRODUCT: "/cg-stickers/api/products",
         UPDATE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
         DELETE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
-        GET_ACTIVE_PRODUCTS: "/cg-stickers/api/products/public",
+        GET_ACTIVE_PRODUCTS: (id: number | string) => `/cg-stickers/api/products/public/${id}`,
     },
 }
