@@ -18,6 +18,11 @@ export const getAllProductTypes = (): Promise<ProductType[]> =>
         .getWithRetries<ProductType[]>(ENDPOINTS.PRODUCT_TYPE.GET_ALL_PRODUCT_TYPES)
         .then(({ data }) => data);
 
+export const getActiveProductTypes = (): Promise<ProductType[]> =>
+    axios
+        .getWithRetries<ProductType[]>(ENDPOINTS.PRODUCT_TYPE.GET_ACTIVE_PRODUCT_TYPES)
+        .then(({ data }) => data);
+
 export const getProductTypeById = (id: number): Promise<ProductType> =>
     axios
         .getWithRetries<ProductType>(ENDPOINTS.PRODUCT_TYPE.GET_PRODUCT_TYPE_BY_ID(id))

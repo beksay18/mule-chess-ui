@@ -12,6 +12,7 @@ export const ENDPOINTS = {
         CREATE_PRODUCT_TYPE: "/cg-stickers/api/product-types",
         UPDATE_PRODUCT_TYPE: (id: number | string) => `/cg-stickers/api/product-types/${id}`,
         DELETE_PRODUCT_TYPE: (id: number | string) => `/cg-stickers/api/product-types/${id}`,
+        GET_ACTIVE_PRODUCT_TYPES: "/cg-stickers/api/product-types/public",
     },
     PRODUCT: {
         GET_ALL_PRODUCTS: "/cg-stickers/api/products",
@@ -19,5 +20,6 @@ export const ENDPOINTS = {
         CREATE_PRODUCT: "/cg-stickers/api/products",
         UPDATE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
         DELETE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
+        GET_ACTIVE_PRODUCTS: "/cg-stickers/api/products/public",
     },
 }

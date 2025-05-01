@@ -15,10 +15,11 @@ import Menu from '@mui/material/Menu';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {getCurrentUser, logout} from "../../api";
 import Avatar from "@mui/material/Avatar";
-import {useCallback, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {useRouter} from "../../routes/hooks";
 import MenuList from "@mui/material/MenuList";
 import Popover from "@mui/material/Popover";
+import {getActiveProductTypes, ProductType} from "../../api/productType";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -36,6 +37,16 @@ export default function Header() {
     const openMenu = Boolean(anchorEl);
     const [open, setOpen] = React.useState(false);
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+    useEffect(() => {
+        loadProductTypes();
+    }, []);
+
+    const loadProductTypes = async () => {
+        const data = await getActiveProductTypes();
+        setProductTypes(data);
+    };
 
     const toggleDrawer = (newOpen: boolean) => () => {
         setOpen(newOpen);
@@ -103,9 +114,16 @@ export default function Header() {
                             onClose={handleCloseMenu}
                             MenuListProps={{'aria-labelledby': 'products-button'}}
                         >
-                            <MenuItem onClick={handleCloseMenu}>Stickers</MenuItem>
-                            <MenuItem onClick={handleCloseMenu}>Banners</MenuItem>
-                            <MenuItem onClick={handleCloseMenu}>Popular</MenuItem>
+                            {productTypes.map((type) => (
+                                <MenuItem
+                                    key={type.id}
+                                    onClick={() => {
+                                        handleCloseMenu();
+                                    }}
+                                >
+                                    {type.name}
+                                </MenuItem>
+                            ))}
                         </Menu>
 
                         <Button size="medium" sx={{color: 'text.primary', fontWeight: 500}}>
@@ -121,14 +139,23 @@ export default function Header() {
                     }}
                 >
                     {user ? (
-                        <>
+                        user.role === 'ROLE_ADMIN' ? (
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                size="medium"
+                                onClick={() => router.push('/dashboard')}
+                            >
+                                Go to Dashboard
+                            </Button>
+                        ) : (
                             <IconButton onClick={handleOpenPopover}>
                                 <Avatar sx={{ bgcolor: 'primary.main' }}>
                                     {user?.person?.firstName?.[0]?.toUpperCase()}
                                     {user?.person?.lastName?.[0]?.toUpperCase()}
                                 </Avatar>
                             </IconButton>
-                        </>
+                        )
                     ) : (
                         <Button color="primary" variant="text" size="medium" href="/sign-in">
                             Sign in

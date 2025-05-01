@@ -8,10 +8,9 @@ import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import TwitterIcon from '@mui/icons-material/X';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import {useEffect, useState} from "react";
+import {getActiveProductTypes, ProductType} from "../../api/productType";
 
 function Copyright() {
     return (
@@ -27,6 +26,17 @@ function Copyright() {
 }
 
 export default function Footer() {
+    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+    useEffect(() => {
+        loadProductTypes();
+    }, []);
+
+    const loadProductTypes = async () => {
+        const data = await getActiveProductTypes();
+        setProductTypes(data);
+    };
+
     return (
         <Container
             sx={{
@@ -100,21 +110,16 @@ export default function Footer() {
                     <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                         Product
                     </Typography>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Features
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Testimonials
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Highlights
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Pricing
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        FAQs
-                    </Link>
+                    {productTypes.map((type) => (
+                        <Link
+                            key={type.id}
+                            color="text.secondary"
+                            variant="body2"
+                            underline="hover"
+                        >
+                            {type.name}
+                        </Link>
+                    ))}
                 </Box>
                 <Box
                     sx={{

@@ -7,6 +7,7 @@ import { styled, useTheme } from '@mui/material/styles';
 
 import { RouterLink } from 'src/routes/components';
 import { logoClasses } from './classes';
+import {getCurrentUser} from "../../api";
 
 // ----------------------------------------------------------------------
 
@@ -19,13 +20,14 @@ export function Logo({
                        sx,
                        disabled,
                        className,
-                       href = '/',
                        isSingle = true,
                        ...other
                      }: LogoProps) {
   const theme = useTheme();
+  const user = getCurrentUser();
+  const href = user?.role === 'ROLE_ADMIN' ? '/dashboard' : '/';
 
-  return (
+    return (
       <LogoRoot
           component={RouterLink}
           href={href}
