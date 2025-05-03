@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import {useEffect, useState} from "react";
 import {getProductById, Product} from "../../../api/product";
 import {useParams} from "react-router-dom";
-import {FormControlLabel, Paper, RadioGroup} from "@mui/material";
+import {FormControlLabel, Paper, RadioGroup, Rating} from "@mui/material";
 import Radio from '@mui/material/Radio';
 
 export default function CustomProductDetails() {
@@ -43,17 +43,33 @@ export default function CustomProductDetails() {
                     }}
                 >
                     <Box sx={{flex: 1}}>
-                        <Typography
-                            component="h2"
-                            variant="h4"
-                            gutterBottom
-                            sx={{color: 'text.primary'}}
-                        >
-                            {customProduct?.name}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Typography
+                                component="h2"
+                                variant="h4"
+                                sx={{ color: 'text.primary' }}
+                            >
+                                {customProduct?.name}
+                            </Typography>
+                            <Rating
+                                name="text-feedback"
+                                value={3.5}
+                                readOnly
+                                precision={0.5}
+                                size="medium"
+                            />
+                            <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
+                                (5,450 reviews)
+                            </Typography>
+                        </Box>
+                        <Typography variant="body1" sx={{ color: 'text.primary', mt: 2 }}>
+                            Price per unit: <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                            ${customProduct?.price}
+                        </Box>
                         </Typography>
                         <Typography
                             variant="body1"
-                            sx={{color: 'text.secondary'}}
+                            sx={{color: 'text.secondary', mt: 2}}
                         >
                             {customProduct?.description}
                         </Typography>
@@ -166,14 +182,30 @@ export default function CustomProductDetails() {
                                     >
                                         {[...(customProduct?.discounts || [])]
                                             .sort((a, b) => a.quantity - b.quantity)
-                                            .map((dim, index) => {
-                                                const label = `${dim.quantity} × ${dim.percentage}`;
+                                            .map((dis, index) => {
+                                                const unitPrice = customProduct?.price ?? 0;
+                                                const discountedTotal = dis.quantity * unitPrice * (1 - dis.percentage / 100);
+
+                                                const label = `${dis.quantity} × $${unitPrice} = $${discountedTotal.toFixed(2)} — Save ${dis.percentage}%`;
+
                                                 return (
                                                     <FormControlLabel
                                                         key={index}
                                                         value={label}
                                                         control={<Radio />}
-                                                        label={label}
+                                                        label={
+                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', pr: 2 }}>
+                                                                <Typography sx={{ minWidth: 60 }}>{dis.quantity}</Typography>
+                                                                <Typography sx={{ minWidth: 130, textAlign: 'right' }}>
+                                                                    ${discountedTotal.toFixed(0)}
+                                                                </Typography>
+                                                                {dis.percentage > 0 && (
+                                                                    <Typography sx={{ color: 'green', fontWeight: 500, minWidth: 120, textAlign: 'right' }}>
+                                                                        Save {dis.percentage}%
+                                                                    </Typography>
+                                                                )}
+                                                            </Box>
+                                                        }
                                                     />
                                                 );
                                             })}
