@@ -20,6 +20,7 @@ import {useRouter} from "../../routes/hooks";
 import MenuList from "@mui/material/MenuList";
 import Popover from "@mui/material/Popover";
 import {getActiveProductTypes, ProductType} from "../../api/productType";
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -138,6 +139,7 @@ export default function Header() {
                         alignItems: 'center',
                     }}
                 >
+                    <ShoppingCartIcon sx={{mr: 2}}/>
                     {user ? (
                         user.role === 'ROLE_ADMIN' ? (
                             <Button

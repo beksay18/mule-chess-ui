@@ -52,6 +52,10 @@ export default function CustomProducts() {
                                     fontWeight: 600,
                                     fontSize: '1.1rem',
                                     textAlign: 'center',
+                                    '&:hover': {
+                                        boxShadow: 4,
+                                        transform: 'translateY(-2px)',
+                                    },
                                 }}
                             >
                                 {customProduct.name}

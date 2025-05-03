@@ -16,7 +16,7 @@ export default function UploadArtwork() {
     };
 
     const handleAddToCart = () => {
-        console.log("Added to cart!");
+        router.push(`/cart`);
     };
 
     const handleBack = () => {

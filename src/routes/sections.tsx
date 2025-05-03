@@ -15,6 +15,7 @@ import {ProductsView} from "../sections/home/products/view";
 import {ProductDetailsView} from "../sections/home/product-details/view";
 import {ProductUploadView} from "../sections/home/product-upload/view";
 import RoleGuard from "./role-guard";
+import {CartView} from "../sections/home/cart/view";
 
 // ----------------------------------------------------------------------
 
@@ -118,6 +119,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'product-upload/:id',
         element: <ProductUploadView />,
+    },
+    {
+        path: 'cart',
+        element: <CartView />,
     },
     {
         path: '404',
