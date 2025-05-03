@@ -133,7 +133,7 @@ export default function ProductForm() {
     const addDiscount = () => {
         setFormData((prev) => ({
             ...prev,
-            discounts: [...prev.discounts, { quantity: 0, percentage: 0 }],
+            discounts: [...prev.discounts, { quantity: 1, percentage: 0 }],
         }));
     };
 
@@ -151,7 +151,7 @@ export default function ProductForm() {
             );
 
             const filteredDiscounts = formData.discounts.filter(
-                (discount) => discount.quantity > 0 && discount.percentage > 0
+                (discount) => discount.quantity > 0
             );
 
             const updatedFormData = { ...formData, dimensions: filteredDimensions, discounts: filteredDiscounts };
@@ -288,6 +288,8 @@ export default function ProductForm() {
                                                     label="Quantity"
                                                     type="number"
                                                     value={discount.quantity}
+                                                    error={discount.quantity === 0}
+                                                    helperText={discount.quantity === 0 ? 'Quantity should not be zero' : ''}
                                                     onChange={(e) =>
                                                         handleDiscountChange(index, 'quantity', parseFloat(e.target.value))
                                                     }
@@ -327,7 +329,6 @@ export default function ProductForm() {
 
                             <Button
                                 variant="contained"
-                                startIcon={<Iconify icon="mingcute:add-line" />}
                                 onClick={handleSubmit}
                                 disabled={!formData.name.trim()}
                             >

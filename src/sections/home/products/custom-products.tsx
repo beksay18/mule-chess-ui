@@ -6,8 +6,10 @@ import Grid from "@mui/material/Grid";
 import {getActiveProducts, Product} from "../../../api/product";
 import {useParams} from "react-router-dom";
 import CustomProductTitle from "./custom-product-title";
+import {useRouter} from "../../../routes/hooks";
 
 export default function CustomProducts() {
+    const router = useRouter();
     const { typeId } = useParams();
     const [customProducts, setCustomProducts] = useState<Product[]>([]);
 
@@ -20,6 +22,10 @@ export default function CustomProducts() {
     const loadProductsByType = async (id: number) => {
         const data = await getActiveProducts(id);
         setCustomProducts(data);
+    };
+
+    const handleProductClick = (productId: number) => {
+        router.push(`/custom-product-details/${productId}`);
     };
 
     return (
@@ -35,6 +41,7 @@ export default function CustomProducts() {
                     {customProducts.map((customProduct) => (
                             <Paper
                                 elevation={3}
+                                onClick={() => handleProductClick(customProduct.id)}
                                 sx={{
                                     p: 2,
                                     width: 160,

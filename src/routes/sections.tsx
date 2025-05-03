@@ -12,6 +12,7 @@ import {DashboardLayout} from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
 import {HomeView} from "../sections/home/view";
 import {ProductsView} from "../sections/home/products/view";
+import {ProductDetailsView} from "../sections/home/product-details/view";
 
 // ----------------------------------------------------------------------
 
@@ -102,6 +103,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'custom-products/:typeId',
         element: <ProductsView />,
+    },
+    {
+        path: 'custom-product-details/:productId',
+        element: <ProductDetailsView />,
     },
     {
         path: '404',
