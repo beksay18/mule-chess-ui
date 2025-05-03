@@ -7,6 +7,7 @@ import {getProductById, Product} from "../../../api/product";
 import {useParams} from "react-router-dom";
 import {FormControlLabel, Paper, RadioGroup, Rating} from "@mui/material";
 import Radio from '@mui/material/Radio';
+import KeyboardTabIcon from '@mui/icons-material/KeyboardTab';
 
 export default function CustomProductDetails() {
     const {productId} = useParams();
@@ -16,6 +17,7 @@ export default function CustomProductDetails() {
     const [customHeight, setCustomHeight] = useState('');
     const [selectedQuantity, setSelectedQuantity] = useState('');
     const [customQuantity, setCustomQuantity] = useState('');
+    const [selectedLamination, setSelectedLamination] = useState('');
 
     useEffect(() => {
         if (productId) {
@@ -43,11 +45,11 @@ export default function CustomProductDetails() {
                     }}
                 >
                     <Box sx={{flex: 1}}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                             <Typography
                                 component="h2"
                                 variant="h4"
-                                sx={{ color: 'text.primary' }}
+                                sx={{color: 'text.primary'}}
                             >
                                 {customProduct?.name}
                             </Typography>
@@ -58,12 +60,12 @@ export default function CustomProductDetails() {
                                 precision={0.5}
                                 size="medium"
                             />
-                            <Typography variant="body2" sx={{ ml: 1, color: 'text.secondary' }}>
+                            <Typography variant="body2" sx={{ml: 1, color: 'text.secondary'}}>
                                 (5,450 reviews)
                             </Typography>
                         </Box>
-                        <Typography variant="body1" sx={{ color: 'text.primary', mt: 2 }}>
-                            Price per unit: <Box component="span" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                        <Typography variant="body1" sx={{color: 'text.primary', mt: 2}}>
+                            Price per unit: <Box component="span" sx={{fontWeight: 'bold', color: 'primary.main'}}>
                             ${customProduct?.price}
                         </Box>
                         </Typography>
@@ -119,7 +121,7 @@ export default function CustomProductDetails() {
                                                     <FormControlLabel
                                                         key={index}
                                                         value={label}
-                                                        control={<Radio />}
+                                                        control={<Radio/>}
                                                         label={label}
                                                     />
                                                 );
@@ -192,15 +194,26 @@ export default function CustomProductDetails() {
                                                     <FormControlLabel
                                                         key={index}
                                                         value={label}
-                                                        control={<Radio />}
+                                                        control={<Radio/>}
                                                         label={
-                                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', pr: 2 }}>
-                                                                <Typography sx={{ minWidth: 60 }}>{dis.quantity}</Typography>
-                                                                <Typography sx={{ minWidth: 130, textAlign: 'right' }}>
+                                                            <Box sx={{
+                                                                display: 'flex',
+                                                                justifyContent: 'space-between',
+                                                                width: '100%',
+                                                                pr: 2
+                                                            }}>
+                                                                <Typography
+                                                                    sx={{minWidth: 60}}>{dis.quantity}</Typography>
+                                                                <Typography sx={{minWidth: 130, textAlign: 'right'}}>
                                                                     ${discountedTotal.toFixed(0)}
                                                                 </Typography>
                                                                 {dis.percentage > 0 && (
-                                                                    <Typography sx={{ color: 'green', fontWeight: 500, minWidth: 120, textAlign: 'right' }}>
+                                                                    <Typography sx={{
+                                                                        color: 'green',
+                                                                        fontWeight: 500,
+                                                                        minWidth: 120,
+                                                                        textAlign: 'right'
+                                                                    }}>
                                                                         Save {dis.percentage}%
                                                                     </Typography>
                                                                 )}
@@ -228,6 +241,68 @@ export default function CustomProductDetails() {
                                     </RadioGroup>
                                 </Box>
                             </Paper>
+                            <Paper
+                                sx={[
+                                    (theme) => ({
+                                        p: 2,
+                                        textAlign: 'left',
+                                        justifyContent: 'flex-start',
+                                        alignItems: 'flex-start',
+                                        display: 'flex',
+                                        '&:hover': {
+                                            backgroundColor: (theme.vars || theme).palette.action.hover,
+                                        },
+                                    }),
+                                ]}
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
+                                        <Typography variant="h6">Select lamination finish</Typography>
+                                    </Box>
+                                    <RadioGroup
+                                        name="product-lamination"
+                                        value={selectedLamination}
+                                        onChange={(e) => setSelectedLamination(e.target.value)}
+                                    >
+                                        <FormControlLabel
+                                            value="gloss"
+                                            control={<Radio/>}
+                                            label="Gloss"
+                                        />
+                                        <FormControlLabel
+                                            value="matte"
+                                            control={<Radio/>}
+                                            label="Matte"
+                                        />
+                                    </RadioGroup>
+                                </Box>
+                            </Paper>
+                            <Box
+                                sx={(theme) => ({
+                                    p: 2,
+                                    textAlign: 'center',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    display: 'flex',
+                                    backgroundColor: theme.palette.primary.main,
+                                    color: theme.palette.primary.contrastText,
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.primary.dark,
+                                    },
+                                })}
+                            >
+                                <Typography sx={{fontWeight: 'bold', mr: 1}}>
+                                    Next: upload artwork
+                                </Typography>
+                                <KeyboardTabIcon/>
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
