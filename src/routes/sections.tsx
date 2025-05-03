@@ -14,6 +14,7 @@ import {HomeView} from "../sections/home/view";
 import {ProductsView} from "../sections/home/products/view";
 import {ProductDetailsView} from "../sections/home/product-details/view";
 import {ProductUploadView} from "../sections/home/product-upload/view";
+import RoleGuard from "./role-guard";
 
 // ----------------------------------------------------------------------
 
@@ -76,6 +77,11 @@ export const routesSection: RouteObject[] = [
             },
             {
                 path: 'products',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <Outlet />
+                    </RoleGuard>
+                ),
                 children: [
                     {path: '', element: <ProductsPage/>},
                     {
