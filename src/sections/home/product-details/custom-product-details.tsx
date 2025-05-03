@@ -8,8 +8,10 @@ import {useParams} from "react-router-dom";
 import {FormControlLabel, Paper, RadioGroup, Rating} from "@mui/material";
 import Radio from '@mui/material/Radio';
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab';
+import {useRouter} from "../../../routes/hooks";
 
 export default function CustomProductDetails() {
+    const router = useRouter();
     const {productId} = useParams();
     const [customProduct, setCustomProduct] = useState<Product | null>(null);
     const [selectedDimension, setSelectedDimension] = useState('');
@@ -24,6 +26,10 @@ export default function CustomProductDetails() {
             getProductById(Number(productId)).then(setCustomProduct);
         }
     }, [productId]);
+
+    const handleUploadArtworkClick = (id: number) => {
+        router.push(`/product-upload/${id}`);
+    };
 
     return (
         <Box
@@ -283,7 +289,9 @@ export default function CustomProductDetails() {
                                     </RadioGroup>
                                 </Box>
                             </Paper>
+                            {customProduct?.id && (
                             <Box
+                                onClick={() => handleUploadArtworkClick(customProduct.id)}
                                 sx={(theme) => ({
                                     p: 2,
                                     textAlign: 'center',
@@ -303,6 +311,7 @@ export default function CustomProductDetails() {
                                 </Typography>
                                 <KeyboardTabIcon/>
                             </Box>
+                            )}
                         </Box>
                     </Box>
                 </Box>

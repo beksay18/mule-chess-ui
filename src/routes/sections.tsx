@@ -13,6 +13,7 @@ import AuthGuard from "./auth-guard";
 import {HomeView} from "../sections/home/view";
 import {ProductsView} from "../sections/home/products/view";
 import {ProductDetailsView} from "../sections/home/product-details/view";
+import {ProductUploadView} from "../sections/home/product-upload/view";
 
 // ----------------------------------------------------------------------
 
@@ -107,6 +108,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'custom-product-details/:productId',
         element: <ProductDetailsView />,
+    },
+    {
+        path: 'product-upload/:id',
+        element: <ProductUploadView />,
     },
     {
         path: '404',
