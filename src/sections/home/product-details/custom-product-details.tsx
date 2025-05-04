@@ -20,6 +20,7 @@ export default function CustomProductDetails() {
     const [selectedQuantity, setSelectedQuantity] = useState('');
     const [customQuantity, setCustomQuantity] = useState('');
     const [selectedLamination, setSelectedLamination] = useState('');
+    const [submitAttempted, setSubmitAttempted] = useState(false);
 
     useEffect(() => {
         if (productId) {
@@ -28,7 +29,15 @@ export default function CustomProductDetails() {
     }, [productId]);
 
     const handleUploadArtworkClick = (id: number) => {
-        router.push(`/product-upload/${id}`);
+        setSubmitAttempted(true);
+
+        const dimensionValid = selectedDimension !== '';
+        const quantityValid = selectedQuantity !== '';
+        const laminationValid = selectedLamination !== '';
+
+        if (dimensionValid && quantityValid && laminationValid) {
+            router.push(`/product-upload/${id}`);
+        }
     };
 
     return (
@@ -101,6 +110,7 @@ export default function CustomProductDetails() {
                                         '&:hover': {
                                             backgroundColor: (theme.vars || theme).palette.action.hover,
                                         },
+                                        border: submitAttempted && !selectedDimension ? '1px solid red' : 'none',
                                     }),
                                 ]}
                             >
@@ -113,6 +123,9 @@ export default function CustomProductDetails() {
                                 >
                                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                         <Typography variant="h6">Select a size</Typography>
+                                        {submitAttempted && !selectedDimension && (
+                                            <Typography color="error" variant="body2">This field is required</Typography>
+                                        )}
                                     </Box>
                                     <RadioGroup
                                         name="product-dimensions"
@@ -170,6 +183,7 @@ export default function CustomProductDetails() {
                                         '&:hover': {
                                             backgroundColor: (theme.vars || theme).palette.action.hover,
                                         },
+                                        border: submitAttempted && !selectedQuantity ? '1px solid red' : 'none',
                                     }),
                                 ]}
                             >
@@ -182,6 +196,9 @@ export default function CustomProductDetails() {
                                 >
                                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                         <Typography variant="h6">Select a quantity</Typography>
+                                        {submitAttempted && !selectedQuantity && (
+                                            <Typography color="error" variant="body2">This field is required</Typography>
+                                        )}
                                     </Box>
                                     <RadioGroup
                                         name="product-quantity"
@@ -258,6 +275,7 @@ export default function CustomProductDetails() {
                                         '&:hover': {
                                             backgroundColor: (theme.vars || theme).palette.action.hover,
                                         },
+                                        border: submitAttempted && !selectedLamination ? '1px solid red' : 'none',
                                     }),
                                 ]}
                             >
@@ -270,6 +288,9 @@ export default function CustomProductDetails() {
                                 >
                                     <Box sx={{display: 'flex', alignItems: 'center', gap: 1}}>
                                         <Typography variant="h6">Select lamination finish</Typography>
+                                        {submitAttempted && !selectedLamination && (
+                                            <Typography color="error" variant="body2">This field is required</Typography>
+                                        )}
                                     </Box>
                                     <RadioGroup
                                         name="product-lamination"

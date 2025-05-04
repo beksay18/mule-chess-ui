@@ -22,4 +22,7 @@ export const ENDPOINTS = {
         DELETE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
         GET_ACTIVE_PRODUCTS: (id: number | string) => `/cg-stickers/api/products/public/${id}`,
     },
+    ORDER: {
+        CREATE_ORDER: "/cg-stickers/api/orders/create",
+    },
 }
