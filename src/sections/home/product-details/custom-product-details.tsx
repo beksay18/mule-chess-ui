@@ -9,6 +9,7 @@ import {FormControlLabel, Paper, RadioGroup, Rating} from "@mui/material";
 import Radio from '@mui/material/Radio';
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab';
 import {useRouter} from "../../../routes/hooks";
+import {useCart} from "../cart/cart-context";
 
 export default function CustomProductDetails() {
     const router = useRouter();
@@ -21,6 +22,7 @@ export default function CustomProductDetails() {
     const [customQuantity, setCustomQuantity] = useState('');
     const [selectedLamination, setSelectedLamination] = useState('');
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const { addItem } = useCart();
 
     useEffect(() => {
         if (productId) {
@@ -36,6 +38,29 @@ export default function CustomProductDetails() {
         const laminationValid = selectedLamination !== '';
 
         if (dimensionValid && quantityValid && laminationValid) {
+            const isCustomSize = selectedDimension === 'custom';
+            const [width, height] = isCustomSize
+                ? [parseFloat(customWidth), parseFloat(customHeight)]
+                : selectedDimension.split('×').map((val) => parseFloat(val.trim().replace('″', '')));
+
+            const isCustomQty = selectedQuantity === 'customQuantity';
+            const quantity = isCustomQty ? parseInt(customQuantity) : parseInt(selectedQuantity);
+
+            const discount = (customProduct?.discounts || []).find(d => d.quantity === quantity);
+            const percentage = discount?.percentage || 0;
+
+            addItem({
+                productId: customProduct?.id || 0,
+                name: customProduct?.name || '',
+                price: customProduct?.price || 0,
+                width,
+                height,
+                quantity,
+                percentage,
+                customDimension: isCustomSize,
+                lamination: selectedLamination
+            });
+
             router.push(`/product-upload/${id}`);
         }
     };

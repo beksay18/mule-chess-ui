@@ -8,8 +8,22 @@ import {
     Paper,
 } from '@mui/material';
 import LockIcon from '@mui/icons-material/Lock';
+import {useCart} from "./cart-context";
+import TextField from "@mui/material/TextField";
+import Table from "@mui/material/Table";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import TableCell from "@mui/material/TableCell";
+import TableBody from "@mui/material/TableBody";
 
-export default function Features() {
+export default function CartPage() {
+    const { cartItems, setCartItems } = useCart();
+
+    const handleQuantityChange = (index: number, quantity: number) => {
+        const updated = [...cartItems];
+        updated[index].quantity = quantity;
+        setCartItems(updated);
+    };
 
     return (
         <Box
@@ -40,26 +54,46 @@ export default function Features() {
                     }}
                 >
                     <Card
-                        variant="outlined"
                         sx={{
                             flex: 7,
-                            minHeight: 400,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: '#f5f5f5',
+                            backgroundColor: 'transparent',
+                            boxShadow: 'none',
                         }}
                     >
-                        <Box
-                            sx={{
-                                width: 300,
-                                height: 300,
-                                backgroundImage: 'url(/placeholder.png)',
-                                backgroundSize: 'contain',
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'center',
-                            }}
-                        />
+                    <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell><strong>Product</strong></TableCell>
+                                    <TableCell><strong>Size</strong></TableCell>
+                                    <TableCell><strong>Finish</strong></TableCell>
+                                    <TableCell><strong>Quantity</strong></TableCell>
+                                    <TableCell><strong>Total</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {cartItems.map((item, i) => (
+                                    <TableRow key={i}>
+                                        <TableCell>{item.name}</TableCell>
+                                        <TableCell>{item.width}&quot; × {item.height}&quot;</TableCell>
+                                        <TableCell>{item.lamination}</TableCell>
+                                        <TableCell>
+                                            <TextField
+                                                type="number"
+                                                value={item.quantity}
+                                                onChange={(e) =>
+                                                    handleQuantityChange(i, parseInt(e.target.value))
+                                                }
+                                                inputProps={{ min: 1 }}
+                                                sx={{ width: 80 }}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            ${(item.price * item.quantity * (1 - item.percentage / 100)).toFixed(2)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </Card>
 
                     <Box sx={{ flex: 3 }}>

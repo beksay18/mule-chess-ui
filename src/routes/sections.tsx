@@ -16,6 +16,7 @@ import {ProductDetailsView} from "../sections/home/product-details/view";
 import {ProductUploadView} from "../sections/home/product-upload/view";
 import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/cart/view";
+import {CartProvider} from "../sections/home/cart/cart-context";
 
 // ----------------------------------------------------------------------
 
