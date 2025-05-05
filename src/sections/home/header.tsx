@@ -21,6 +21,10 @@ import MenuList from "@mui/material/MenuList";
 import Popover from "@mui/material/Popover";
 import {getActiveProductTypes, ProductType} from "../../api/productType";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import {Iconify} from "../../components/iconify";
+import Badge from '@mui/material/Badge';
+import {useCart} from "./cart/cart-context";
+import {primary} from "../../theme";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -34,6 +38,7 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
 export default function Header() {
     const user = getCurrentUser();
     const router = useRouter();
+    const { cartItems, setCartItems } = useCart();
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
     const openMenu = Boolean(anchorEl);
     const [open, setOpen] = React.useState(false);
@@ -139,7 +144,18 @@ export default function Header() {
                         alignItems: 'center',
                     }}
                 >
-                    <ShoppingCartIcon sx={{mr: 2}}/>
+                    <IconButton
+                        onClick={() => router.push('/cart')}
+                        sx={{
+                            '&:hover': {
+                                backgroundColor: 'transparent',
+                            },
+                        }}
+                    >
+                        <Badge badgeContent={cartItems.length} color="warning" sx={{mr: 2}}>
+                            <ShoppingCartIcon/>
+                        </Badge>
+                    </IconButton>
                     {user ? (
                         user.role === 'ROLE_ADMIN' ? (
                             <Button

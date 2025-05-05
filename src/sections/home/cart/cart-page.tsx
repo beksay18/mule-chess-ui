@@ -15,15 +15,24 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
+import Avatar from "@mui/material/Avatar";
+import ClearIcon from '@mui/icons-material/Clear';
+import {useRouter} from "../../../routes/hooks";
 
 export default function CartPage() {
-    const { cartItems, setCartItems } = useCart();
+    const router = useRouter();
+    const { cartItems, setCartItems, removeItem } = useCart();
 
     const handleQuantityChange = (index: number, quantity: number) => {
         const updated = [...cartItems];
         updated[index].quantity = quantity;
         setCartItems(updated);
     };
+
+    const subtotal = cartItems.reduce((total, item) => {
+        const itemTotal = item.price * item.quantity * (1 - item.percentage / 100);
+        return total + itemTotal;
+    }, 0);
 
     return (
         <Box
@@ -62,20 +71,51 @@ export default function CartPage() {
                     >
                     <Table>
                             <TableHead>
-                                <TableRow>
-                                    <TableCell><strong>Product</strong></TableCell>
-                                    <TableCell><strong>Size</strong></TableCell>
-                                    <TableCell><strong>Finish</strong></TableCell>
-                                    <TableCell><strong>Quantity</strong></TableCell>
-                                    <TableCell><strong>Total</strong></TableCell>
+                                <TableRow sx={{
+                                    backgroundColor: 'transparent',
+                                    '& > th': {
+                                        color: 'black',
+                                        fontWeight: 'bold',
+                                    },
+                                    borderBottom: '1px dotted #ccc',
+                                }}>
+                                    <TableCell>Product</TableCell>
+                                    <TableCell>Quantity</TableCell>
+                                    <TableCell>Price</TableCell>
+                                    <TableCell />
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {cartItems.map((item, i) => (
-                                    <TableRow key={i}>
-                                        <TableCell>{item.name}</TableCell>
-                                        <TableCell>{item.width}&quot; × {item.height}&quot;</TableCell>
-                                        <TableCell>{item.lamination}</TableCell>
+                                    <TableRow key={i}
+                                              sx={{
+                                                  borderBottom: '1px dotted #ccc',
+                                              }}>
+                                        <TableCell>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                <Avatar
+                                                    variant="rounded"
+                                                    sx={{
+                                                        width: 70,
+                                                        height: 70,
+                                                        flexShrink: 0,
+                                                        bgcolor: 'primary.main',
+                                                        fontSize: 20,
+                                                        fontWeight: 'bold',
+                                                    }}
+                                                >
+                                                    {item.name.charAt(0)}
+                                                </Avatar>
+
+                                                <Box>
+                                                    <Typography variant="body1">{item.name}</Typography>
+                                                    <Typography variant="body2">
+                                                        {item.width}&quot; × {item.height}&quot;
+                                                    </Typography>
+                                                    <Typography variant="body2">{item.lamination}</Typography>
+                                                </Box>
+                                            </Box>
+                                        </TableCell>
                                         <TableCell>
                                             <TextField
                                                 type="number"
@@ -88,7 +128,29 @@ export default function CartPage() {
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            ${(item.price * item.quantity * (1 - item.percentage / 100)).toFixed(2)}
+                                            {item.percentage > 0 ? (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                    <Typography
+                                                        variant="body2"
+                                                        sx={{ textDecoration: 'line-through', color: 'text.secondary' }}
+                                                    >
+                                                        ${(item.price * item.quantity).toFixed(2)}
+                                                    </Typography>
+                                                    <Typography variant="body1" fontWeight="bold">
+                                                        ${(item.price * item.quantity * (1 - item.percentage / 100)).toFixed(2)}
+                                                    </Typography>
+                                                </Box>
+                                            ) : (
+                                                <Typography variant="body1" fontWeight="bold">
+                                                    ${(item.price * item.quantity).toFixed(2)}
+                                                </Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <ClearIcon
+                                                onClick={() => removeItem(i)}
+                                                sx={{ cursor: 'pointer' }}
+                                            />
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -114,7 +176,7 @@ export default function CartPage() {
                             >
                                 <Typography variant="body1" fontWeight="bold" sx={{mr: 1}}>Subtotal: </Typography>
                                 <Typography variant="body1">
-                                    $904
+                                    ${subtotal.toFixed(2)}
                                 </Typography>
                             </Box>
 
@@ -135,7 +197,16 @@ export default function CartPage() {
                                     Checkout
                                 </Button>
                             </Box>
-                            <Typography variant="body1">
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        color: 'primary.dark',
+                                    },
+                                }}
+                                onClick={() => router.push('/')}
+                            >
                                 or continue shopping
                             </Typography>
                         </Paper>
