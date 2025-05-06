@@ -1,6 +1,6 @@
-import { axios } from "../http";
-import { ENDPOINTS } from "../constant";
-import { OrderRequest, OrderResponse } from "./type";
+import {axios} from "../http";
+import {ENDPOINTS} from "../constant";
+import {OrderRequest, OrderResponse} from "./type";
 
 export const createOrder = (
     payload: OrderRequest
@@ -9,7 +9,10 @@ export const createOrder = (
         .postWithRetries<OrderResponse, OrderRequest>(
             ENDPOINTS.ORDER.CREATE_ORDER,
             payload,
-            undefined
-        )
-        .then(({ data }) => data);
+            {
+                headers: {
+                    'x-skip-auth': 'true',
+                },
+            })
+        .then(({data}) => data);
 
