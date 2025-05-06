@@ -57,9 +57,9 @@ export default function CheckoutPage() {
         };
 
         try {
-            await createOrder(payload);
+            const order = await createOrder(payload);
             setCartItems([]);
-            router.push('/order-confirmation');
+            router.push(`/order-confirmation?orderNumber=${order.orderNumber}`);
         } catch (error) {
             console.error('Order placement failed', error);
             alert('Failed to place order. Please try again.');

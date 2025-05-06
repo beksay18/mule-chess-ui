@@ -17,6 +17,7 @@ import {ProductUploadView} from "../sections/home/create-order/product-upload/vi
 import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/create-order/cart/view";
 import {CheckoutView} from "../sections/home/create-order/checkout/view";
+import {OrderConfirmationView} from "../sections/home/create-order/order-confirmation/view";
 
 // ----------------------------------------------------------------------
 
@@ -128,6 +129,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'checkout',
         element: <CheckoutView />,
+    },
+    {
+        path: 'order-confirmation',
+        element: <OrderConfirmationView />,
     },
     {
         path: '404',
