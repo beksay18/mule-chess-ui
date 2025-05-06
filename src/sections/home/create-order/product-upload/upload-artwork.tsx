@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import TextField from "@mui/material/TextField";
 import {useParams} from "react-router-dom";
-import {useRouter} from "../../../routes/hooks";
+import {useRouter} from "../../../../routes/hooks";
 import Button from "@mui/material/Button";
 
 export default function UploadArtwork() {

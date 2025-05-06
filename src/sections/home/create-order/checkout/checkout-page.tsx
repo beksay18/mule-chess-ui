@@ -7,11 +7,11 @@ import {
     Typography,
     Paper,
 } from '@mui/material';
-import {useRouter} from "../../../routes/hooks";
+import {useRouter} from "../../../../routes/hooks";
 import {useCart} from "../cart/cart-context";
 import TextField from "@mui/material/TextField";
-import {createOrder, LineItemRequest, OrderRequest, ShippingAddressRequest} from "../../../api/order";
-import {getCurrentUser} from "../../../api";
+import {createOrder, LineItemRequest, OrderRequest, ShippingAddressRequest} from "../../../../api/order";
+import {getCurrentUser} from "../../../../api";
 
 export default function CheckoutPage() {
     const router = useRouter();
@@ -72,8 +72,6 @@ export default function CheckoutPage() {
             sx={{
                 width: '100%',
                 backgroundRepeat: 'no-repeat',
-                backgroundImage:
-                    'radial-gradient(ellipse 95% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
                 py: 8,
             }}
         >

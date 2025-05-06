@@ -23,7 +23,7 @@ import {getActiveProductTypes, ProductType} from "../../api/productType";
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {Iconify} from "../../components/iconify";
 import Badge from '@mui/material/Badge';
-import {useCart} from "./cart/cart-context";
+import {useCart} from "./create-order/cart/cart-context";
 import {primary} from "../../theme";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
@@ -88,6 +88,13 @@ export default function Header() {
     }, [router]);
 
     return (
+        <Box
+            id="hero"
+            sx={{
+                width: '100%',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            }}
+        >
         <Container>
             <StyledToolbar variant="dense">
                 <Box sx={{flexGrow: 1, display: 'flex', alignItems: 'center', px: 0}}>
@@ -273,5 +280,6 @@ export default function Header() {
                 </Popover>
             </StyledToolbar>
         </Container>
+        </Box>
     );
 }

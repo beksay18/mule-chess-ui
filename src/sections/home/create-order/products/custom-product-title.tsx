@@ -6,7 +6,7 @@ import Container from '@mui/material/Container';
 import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
-import {getProductTypeById, ProductType} from "../../../api/productType";
+import {getProductTypeById, ProductType} from "../../../../api/productType";
 import {Rating} from "@mui/material";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({

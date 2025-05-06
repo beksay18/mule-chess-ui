@@ -1,5 +1,5 @@
-import Header from "../../header";
-import Footer from "../../footer";
+import Header from "../../../header";
+import Footer from "../../../footer";
 import CustomProducts from "../custom-products";
 
 export function ProductsView() {

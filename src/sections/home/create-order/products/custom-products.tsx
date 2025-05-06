@@ -3,10 +3,10 @@ import Box from '@mui/material/Box';
 import {useEffect, useState} from "react";
 import {Paper} from "@mui/material";
 import Grid from "@mui/material/Grid";
-import {getActiveProducts, Product} from "../../../api/product";
+import {getActiveProducts, Product} from "../../../../api/product";
 import {useParams} from "react-router-dom";
 import CustomProductTitle from "./custom-product-title";
-import {useRouter} from "../../../routes/hooks";
+import {useRouter} from "../../../../routes/hooks";
 
 export default function CustomProducts() {
     const router = useRouter();

@@ -11,13 +11,12 @@ import {AuthLayout} from 'src/layouts/auth';
 import {DashboardLayout} from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
 import {HomeView} from "../sections/home/view";
-import {ProductsView} from "../sections/home/products/view";
-import {ProductDetailsView} from "../sections/home/product-details/view";
-import {ProductUploadView} from "../sections/home/product-upload/view";
+import {ProductsView} from "../sections/home/create-order/products/view";
+import {ProductDetailsView} from "../sections/home/create-order/product-details/view";
+import {ProductUploadView} from "../sections/home/create-order/product-upload/view";
 import RoleGuard from "./role-guard";
-import {CartView} from "../sections/home/cart/view";
-import {CartProvider} from "../sections/home/cart/cart-context";
-import {CheckoutView} from "../sections/home/checkout/view";
+import {CartView} from "../sections/home/create-order/cart/view";
+import {CheckoutView} from "../sections/home/create-order/checkout/view";
 
 // ----------------------------------------------------------------------
 

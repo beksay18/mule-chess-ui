@@ -17,7 +17,7 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import Avatar from "@mui/material/Avatar";
 import ClearIcon from '@mui/icons-material/Clear';
-import {useRouter} from "../../../routes/hooks";
+import {useRouter} from "../../../../routes/hooks";
 
 export default function CartPage() {
     const router = useRouter();

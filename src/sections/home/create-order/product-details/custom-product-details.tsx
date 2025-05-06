@@ -3,12 +3,12 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import {useEffect, useState} from "react";
-import {getProductById, Product} from "../../../api/product";
+import {getProductById, Product} from "../../../../api/product";
 import {useParams} from "react-router-dom";
 import {FormControlLabel, Paper, RadioGroup, Rating} from "@mui/material";
 import Radio from '@mui/material/Radio';
 import KeyboardTabIcon from '@mui/icons-material/KeyboardTab';
-import {useRouter} from "../../../routes/hooks";
+import {useRouter} from "../../../../routes/hooks";
 import {useCart} from "../cart/cart-context";
 
 export default function CustomProductDetails() {
