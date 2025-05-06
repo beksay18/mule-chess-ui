@@ -17,6 +17,7 @@ import {ProductUploadView} from "../sections/home/product-upload/view";
 import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/cart/view";
 import {CartProvider} from "../sections/home/cart/cart-context";
+import {CheckoutView} from "../sections/home/checkout/view";
 
 // ----------------------------------------------------------------------
 
@@ -124,6 +125,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'cart',
         element: <CartView />,
+    },
+    {
+        path: 'checkout',
+        element: <CheckoutView />,
     },
     {
         path: '404',

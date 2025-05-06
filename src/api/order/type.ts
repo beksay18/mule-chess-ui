@@ -1,5 +1,5 @@
 export interface OrderRequest {
-    userId: number;
+    userId?: number;
     customerEmail: string;
     customerPhone: string;
     totalAmount: number;

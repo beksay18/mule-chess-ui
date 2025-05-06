@@ -34,6 +34,10 @@ export default function CartPage() {
         return total + itemTotal;
     }, 0);
 
+    const handleCheckout = () => {
+        router.push('/checkout');
+    };
+
     return (
         <Box
             id="hero"
@@ -193,6 +197,7 @@ export default function CartPage() {
                                         fontSize: '1.2rem',
                                         fontWeight: 'bold',
                                     }}
+                                    onClick={handleCheckout}
                                 >
                                     Checkout
                                 </Button>

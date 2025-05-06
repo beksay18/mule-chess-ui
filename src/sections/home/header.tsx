@@ -146,6 +146,7 @@ export default function Header() {
                 >
                     <IconButton
                         onClick={() => router.push('/cart')}
+                        disabled={cartItems.length === 0}
                         sx={{
                             '&:hover': {
                                 backgroundColor: 'transparent',

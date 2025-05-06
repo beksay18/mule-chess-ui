@@ -37,6 +37,7 @@ export function SignInView() {
           });
 
           SessionStorage.setJSONValue("current-user", {
+              userId: res.id,
               username: res.username,
               role: res.role,
               person: res.person,
