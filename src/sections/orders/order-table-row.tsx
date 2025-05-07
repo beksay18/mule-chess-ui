@@ -1,6 +1,4 @@
 import { useState, useCallback } from 'react';
-
-import Box from '@mui/material/Box';
 import Popover from '@mui/material/Popover';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
@@ -12,7 +10,6 @@ import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
-// This matches your OrderContent API type
 export type UserProps = {
     orderId: number;
     orderNumber: string;
