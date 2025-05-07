@@ -16,22 +16,11 @@ export const createOrder = (
             })
         .then(({data}) => data);
 
-
-export const getAllOrders = ({
-                                 page,
-                                 size,
-                                 filter,
-                             }: {
+export const getAllOrders = ({page, size, filter}: {
     page: number;
     size: number;
     filter?: string;
 }): Promise<OrderResponsePage> =>
-    axios
-        .getWithRetries<OrderResponsePage>(ENDPOINTS.ORDER.GET_ALL_ORDERS, {
-            params: {
-                page,
-                size,
-                filter,
-            },
-        })
-        .then(({data}) => data);
+    axios.getWithRetries<OrderResponsePage>(
+        `${ENDPOINTS.ORDER.GET_ALL_ORDERS}?page=${page}&size=${size}${filter ? `&filter=${encodeURIComponent(filter)}` : ''}`
+    ).then(({data}) => data);

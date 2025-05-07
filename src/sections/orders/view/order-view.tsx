@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
@@ -12,7 +12,7 @@ import { TableNoData } from '../table-no-data';
 import { OrderTableHead } from '../order-table-head';
 import { OrderTableRow } from '../order-table-row';
 import { getAllOrders, OrderContent } from 'src/api/order';
-import {useTable} from "../../../utils/use-table";
+import { useTable } from "../../../utils/use-table";
 
 // ----------------------------------------------------------------------
 
@@ -20,16 +20,19 @@ export function OrderView() {
     const table = useTable(0, 10);
     const [orders, setOrders] = useState<OrderContent[]>([]);
     const [totalOrders, setTotalOrders] = useState(0);
-    const [filterName, setFilterName] = useState('');
+    const [filters, setFilters] = useState('');
 
     useEffect(() => {
+        console.log("Fetching orders with page:", table.page);
         const fetchOrders = async () => {
             try {
                 const response = await getAllOrders({
                     page: table.page,
                     size: table.rowsPerPage,
-                    filter: filterName,
+                    filter: filters,
                 });
+                console.log("Page:", table.page);
+                console.log("Orders returned:", response.content);
                 setOrders(response.content);
                 setTotalOrders(response.totalElements);
             } catch (error) {
@@ -38,13 +41,22 @@ export function OrderView() {
         };
 
         fetchOrders();
-    }, [table.page, table.rowsPerPage, filterName]);
+    }, [table.page, table.rowsPerPage, filters]);
 
     useEffect(() => {
-        table.onResetPage(); // Reset to first page when filter changes
-    }, [filterName]);
+        table.onResetPage();
+    }, [filters]);
 
-    const notFound = !orders.length && !!filterName;
+    const notFound = Array.isArray(orders) && orders.length === 0 && !!filters;
+
+    const handlePageChange = (event: unknown, newPage: number) => {
+        console.log("Pagination changed to page:", newPage);
+        table.onChangePage(event, newPage);
+    };
+
+    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        table.onChangeRowsPerPage(event);
+    };
 
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
@@ -72,8 +84,7 @@ export function OrderView() {
                                         onSelectRow={() => table.onSelectRow(row.orderId.toString())}
                                     />
                                 ))}
-
-                                {notFound && <TableNoData searchQuery={filterName} />}
+                                {notFound && <TableNoData searchQuery={filters} />}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -84,7 +95,10 @@ export function OrderView() {
                     page={table.page}
                     count={totalOrders}
                     rowsPerPage={table.rowsPerPage}
-                    onPageChange={table.onChangePage}
+                    onPageChange={(event, newPage) => {
+                        console.log("UI requested page change to:", newPage);
+                        table.onChangePage(event, newPage);
+                    }}
                     onRowsPerPageChange={table.onChangeRowsPerPage}
                     rowsPerPageOptions={[10, 20, 40]}
                     labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
