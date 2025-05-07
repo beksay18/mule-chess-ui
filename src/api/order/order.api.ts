@@ -1,6 +1,6 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {OrderRequest, OrderResponse} from "./type";
+import {OrderRequest, OrderResponse, OrderResponsePage} from "./type";
 
 export const createOrder = (
     payload: OrderRequest
@@ -16,3 +16,22 @@ export const createOrder = (
             })
         .then(({data}) => data);
 
+
+export const getAllOrders = ({
+                                 page,
+                                 size,
+                                 filter,
+                             }: {
+    page: number;
+    size: number;
+    filter?: string;
+}): Promise<OrderResponsePage> =>
+    axios
+        .getWithRetries<OrderResponsePage>(ENDPOINTS.ORDER.GET_ALL_ORDERS, {
+            params: {
+                page,
+                size,
+                filter,
+            },
+        })
+        .then(({data}) => data);

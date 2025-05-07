@@ -47,9 +47,6 @@ export function UserView() {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h4" sx={{ flexGrow: 1 }}>
-          Users
-        </Typography>
         <Button
           variant="contained"
           color="inherit"

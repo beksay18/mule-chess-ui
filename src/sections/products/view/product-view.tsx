@@ -75,9 +75,6 @@ export function ProductView() {
                     alignItems: 'center',
                 }}
             >
-                <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                    Products
-                </Typography>
                 <Button
                     variant="contained"
                     color="inherit"

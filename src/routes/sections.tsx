@@ -18,11 +18,13 @@ import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/create-order/cart/view";
 import {CheckoutView} from "../sections/home/create-order/checkout/view";
 import {OrderConfirmationView} from "../sections/home/create-order/order-confirmation/view";
+import {OrderView} from "../sections/orders/view";
 
 // ----------------------------------------------------------------------
 
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const UserPage = lazy(() => import('src/pages/user'));
+export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const ProductForm = lazy(() => import('src/sections/products/product-form'));
@@ -64,6 +66,7 @@ export const routesSection: RouteObject[] = [
         ),
         children: [
             {path: 'dashboard', element: <DashboardPage/>},
+            {path: 'orders', element: <OrdersPage/>},
             {path: 'user', element: <UserPage/>},
             {
                 path: 'products-types',

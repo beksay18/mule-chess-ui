@@ -22,6 +22,7 @@ import { AccountPopover } from '../components/account-popover';
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+import Typography from "@mui/material/Typography";
 
 // ----------------------------------------------------------------------
 
@@ -46,6 +47,17 @@ export function DashboardLayout({
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
+  const getPageTitle = (pathname: string): string => {
+    if (pathname.startsWith('/orders')) return 'Orders';
+    if (pathname.startsWith('/user')) return 'Users';
+    if (pathname.startsWith('/products-types')) return 'Product Types';
+    if (pathname.startsWith('/products')) return 'Products';
+    if (pathname.startsWith('/dashboard')) return 'Dashboard';
+    return '';
+  };
+
+  const pageTitle = getPageTitle(location.pathname);
+
   const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
       container: {
@@ -63,16 +75,19 @@ export function DashboardLayout({
         <>
           {/** @slot Nav mobile */}
           <MenuButton
-            onClick={onOpen}
-            sx={{ mr: 1, ml: -1, [theme.breakpoints.up(layoutQuery)]: { display: 'none' } }}
+              onClick={onOpen}
+              sx={{ mr: 1, ml: -1, [theme.breakpoints.up(layoutQuery)]: { display: 'none' } }}
           />
+          {pageTitle && (
+              <Typography variant="h4" ml={3} noWrap>
+                {pageTitle}
+              </Typography>
+          )}
           <NavMobile data={navData} open={open} onClose={onClose} />
         </>
       ),
       rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 0.75 } }}>
-          {/** @slot Searchbar */}
-          <Searchbar />
 
           {/** @slot Account drawer */}
           <AccountPopover data={_account} />
@@ -87,7 +102,14 @@ export function DashboardLayout({
         {...slotProps?.header}
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
-        sx={slotProps?.header?.sx}
+        sx={[
+          {
+            borderBottom: `1px dotted ${theme.palette.divider}`,
+            zIndex: theme.zIndex.appBar,
+            mb: 3,
+          },
+          ...(Array.isArray(slotProps?.header?.sx) ? slotProps.header.sx : [slotProps?.header?.sx]),
+        ]}
       />
     );
   };

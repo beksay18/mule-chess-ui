@@ -71,9 +71,6 @@ export function ProductTypesView() {
                     alignItems: 'center',
                 }}
             >
-                <Typography variant="h4" sx={{ flexGrow: 1 }}>
-                    Product Types
-                </Typography>
                 <Button
                     variant="contained"
                     color="inherit"
