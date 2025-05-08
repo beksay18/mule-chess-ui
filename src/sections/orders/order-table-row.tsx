@@ -10,7 +10,7 @@ import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
-export type UserProps = {
+export type OrderProps = {
     orderId: number;
     orderNumber: string;
     totalAmount: number;
@@ -22,13 +22,13 @@ export type UserProps = {
     state: string;
 };
 
-type UserTableRowProps = {
-    row: UserProps;
+type OrderTableRowProps = {
+    row: OrderProps;
     selected: boolean;
     onSelectRow: () => void;
 };
 
-export function OrderTableRow({ row, selected, onSelectRow }: UserTableRowProps) {
+export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
     const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +46,7 @@ export function OrderTableRow({ row, selected, onSelectRow }: UserTableRowProps)
 
                 <TableCell>{row.customerEmail}</TableCell>
 
-                <TableCell>{row.customerPhone}</TableCell>
+                <TableCell>{row.city}, {row.state}</TableCell>
 
                 <TableCell>${row.totalAmount.toFixed(2)}</TableCell>
 
@@ -55,14 +55,17 @@ export function OrderTableRow({ row, selected, onSelectRow }: UserTableRowProps)
                         color={
                             row.orderStatus.toLowerCase() === 'cancelled'
                                 ? 'error'
-                                : row.orderStatus.toLowerCase() === 'pending'
+                                : row.orderStatus.toLowerCase() === 'ready_to_ship'
                                     ? 'warning'
-                                    : 'success'
+                                    : row.orderStatus.toLowerCase() === 'new'
+                                        ? 'primary'
+                                        : 'success'
                         }
                     >
                         {row.orderStatus}
                     </Label>
                 </TableCell>
+
 
                 <TableCell>{new Date(row.dateCreated).toLocaleDateString()}</TableCell>
 

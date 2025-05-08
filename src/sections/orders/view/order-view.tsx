@@ -8,7 +8,7 @@ import TablePagination from '@mui/material/TablePagination';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
-import { TableNoData } from '../table-no-data';
+import { TableNoData } from '../../../utils/table-no-data';
 import { OrderTableHead } from '../order-table-head';
 import { OrderTableRow } from '../order-table-row';
 import { getAllOrders, OrderContent } from 'src/api/order';
@@ -23,7 +23,6 @@ export function OrderView() {
     const [filters, setFilters] = useState('');
 
     useEffect(() => {
-        console.log("Fetching orders with page:", table.page);
         const fetchOrders = async () => {
             try {
                 const response = await getAllOrders({
@@ -31,8 +30,6 @@ export function OrderView() {
                     size: table.rowsPerPage,
                     filter: filters,
                 });
-                console.log("Page:", table.page);
-                console.log("Orders returned:", response.content);
                 setOrders(response.content);
                 setTotalOrders(response.totalElements);
             } catch (error) {
@@ -49,15 +46,6 @@ export function OrderView() {
 
     const notFound = Array.isArray(orders) && orders.length === 0 && !!filters;
 
-    const handlePageChange = (event: unknown, newPage: number) => {
-        console.log("Pagination changed to page:", newPage);
-        table.onChangePage(event, newPage);
-    };
-
-    const handleRowsPerPageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        table.onChangeRowsPerPage(event);
-    };
-
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Card>
@@ -68,7 +56,7 @@ export function OrderView() {
                                 headLabel={[
                                     { id: 'orderNumber', label: 'Order #' },
                                     { id: 'customerEmail', label: 'Email' },
-                                    { id: 'customerPhone', label: 'Phone' },
+                                    { id: 'location', label: 'Location' },
                                     { id: 'totalAmount', label: 'Total' },
                                     { id: 'orderStatus', label: 'Status' },
                                     { id: 'dateCreated', label: 'Date' },
@@ -96,7 +84,6 @@ export function OrderView() {
                     count={totalOrders}
                     rowsPerPage={table.rowsPerPage}
                     onPageChange={(event, newPage) => {
-                        console.log("UI requested page change to:", newPage);
                         table.onChangePage(event, newPage);
                     }}
                     onRowsPerPageChange={table.onChangeRowsPerPage}
