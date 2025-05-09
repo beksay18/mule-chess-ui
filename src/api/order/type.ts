@@ -5,6 +5,7 @@ export interface OrderRequest {
     totalAmount: number;
     lineItems: LineItemRequest[];
     shippingAddress: ShippingAddressRequest;
+    paymentMethodId: string;
 }
 
 export interface LineItemRequest {
@@ -70,6 +71,7 @@ export interface OrderContent {
     orderStatus: string;
     customerEmail: string;
     customerPhone: string;
+    paymentStatus: string;
     city: string;
     state: string;
 }

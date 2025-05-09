@@ -60,6 +60,7 @@ export function OrderView() {
                                     { id: 'totalAmount', label: 'Total' },
                                     { id: 'orderStatus', label: 'Status' },
                                     { id: 'dateCreated', label: 'Date' },
+                                    { id: 'paymentStatus', label: 'Payment Status' },
                                     { id: '', label: '' },
                                 ]}
                             />

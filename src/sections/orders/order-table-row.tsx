@@ -18,6 +18,7 @@ export type OrderProps = {
     orderStatus: string;
     customerEmail: string;
     customerPhone: string;
+    paymentStatus: string;
     city: string;
     state: string;
 };
@@ -68,6 +69,18 @@ export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps
 
 
                 <TableCell>{new Date(row.dateCreated).toLocaleDateString()}</TableCell>
+
+                <TableCell>
+                    <Label
+                        color={
+                            row.paymentStatus.toLowerCase() === 'unpaid'
+                                        ? 'warning'
+                                        : 'success'
+                        }
+                    >
+                        {row.paymentStatus}
+                    </Label>
+                </TableCell>
 
                 <TableCell align="right">
                     <IconButton onClick={handleOpenPopover}>

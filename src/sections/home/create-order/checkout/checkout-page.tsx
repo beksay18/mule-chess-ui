@@ -93,6 +93,7 @@ export default function CheckoutPage() {
             totalAmount: subtotal,
             lineItems,
             shippingAddress: shipping,
+            paymentMethodId
         };
 
         try {
