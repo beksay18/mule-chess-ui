@@ -3,7 +3,7 @@ import {
     Box,
     Button,
     Card,
-    Container,
+    Container, Paper,
 } from '@mui/material';
 import { useRouter } from '../../../../routes/hooks';
 import { useCart } from '../cart/cart-context';
@@ -12,11 +12,17 @@ import { getCurrentUser } from '../../../../api';
 import OrderSummary from "./order-summary";
 import ShippingInfoSection from "./shipping-info-section";
 import ContactInfoSection from "./contact-info-section";
+import {loadStripe} from "@stripe/stripe-js";
+import {Elements} from "@stripe/react-stripe-js";
+import StripeCardForm from "./stripe-card-form";
 
 export default function CheckoutPage() {
     const router = useRouter();
     const { cartItems, setCartItems } = useCart();
     const user = getCurrentUser();
+    const stripePromise = loadStripe('pk_test_51RMtxDFkgHwmDM7GHaAGBSIdkkVLdjmEGwHoEgLcNEmAgPk4IlAN8AoV76HzYwC1qLJnQvWLPXklGWoJp9504akp00Bo7DOm1d');
+    const [paymentConfirmed, setPaymentConfirmed] = React.useState(false);
+    const [paymentMethodId, setPaymentMethodId] = React.useState<string | null>(null);
 
     const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
     const [customerEmail, setCustomerEmail] = React.useState('');
@@ -73,6 +79,11 @@ export default function CheckoutPage() {
         setErrors(newErrors);
         if (hasError || isPlacingOrder) return;
 
+        if (!paymentConfirmed || !paymentMethodId) {
+            alert("Please confirm card details before placing the order.");
+            return;
+        }
+
         setIsPlacingOrder(true);
 
         const payload: OrderRequest = {
@@ -105,6 +116,7 @@ export default function CheckoutPage() {
             <Container>
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <Card sx={{ flex: 7, backgroundColor: 'transparent', boxShadow: 'none' }}>
+
                         <ContactInfoSection
                             customerEmail={customerEmail}
                             setCustomerEmail={setCustomerEmail}
@@ -119,6 +131,13 @@ export default function CheckoutPage() {
                             errors={errors}
                             usStates={usStates}
                         />
+
+                        <Elements stripe={stripePromise}>
+                            <StripeCardForm onPaymentSuccess={(id) => {
+                                setPaymentMethodId(id);
+                                setPaymentConfirmed(true);
+                            }} />
+                        </Elements>
 
                         <Box sx={{ mt: 2 }}>
                             <Button
