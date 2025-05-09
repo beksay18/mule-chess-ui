@@ -17,6 +17,7 @@ export default function CheckoutPage() {
     const router = useRouter();
     const { cartItems , setCartItems} = useCart();
     const user = getCurrentUser();
+    const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
 
     const [customerEmail, setCustomerEmail] = React.useState('');
     const [customerPhone, setCustomerPhone] = React.useState('');
@@ -46,7 +47,8 @@ export default function CheckoutPage() {
     }, 0);
 
     const handlePlaceOrder = async () => {
-
+        if (isPlacingOrder) return;
+        setIsPlacingOrder(true);
         const payload: OrderRequest = {
             userId: user?.userId,
             customerEmail,
@@ -63,6 +65,8 @@ export default function CheckoutPage() {
         } catch (error) {
             console.error('Order placement failed', error);
             alert('Failed to place order. Please try again.');
+        } finally {
+            setIsPlacingOrder(false);
         }
     };
 
@@ -198,6 +202,7 @@ export default function CheckoutPage() {
                                 color="warning"
                                 size="large"
                                 onClick={handlePlaceOrder}
+                                disabled={isPlacingOrder}
                                 sx={{
                                     fontWeight: 'bold',
                                     textTransform: 'none',
@@ -206,7 +211,7 @@ export default function CheckoutPage() {
                                     borderRadius: 2,
                                 }}
                             >
-                                Place Order
+                                {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
                             </Button>
                         </Box>
                     </Card>
