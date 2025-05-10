@@ -38,3 +38,7 @@ export interface SignUpRequest {
 export interface MessageResponse {
     message: string;
 }
+
+export type GoogleSignInRequest = {
+    idToken: string;
+};
