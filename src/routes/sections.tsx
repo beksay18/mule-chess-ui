@@ -26,6 +26,7 @@ export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
+export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const ProductForm = lazy(() => import('src/sections/products/product-form'));
 export const ProductTypesPage = lazy(() => import('src/pages/product-types'));
@@ -106,6 +107,14 @@ export const routesSection: RouteObject[] = [
         element: (
             <AuthLayout>
                 <SignInPage/>
+            </AuthLayout>
+        ),
+    },
+    {
+        path: 'sign-up',
+        element: (
+            <AuthLayout>
+                <SignUpPage/>
             </AuthLayout>
         ),
     },

@@ -27,3 +27,14 @@ export interface CurrentUser {
         phoneNumber: string | null;
     };
 }
+
+export interface SignUpRequest {
+    username: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+}
+
+export interface MessageResponse {
+    message: string;
+}

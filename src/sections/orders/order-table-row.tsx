@@ -73,9 +73,9 @@ export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps
                 <TableCell>
                     <Label
                         color={
-                            row.paymentStatus.toLowerCase() === 'unpaid'
-                                        ? 'warning'
-                                        : 'success'
+                            row.paymentStatus.toLowerCase() === 'paid'
+                                        ? 'success'
+                                        : 'warning'
                         }
                     >
                         {row.paymentStatus}
