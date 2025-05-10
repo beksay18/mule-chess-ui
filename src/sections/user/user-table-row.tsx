@@ -19,6 +19,7 @@ export type UserProps = {
     phoneNumber: string;
     role: string;
     active: boolean;
+    provider: string;
 };
 
 type UserTableRowProps = {
@@ -68,6 +69,22 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
                         }}
                     >
                         {row.active === true ? 'Active' : row.active === false ? 'Inactive' : 'Unknown'}
+                    </Label>
+                </TableCell>
+
+                <TableCell>
+                    <Label
+                        variant="soft"
+                        color={row.provider === 'GOOGLE' ? 'info' : 'default'}
+                        sx={{
+                            textTransform: 'capitalize',
+                            fontSize: 12,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 1.5,
+                        }}
+                    >
+                        {row.provider === 'GOOGLE' ? 'Google' : 'Local'}
                     </Label>
                 </TableCell>
 

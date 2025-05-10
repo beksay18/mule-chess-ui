@@ -59,6 +59,7 @@ export function UserView() {
                                     { id: 'fullName', label: 'Full Name' },
                                     { id: 'role', label: 'Role' },
                                     { id: 'orderStatus', label: 'Status' },
+                                    { id: 'provider', label: 'Provider' },
                                     { id: 'dateCreated', label: 'Date Created' },
                                     { id: '', label: '' },
                                 ]}

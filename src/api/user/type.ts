@@ -11,6 +11,7 @@ export interface UserContent {
     phoneNumber: string;
     role: string;
     active: boolean;
+    provider: string;
 }
 
 
