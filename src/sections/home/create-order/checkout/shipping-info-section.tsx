@@ -10,8 +10,6 @@ import {
 } from '@mui/material';
 
 interface ShippingAddress {
-    firstName: string;
-    lastName: string;
     addressLine1: string;
     addressLine2: string;
     city: string;
@@ -39,26 +37,6 @@ export default function ShippingInfoSection({
                 Shipping Info
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
-                    <TextField
-                        label="First Name"
-                        fullWidth
-                        required
-                        value={shipping.firstName}
-                        error={errors.firstName}
-                        helperText={errors.firstName && 'First Name is required'}
-                        onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })}
-                    />
-                    <TextField
-                        label="Last Name"
-                        fullWidth
-                        required
-                        value={shipping.lastName}
-                        error={errors.lastName}
-                        helperText={errors.lastName && 'Last Name is required'}
-                        onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })}
-                    />
-                </Box>
 
                 <TextField
                     label="Address Line 1"

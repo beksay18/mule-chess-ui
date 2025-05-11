@@ -55,7 +55,7 @@ export function OrderView() {
                             <OrderTableHead
                                 headLabel={[
                                     { id: 'orderNumber', label: 'Order #' },
-                                    { id: 'customerEmail', label: 'Email' },
+                                    { id: 'customerInfo', label: 'Customer' },
                                     { id: 'location', label: 'Location' },
                                     { id: 'totalAmount', label: 'Total' },
                                     { id: 'orderStatus', label: 'Status' },

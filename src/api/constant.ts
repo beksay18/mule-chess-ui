@@ -29,7 +29,8 @@ export const ENDPOINTS = {
     USER: {
         GET_ALL_USERS: "/cg-stickers/api/user/all-users",
     },
-    PAYMENT: {
-        CREATE_PAYMENT: "/cg-stickers/api/payment/create-payment-intent",
+    PROFILE: {
+        GET_PROFILE_VIEW: (id: number | string) => `/cg-stickers/api/profile/${id}`,
+        UPDATE_PROFILE: (id: number | string) => `/cg-stickers/api/profile/edit/${id}`,
     },
 }

@@ -27,9 +27,9 @@ export default function CheckoutPage() {
     const [isPlacingOrder, setIsPlacingOrder] = React.useState(false);
     const [customerEmail, setCustomerEmail] = React.useState('');
     const [customerPhone, setCustomerPhone] = React.useState('');
+    const [customerFirstName, setCustomerFirstName] = React.useState('');
+    const [customerLastName, setCustomerLast] = React.useState('');
     const [shipping, setShipping] = React.useState<ShippingAddressRequest>({
-        firstName: '',
-        lastName: '',
         addressLine1: '',
         addressLine2: '',
         city: '',
@@ -67,8 +67,8 @@ export default function CheckoutPage() {
         const newErrors = {
             email: customerEmail.trim() === '',
             phone: customerPhone.trim() === '',
-            firstName: shipping.firstName.trim() === '',
-            lastName: shipping.lastName.trim() === '',
+            firstName: customerFirstName.trim() === '',
+            lastName: customerLastName.trim() === '',
             addressLine1: shipping.addressLine1.trim() === '',
             city: shipping.city.trim() === '',
             state: shipping.state.trim() === '',
@@ -90,6 +90,8 @@ export default function CheckoutPage() {
             userId: user?.userId,
             customerEmail,
             customerPhone,
+            customerFirstName,
+            customerLastName,
             totalAmount: subtotal,
             lineItems,
             shippingAddress: shipping,
@@ -119,6 +121,10 @@ export default function CheckoutPage() {
                     <Card sx={{ flex: 7, backgroundColor: 'transparent', boxShadow: 'none' }}>
 
                         <ContactInfoSection
+                            customerFirstName={customerFirstName}
+                            setCustomerFirstName={setCustomerFirstName}
+                            customerLastName={customerLastName}
+                            setCustomerLastName={setCustomerLast}
                             customerEmail={customerEmail}
                             setCustomerEmail={setCustomerEmail}
                             customerPhone={customerPhone}

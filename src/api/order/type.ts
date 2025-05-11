@@ -2,6 +2,8 @@ export interface OrderRequest {
     userId?: number;
     customerEmail: string;
     customerPhone: string;
+    customerFirstName: string;
+    customerLastName: string;
     totalAmount: number;
     lineItems: LineItemRequest[];
     shippingAddress: ShippingAddressRequest;
@@ -18,8 +20,6 @@ export interface LineItemRequest {
 }
 
 export interface ShippingAddressRequest {
-    firstName: string;
-    lastName: string;
     addressLine1: string;
     addressLine2: string;
     city: string;
@@ -36,13 +36,13 @@ export interface OrderResponse {
     userId: number;
     customerEmail: string;
     customerPhone: string;
+    customerFirstName: string;
+    customerLastName: string;
     shippingAddress: ShippingAddressResponse;
     lineItems: LineItemResponse[];
 }
 
 export interface ShippingAddressResponse {
-    firstName: string;
-    lastName: string;
     addressLine1: string;
     addressLine2: string;
     city: string;
@@ -71,6 +71,8 @@ export interface OrderContent {
     orderStatus: string;
     customerEmail: string;
     customerPhone: string;
+    customerFirstName: string;
+    customerLastName: string;
     paymentStatus: string;
     city: string;
     state: string;

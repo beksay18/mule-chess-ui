@@ -16,8 +16,8 @@ export type OrderProps = {
     totalAmount: number;
     dateCreated: string;
     orderStatus: string;
-    customerEmail: string;
-    customerPhone: string;
+    customerFirstName: string;
+    customerLastName: string;
     paymentStatus: string;
     city: string;
     state: string;
@@ -45,7 +45,7 @@ export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps
             <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
                 <TableCell>{row.orderNumber}</TableCell>
 
-                <TableCell>{row.customerEmail}</TableCell>
+                <TableCell>{row.customerFirstName} {row.customerLastName}</TableCell>
 
                 <TableCell>{row.city}, {row.state}</TableCell>
 
