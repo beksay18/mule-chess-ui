@@ -23,11 +23,30 @@ export default function CartPage() {
     const router = useRouter();
     const { cartItems, setCartItems, removeItem } = useCart();
 
-    const handleQuantityChange = (index: number, quantity: number) => {
+    const getDiscountForQuantity = (
+        quantity: number,
+        tiers: { quantity: number; percentage: number }[] = []
+    ): number => {
+        return tiers.reduce((max, tier) =>
+                quantity >= tier.quantity && tier.percentage > max
+                    ? tier.percentage
+                    : max,
+            0
+        );
+    };
+
+    const handleQuantityChange = (index: number, newQuantity: number) => {
+        if (newQuantity < 1) return;
+
         const updated = [...cartItems];
-        updated[index].quantity = quantity;
+        const item = updated[index];
+
+        const newDiscount = getDiscountForQuantity(newQuantity, item.discountTiers);
+        updated[index] = { ...item, quantity: newQuantity, percentage: newDiscount };
+
         setCartItems(updated);
     };
+
 
     const subtotal = cartItems.reduce((total, item) => {
         const itemTotal = item.price * item.quantity * (1 - item.percentage / 100);
@@ -68,7 +87,7 @@ export default function CartPage() {
                 >
                     <Card
                         sx={{
-                            flex: 7,
+                            flex: 6,
                             backgroundColor: 'transparent',
                             boxShadow: 'none',
                         }}
@@ -121,15 +140,39 @@ export default function CartPage() {
                                             </Box>
                                         </TableCell>
                                         <TableCell>
-                                            <TextField
-                                                type="number"
-                                                value={item.quantity}
-                                                onChange={(e) =>
-                                                    handleQuantityChange(i, parseInt(e.target.value))
-                                                }
-                                                inputProps={{ min: 1 }}
-                                                sx={{ width: 80 }}
-                                            />
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onClick={() => handleQuantityChange(i, item.quantity - 1)}
+                                                    disabled={item.quantity <= 1}
+                                                    sx={{ minWidth: 32, px: 0 }}
+                                                >
+                                                    –
+                                                </Button>
+
+                                                <TextField
+                                                    type="number"
+                                                    value={item.quantity}
+                                                    onChange={(e) => {
+                                                        const newQuantity = parseInt(e.target.value, 10);
+                                                        if (!isNaN(newQuantity)) {
+                                                            handleQuantityChange(i, newQuantity);
+                                                        }
+                                                    }}
+                                                    inputProps={{ min: 1, style: { textAlign: 'center', width: '3rem' } }}
+                                                    size="small"
+                                                />
+
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onClick={() => handleQuantityChange(i, item.quantity + 1)}
+                                                    sx={{ minWidth: 32, px: 0 }}
+                                                >
+                                                    +
+                                                </Button>
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             {item.percentage > 0 ? (
@@ -142,6 +185,9 @@ export default function CartPage() {
                                                     </Typography>
                                                     <Typography variant="body1" fontWeight="bold">
                                                         ${(item.price * item.quantity * (1 - item.percentage / 100)).toFixed(2)}
+                                                    </Typography>
+                                                    <Typography variant="caption" color="success">
+                                                        ({item.percentage}% off)
                                                     </Typography>
                                                 </Box>
                                             ) : (
@@ -162,59 +208,83 @@ export default function CartPage() {
                         </Table>
                     </Card>
 
-                    <Box sx={{ flex: 3 }}>
-                        <Paper
-                            elevation={3}
+                    <Box sx={{ flex: 4 }}>
+                    <Paper
+                        elevation={4}
+                        sx={{
+                            p: 4,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 3,
+                            backgroundColor: '#fdfdfd',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                            minHeight: 300,
+                        }}
+                    >
+                        <Typography variant="h6" fontWeight="bold">
+                            Order Summary
+                        </Typography>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant="body1">Subtotal:</Typography>
+                            <Typography variant="body1">${subtotal.toFixed(2)}</Typography>
+                        </Box>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                            <Typography variant="body1">Sales & Promotions:</Typography>
+                            <Typography variant="body1" sx={{ color: 'error.main' }}>
+                                -${(cartItems.reduce((total, item) =>
+                                total + item.price * item.quantity * (item.percentage / 100), 0
+                            )).toFixed(2)}
+                            </Typography>
+                        </Box>
+
+                        <Box
                             sx={{
-                                p: 3,
                                 display: 'flex',
-                                flexDirection: 'column',
-                                gap: 2,
+                                justifyContent: 'space-between',
+                                borderTop: '1px solid #ccc',
+                                pt: 2,
                             }}
                         >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <Typography variant="body1" fontWeight="bold" sx={{mr: 1}}>Subtotal: </Typography>
-                                <Typography variant="body1">
-                                    ${subtotal.toFixed(2)}
-                                </Typography>
-                            </Box>
-
-                            <Box sx={{ display: 'flex',}}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    color="primary"
-                                    size="large"
-                                    endIcon={<LockIcon />}
-                                    sx={{
-                                        textTransform: 'none',
-                                        height: 60,
-                                        fontSize: '1.2rem',
-                                        fontWeight: 'bold',
-                                    }}
-                                    onClick={handleCheckout}
-                                >
-                                    Checkout
-                                </Button>
-                            </Box>
-                            <Typography
-                                variant="body1"
-                                sx={{
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                        color: 'primary.dark',
-                                    },
-                                }}
-                                onClick={() => router.push('/')}
-                            >
-                                or continue shopping
+                            <Typography variant="body1" fontWeight="bold">
+                                Order Total:
                             </Typography>
-                        </Paper>
+                            <Typography variant="body1" fontWeight="bold">
+                                ${subtotal.toFixed(2)}
+                            </Typography>
+                        </Box>
+
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            endIcon={<LockIcon />}
+                            sx={{
+                                textTransform: 'none',
+                                height: 60,
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                            }}
+                            onClick={handleCheckout}
+                        >
+                            Checkout
+                        </Button>
+
+                        <Typography
+                            variant="body1"
+                            sx={{
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    color: 'primary.dark',
+                                },
+                            }}
+                            onClick={() => router.push('/')}
+                        >
+                            or continue shopping
+                        </Typography>
+                    </Paper>
                     </Box>
                 </Box>
             </Container>

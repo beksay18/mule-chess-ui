@@ -30,6 +30,14 @@ export default function CustomProductDetails() {
         }
     }, [productId]);
 
+    const getBestDiscount = (qty: number) => {
+        const tiers = customProduct?.discounts || [];
+        return tiers.reduce((acc, tier) =>
+                qty >= tier.quantity && tier.percentage > acc.percentage ? tier : acc,
+            { quantity: 0, percentage: 0 }
+        );
+    };
+
     const handleUploadArtworkClick = (id: number) => {
         setSubmitAttempted(true);
 
@@ -46,8 +54,7 @@ export default function CustomProductDetails() {
             const isCustomQty = selectedQuantity === 'customQuantity';
             const quantity = isCustomQty ? parseInt(customQuantity) : parseInt(selectedQuantity);
 
-            const discount = (customProduct?.discounts || []).find(d => d.quantity === quantity);
-            const percentage = discount?.percentage || 0;
+            const bestDiscount = getBestDiscount(quantity);
 
             addItem({
                 productId: customProduct?.id || 0,
@@ -56,9 +63,10 @@ export default function CustomProductDetails() {
                 width,
                 height,
                 quantity,
-                percentage,
+                percentage: bestDiscount.percentage,
                 customDimension: isCustomSize,
-                lamination: selectedLamination
+                lamination: selectedLamination,
+                discountTiers: customProduct?.discounts || []
             });
 
             router.push(`/product-upload/${id}`);
