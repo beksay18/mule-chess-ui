@@ -39,7 +39,7 @@ export default function HomeOverview() {
                             fontSize: 'clamp(3rem, 10vw, 3.5rem)',
                         }}
                     >
-                        Print&nbsp;custom&nbsp;
+                        Create&nbsp;custom&nbsp;
                         <Typography
                             component="span"
                             variant="h2"
@@ -75,15 +75,32 @@ export default function HomeOverview() {
                             width: { sm: '100%', md: '80%' },
                         }}
                     >
-                        Get a free proof before printing, fast print turnaround and free fast shipping.
+                        Enjoy free digital proofs, quick production, and complimentary express shipping.
                     </Typography>
                     <Button
-                        variant="contained"
-                        color="primary"
-                        size="medium"
-                        sx={{ minWidth: 'fit-content' }}
+                        sx={{
+                            mt: { xs: 2, sm: 0 },
+                            px: 4,
+                            py: 1.5,
+                            fontWeight: 'bold',
+                            fontSize: '1rem',
+                            borderRadius: 2,
+                            backgroundColor: 'white',
+                            color: '#1976d2',
+                            textTransform: 'none',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                backgroundColor: '#f0f0f0',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                        onClick={() => {
+                            console.log('Contact Us clicked');
+                        }}
                     >
-                        Shop stickers
+                        Shop Stickers
                     </Button>
                 </Stack>
             </Container>

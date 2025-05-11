@@ -26,14 +26,14 @@ export default function CartPage() {
     const getDiscountForQuantity = (
         quantity: number,
         tiers: { quantity: number; percentage: number }[] = []
-    ): number => {
-        return tiers.reduce((max, tier) =>
+    ): number =>
+        tiers.reduce((max, tier) =>
                 quantity >= tier.quantity && tier.percentage > max
                     ? tier.percentage
                     : max,
             0
         );
-    };
+
 
     const handleQuantityChange = (index: number, newQuantity: number) => {
         if (newQuantity < 1) return;
@@ -47,11 +47,17 @@ export default function CartPage() {
         setCartItems(updated);
     };
 
+    const subtotal = cartItems.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+    );
 
-    const subtotal = cartItems.reduce((total, item) => {
-        const itemTotal = item.price * item.quantity * (1 - item.percentage / 100);
-        return total + itemTotal;
-    }, 0);
+    const totalDiscount = cartItems.reduce(
+        (total, item) => total + item.price * item.quantity * (item.percentage / 100),
+        0
+    );
+
+    const orderTotal = subtotal - totalDiscount;
 
     const handleCheckout = () => {
         router.push('/checkout');
@@ -231,11 +237,9 @@ export default function CartPage() {
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Typography variant="body1">Sales & Promotions:</Typography>
+                            <Typography variant="body1">Savings:</Typography>
                             <Typography variant="body1" sx={{ color: 'error.main' }}>
-                                -${(cartItems.reduce((total, item) =>
-                                total + item.price * item.quantity * (item.percentage / 100), 0
-                            )).toFixed(2)}
+                                -${totalDiscount.toFixed(2)}
                             </Typography>
                         </Box>
 
@@ -251,7 +255,7 @@ export default function CartPage() {
                                 Order Total:
                             </Typography>
                             <Typography variant="body1" fontWeight="bold">
-                                ${subtotal.toFixed(2)}
+                                ${orderTotal.toFixed(2)}
                             </Typography>
                         </Box>
 
