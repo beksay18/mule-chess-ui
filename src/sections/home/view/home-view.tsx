@@ -7,6 +7,7 @@ import HomeProducts from "../home-products";
 import Footer from "../footer";
 import Header from "../header";
 import HelpOverview from "../help-overview";
+import TrustedBrands from "../trusted-brands";
 
 // ----------------------------------------------------------------------
 
@@ -16,6 +17,7 @@ export function HomeView() {
       <Header/>
       <HomeOverview/>
       <HomeProducts/>
+      <TrustedBrands />
       <HelpOverview />
       <Footer/>
     </>
