@@ -24,7 +24,7 @@ export default function HomeProducts() {
     };
 
     return (
-        <Box id="logoCollection" sx={{ py: 4 }}>
+        <Box sx={{ py: 5, backgroundColor: '#eaecec' }}>
             <Grid container spacing={3} justifyContent="center">
                 {productTypes.map((productType) => (
                         <Paper
