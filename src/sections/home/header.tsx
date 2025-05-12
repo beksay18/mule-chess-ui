@@ -12,7 +12,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Typography from "@mui/material/Typography";
 import Menu from '@mui/material/Menu';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import {getCurrentUser, logout} from "../../api";
 import Avatar from "@mui/material/Avatar";
 import {useCallback, useEffect, useState} from "react";
@@ -24,7 +23,7 @@ import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import {Iconify} from "../../components/iconify";
 import Badge from '@mui/material/Badge';
 import {useCart} from "./create-order/cart/cart-context";
-import {primary} from "../../theme";
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -66,7 +65,7 @@ export default function Header() {
         setAnchorEl(null);
     };
 
-    const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleOpenPopover = useCallback((event: any) => {
         setOpenPopover(event.currentTarget);
     }, []);
 
@@ -167,20 +166,43 @@ export default function Header() {
                     {user ? (
                         user.role === 'ROLE_ADMIN' ? (
                             <Button
-                                color="primary"
-                                variant="contained"
-                                size="medium"
                                 onClick={() => router.push('/dashboard')}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    color: 'text.primary',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 2,
+                                    px: 2,
+                                    py: 1,
+                                    '&:hover': {
+                                        backgroundColor: 'action.hover',
+                                    },
+                                }}
                             >
                                 Go to Dashboard
                             </Button>
                         ) : (
-                            <IconButton onClick={handleOpenPopover}>
-                                <Avatar sx={{ bgcolor: 'primary.main' }}>
-                                    {user?.person?.firstName?.[0]?.toUpperCase()}
-                                    {user?.person?.lastName?.[0]?.toUpperCase()}
-                                </Avatar>
-                            </IconButton>
+                            <Button
+                                onClick={handleOpenPopover}
+                                sx={{
+                                    textTransform: 'none',
+                                    fontWeight: 500,
+                                    color: 'text.primary',
+                                    border: '1px solid',
+                                    borderColor: 'divider',
+                                    borderRadius: 2,
+                                    px: 2,
+                                    py: 1,
+                                    '&:hover': {
+                                        backgroundColor: 'action.hover',
+                                    },
+                                }}
+                                endIcon={<ArrowDropDownIcon />}
+                            >
+                                {user?.person?.firstName}
+                            </Button>
                         )
                     ) : (
                         <Button color="primary" variant="text" size="medium" href="/sign-in">
