@@ -124,6 +124,10 @@ export const routesSection: RouteObject[] = [
         element: <HomeView/>,
     },
     {
+        index: true,
+        element: <HomeView/>,
+    },
+    {
         path: 'custom-products/:typeId',
         element: <ProductsView />,
     },
