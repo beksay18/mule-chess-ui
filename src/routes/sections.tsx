@@ -57,6 +57,7 @@ const renderFallback = () => (
 
 export const routesSection: RouteObject[] = [
     {
+        path: '/',
         element: (
             <AuthGuard>
                 <DashboardLayout>
@@ -118,10 +119,6 @@ export const routesSection: RouteObject[] = [
                 <SignUpPage/>
             </AuthLayout>
         ),
-    },
-    {
-        path: '',
-        element: <HomeView/>,
     },
     {
         index: true,
