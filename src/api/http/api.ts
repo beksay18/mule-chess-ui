@@ -9,6 +9,7 @@ import {get} from "lodash";
 import {requestInterceptor, responseInterceptor} from "./interceptors";
 
 type AllowedActions = "get" | "post" | "put" | "delete";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 interface RetryableAxiosInstance extends AxiosInstance {
     getWithRetries: <T>(
@@ -37,7 +38,7 @@ interface RetryableAxiosInstance extends AxiosInstance {
 const MAX_RETRIES = 2;
 
 const instance: RetryableAxiosInstance = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: API_BASE_URL,
     timeout: 2000,
     headers: {"Content-Type": "application/json"},
 }) as RetryableAxiosInstance;

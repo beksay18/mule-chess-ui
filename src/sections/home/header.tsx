@@ -205,7 +205,8 @@ export default function Header() {
                             </Button>
                         )
                     ) : (
-                        <Button color="primary" variant="text" size="medium" href="/sign-in">
+                        <Button color="primary" variant="text" size="medium" href="/sign-in"
+                                sx={{ border: '1px solid', borderColor: 'primary.main' }} >
                             Sign in
                         </Button>
                     )}
@@ -238,12 +239,33 @@ export default function Header() {
 
                             <MenuItem>Products</MenuItem>
                             <MenuItem>For Businesses</MenuItem>
-                            <Divider sx={{my: 3}}/>
-                            <MenuItem>
-                                <Button color="primary" variant="outlined" fullWidth>
-                                    Sign in
-                                </Button>
-                            </MenuItem>
+                            {user ? (
+                                <>
+                                    <Divider sx={{ my: 2 }} />
+                                    <Box sx={{ px: 2, pb: 2 }}>
+                                        <Typography variant="subtitle2" noWrap>
+                                            {user.person.firstName} {user.person.lastName}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+                                            {user.username}
+                                        </Typography>
+                                    </Box>
+                                    <MenuItem onClick={() => router.push('/profile')}>Profile</MenuItem>
+                                    <MenuItem onClick={() => router.push('/my-orders')}>My Orders</MenuItem>
+                                    <Divider sx={{ my: 2 }} />
+                                    <MenuItem>
+                                        <Button color="error" fullWidth onClick={handleLogout}>
+                                            Logout
+                                        </Button>
+                                    </MenuItem>
+                                </>
+                            ) : (
+                                <MenuItem>
+                                    <Button color="primary" variant="outlined" fullWidth href="/sign-in">
+                                        Sign in
+                                    </Button>
+                                </MenuItem>
+                            )}
                         </Box>
                     </Drawer>
                 </Box>
