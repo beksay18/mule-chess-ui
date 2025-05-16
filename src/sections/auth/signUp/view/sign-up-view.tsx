@@ -9,6 +9,7 @@ export function SignUpView() {
     const handleSignUp = async (form: {
         firstName: string;
         lastName: string;
+        phoneNumber: string;
         username: string;
         password: string;
     }) => {

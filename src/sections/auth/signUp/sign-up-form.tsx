@@ -13,6 +13,7 @@ type Props = {
     onSubmit: (data: {
         firstName: string;
         lastName: string;
+        phoneNumber: string;
         username: string;
         password: string;
     }) => void;
@@ -22,6 +23,7 @@ export function SignUpForm({ onSubmit }: Props) {
     const [form, setForm] = useState({
         firstName: '',
         lastName: '',
+        phoneNumber: '',
         username: '',
         password: '',
     });
@@ -29,6 +31,7 @@ export function SignUpForm({ onSubmit }: Props) {
     const [errors, setErrors] = useState({
         firstName: false,
         lastName: false,
+        phoneNumber: false,
         username: false,
         password: false,
     });
@@ -42,6 +45,7 @@ export function SignUpForm({ onSubmit }: Props) {
         const newErrors = {
             firstName: form.firstName.trim() === '',
             lastName: form.lastName.trim() === '',
+            phoneNumber: form.phoneNumber.trim() === '',
             username: form.username.trim() === '' || !isValidEmail(form.username),
             password: form.password.trim() === '',
         };
@@ -73,6 +77,16 @@ export function SignUpForm({ onSubmit }: Props) {
                 required
                 error={errors.lastName}
                 helperText={errors.lastName && 'Last name is required'}
+                sx={{ mb: 2 }}
+            />
+            <TextField
+                fullWidth
+                label="Phone Number"
+                value={form.phoneNumber}
+                onChange={(e) => handleChange('phoneNumber', e.target.value)}
+                required
+                error={errors.phoneNumber}
+                helperText={errors.phoneNumber && 'Phone Number is required'}
                 sx={{ mb: 2 }}
             />
             <TextField
