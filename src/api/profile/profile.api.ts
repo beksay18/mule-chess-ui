@@ -1,6 +1,6 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {MessageResponse, ProfileRequest, PasswordRequest} from "./type";
+import {MessageResponse, ProfileRequest, PasswordRequest, PersonResponse} from "./type";
 
 export const changePassword = (
     userId: number,
@@ -17,9 +17,9 @@ export const changePassword = (
 export const updatePersonalInfo = (
     userId: number,
     payload: ProfileRequest
-): Promise<MessageResponse> =>
+): Promise<PersonResponse> =>
     axios
-        .postWithRetries<MessageResponse, ProfileRequest>(
+        .postWithRetries<PersonResponse, ProfileRequest>(
             ENDPOINTS.PROFILE.UPDATE_PERSONAL_INFO(userId),
             payload,
             undefined

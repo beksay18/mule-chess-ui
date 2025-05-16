@@ -8,6 +8,12 @@ export interface MessageResponse {
     message: string;
 }
 
+export interface PersonResponse {
+    firstName: string;
+    lastName: string;
+    phoneNumber: string;
+}
+
 export interface PasswordRequest {
     oldPassword: string;
     newPassword: string;

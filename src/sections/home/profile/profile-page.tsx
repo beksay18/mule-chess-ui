@@ -8,10 +8,18 @@ import {
 import { getCurrentUser } from '../../../api';
 import ShippingAddressSection from "./shipping-address-section";
 import ChangePasswordDialog from "./change-password-dialog";
+import UpdateProfileDialog from "./update-profile-dialog";
 
 export default function ProfilePage() {
     const user = getCurrentUser();
     const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
+    const [updateProfileOpen, setUpdateProfileOpen] = React.useState(false);
+
+    const initialProfile = {
+        firstName: user?.person?.firstName || '',
+        lastName: user?.person?.lastName || '',
+        phoneNumber: user?.person?.phoneNumber || '',
+    };
 
     return (
         <Container sx={{ mt: 5 }}>
@@ -44,22 +52,27 @@ export default function ProfilePage() {
                             left: 24,
                         }}
                     />
-                    <Box sx={{ ml: 16, pt: 3 }}>
+                    <Box sx={{ ml: 16, pt: -5 }}>
                         <Typography variant="h5" fontWeight={700}>
                             {user?.person?.firstName} {user?.person?.lastName}
                         </Typography>
                         <Typography variant="body2" sx={{ mt: 1 }}>
                             {user?.username}
                         </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                            {user?.person?.phoneNumber}
+                        </Typography>
                     </Box>
                 </Box>
 
                 {user?.userId && (
                     <>
-                        <ShippingAddressSection userId={user.userId} />
                         <Box sx={{ mt: 3 }}>
                             <Button variant="outlined" onClick={() => setChangePasswordOpen(true)}>
                                 Change Password
+                            </Button>
+                            <Button variant="outlined" onClick={() => setUpdateProfileOpen(true)} sx={{ml: 2}}>
+                                Update Profile Info
                             </Button>
                         </Box>
                         <ChangePasswordDialog
@@ -67,6 +80,13 @@ export default function ProfilePage() {
                             onClose={() => setChangePasswordOpen(false)}
                             userId={user.userId}
                         />
+                        <UpdateProfileDialog
+                            open={updateProfileOpen}
+                            onClose={() => setUpdateProfileOpen(false)}
+                            userId={user.userId}
+                            initialData={initialProfile}
+                        />
+                        <ShippingAddressSection userId={user.userId}  />
                     </>
                 )}
             </Box>
