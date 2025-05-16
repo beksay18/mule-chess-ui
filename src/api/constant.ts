@@ -30,8 +30,8 @@ export const ENDPOINTS = {
         GET_ALL_USERS: "/cg-stickers/api/user/all-users",
     },
     PROFILE: {
-        GET_PROFILE_VIEW: (id: number | string) => `/cg-stickers/api/profile/${id}`,
-        UPDATE_PROFILE: (id: number | string) => `/cg-stickers/api/profile/edit/${id}`,
+        CHANGE_PASSWORD: (userId: number | string) => `/cg-stickers/api/profile/change-password/${userId}`,
+        UPDATE_PERSONAL_INFO: (userId: number | string) => `/cg-stickers/api/profile/edit-personal-info/${userId}`,
     },
     SHIPPING_ADDRESS: {
         CREATE_SHIPPING: (userId: number) => `/cg-stickers/api/shipping-address/${userId}`,

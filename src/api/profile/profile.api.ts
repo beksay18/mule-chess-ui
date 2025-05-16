@@ -1,19 +1,26 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {ProfileActionResponse, ProfileRequest, ProfileResponse} from "./type";
+import {MessageResponse, ProfileRequest, PasswordRequest} from "./type";
 
-export const getProfile = (id: number): Promise<ProfileResponse> =>
+export const changePassword = (
+    userId: number,
+    payload: PasswordRequest
+): Promise<MessageResponse> =>
     axios
-        .getWithRetries<ProfileResponse>(ENDPOINTS.PROFILE.GET_PROFILE_VIEW(id))
+        .putWithRetries<MessageResponse, PasswordRequest>(
+            ENDPOINTS.PROFILE.CHANGE_PASSWORD(userId),
+            payload,
+            undefined
+        )
         .then(({ data }) => data);
 
-export const updateProfile = (
-    id: number,
+export const updatePersonalInfo = (
+    userId: number,
     payload: ProfileRequest
-): Promise<ProfileActionResponse> =>
+): Promise<MessageResponse> =>
     axios
-        .postWithRetries<ProfileActionResponse, ProfileRequest>(
-            ENDPOINTS.PROFILE.UPDATE_PROFILE(id),
+        .postWithRetries<MessageResponse, ProfileRequest>(
+            ENDPOINTS.PROFILE.UPDATE_PERSONAL_INFO(userId),
             payload,
             undefined
         )

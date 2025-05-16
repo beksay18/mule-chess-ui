@@ -3,13 +3,15 @@ import {
     Box,
     Typography,
     Avatar,
-    Container,
+    Container, Button,
 } from '@mui/material';
 import { getCurrentUser } from '../../../api';
 import ShippingAddressSection from "./shipping-address-section";
+import ChangePasswordDialog from "./change-password-dialog";
 
 export default function ProfilePage() {
     const user = getCurrentUser();
+    const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
 
     return (
         <Container sx={{ mt: 5 }}>
@@ -52,7 +54,21 @@ export default function ProfilePage() {
                     </Box>
                 </Box>
 
-                {user?.userId && <ShippingAddressSection userId={user.userId} />}
+                {user?.userId && (
+                    <>
+                        <ShippingAddressSection userId={user.userId} />
+                        <Box sx={{ mt: 3 }}>
+                            <Button variant="outlined" onClick={() => setChangePasswordOpen(true)}>
+                                Change Password
+                            </Button>
+                        </Box>
+                        <ChangePasswordDialog
+                            open={changePasswordOpen}
+                            onClose={() => setChangePasswordOpen(false)}
+                            userId={user.userId}
+                        />
+                    </>
+                )}
             </Box>
         </Container>
     );
