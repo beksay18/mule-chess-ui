@@ -9,7 +9,7 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
+    DialogActions, Select, FormControl, InputLabel,
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -20,6 +20,8 @@ import {
     ShippingAddressResponse,
     ShippingAddressRequest,
 } from '../../../api/shippingAddress';
+import MenuItem from "@mui/material/MenuItem";
+import {usStates} from "../../../api/order";
 
 interface ShippingAddressSectionProps {
     userId: number;
@@ -38,7 +40,7 @@ export default function ShippingAddressSection({ userId }: ShippingAddressSectio
         city: '',
         state: '',
         postalCode: '',
-        country: '',
+        country: 'United States',
         isDefault: true,
     });
 
@@ -109,7 +111,7 @@ export default function ShippingAddressSection({ userId }: ShippingAddressSectio
                             city: '',
                             state: '',
                             postalCode: '',
-                            country: '',
+                            country: 'United States',
                             isDefault: true,
                         });
                         setSelectedAddress(null);
@@ -224,22 +226,52 @@ export default function ShippingAddressSection({ userId }: ShippingAddressSectio
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         {['addressLine1', 'addressLine2', 'city', 'state', 'postalCode', 'country'].map((field) => {
-                            const isRequired = field !== 'addressLine2';
+                            const isRequired = field !== 'addressLine2' && field !== 'country';
                             const showError =
                                 isRequired &&
                                 formSubmitted &&
                                 !form[field as keyof ShippingAddressRequest]?.toString().trim();
 
+                            if (field === 'state') {
+                                return (
+                                    <FormControl fullWidth required error={showError}>
+                                        <InputLabel id="state-label">State</InputLabel>
+                                        <Select
+                                            labelId="state-label"
+                                            id="state"
+                                            value={form.state}
+                                            label="State"
+                                            onChange={(e) =>
+                                                setForm((prev) => ({ ...prev, state: e.target.value }))
+                                            }
+                                        >
+                                            {usStates.map((state) => (
+                                                <MenuItem key={state} value={state}>
+                                                    {state}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                );
+                            }
+
                             return (
                                 <TextField
                                     key={field}
-                                    label={field}
+                                    label={field === 'country' ? 'Country (Fixed)' : field}
                                     fullWidth
                                     required={isRequired}
                                     variant="outlined"
                                     value={(form as any)[field]}
+                                    disabled={field === 'country'}
                                     error={showError}
-                                    helperText={showError ? `${field} is required` : ''}
+                                    helperText={
+                                        field === 'country'
+                                            ? 'Country is fixed to United States'
+                                            : showError
+                                                ? `${field} is required`
+                                                : ''
+                                    }
                                     onChange={(e) =>
                                         setForm((prev) => ({
                                             ...prev,
