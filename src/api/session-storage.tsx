@@ -4,8 +4,6 @@ export const SessionStorage = {
     getJSONValue: (key: string): Record<string, unknown> =>
         JSON.parse(`${window.sessionStorage.getItem(key)}`),
 
-    getValue: (key: string): string | null => window.sessionStorage.getItem(key),
-
     setJSONValue: (key: string, value: Record<string, unknown>): void =>
         window.sessionStorage.setItem(key, JSON.stringify(value)),
 

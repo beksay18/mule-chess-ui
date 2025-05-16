@@ -33,4 +33,9 @@ export const ENDPOINTS = {
         GET_PROFILE_VIEW: (id: number | string) => `/cg-stickers/api/profile/${id}`,
         UPDATE_PROFILE: (id: number | string) => `/cg-stickers/api/profile/edit/${id}`,
     },
+    SHIPPING_ADDRESS: {
+        CREATE_SHIPPING: (userId: number) => `/cg-stickers/api/shipping-address/${userId}`,
+        GET_ALL_SHIPPING: (userId: number) => `/cg-stickers/api/shipping-address/${userId}`,
+        DELETE_SHIPPING: (userId: number, id: number) => `/cg-stickers/api/shipping-address/${userId}/${id}`,
+    },
 }

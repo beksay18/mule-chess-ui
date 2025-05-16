@@ -1,194 +1,307 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
 import {
     Box,
-    Paper,
-    TextField,
     Typography,
-    Button,
-    CircularProgress,
-    Divider,
+    Avatar,
+    Card,
+    CardContent,
     Container,
+    CircularProgress,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    TextField,
+    DialogActions
 } from '@mui/material';
-
-import { getProfile, updateProfile } from '../../../api/profile';
-import { ProfileRequest, ProfileResponse } from '../../../api/profile/type';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { getCurrentUser } from '../../../api';
-import { useRouter } from '../../../routes/hooks';
+import {
+    getShippingAddresses,
+    createOrUpdateShippingAddress,
+    deleteShippingAddress,
+    ShippingAddressResponse,
+    ShippingAddressRequest,
+} from '../../../api/shippingAddress';
 
 export default function ProfilePage() {
-    const router = useRouter();
-    const [profile, setProfile] = useState<ProfileResponse | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [editPersonal, setEditPersonal] = useState(false);
-    const [editPassword, setEditPassword] = useState(false);
-    const [editShipping, setEditShipping] = useState(false);
+    const user = getCurrentUser();
 
-    const [form, setForm] = useState<ProfileRequest>({
-        firstName: '',
-        lastName: '',
-        oldPassword: '',
-        newPassword: '',
-        phoneNumber: '',
+    const [addressList, setAddressList] = React.useState<ShippingAddressResponse[]>([]);
+    const [loading, setLoading] = React.useState<boolean>(true);
+    const [editOpen, setEditOpen] = React.useState(false);
+    const [selectedAddress, setSelectedAddress] = React.useState<ShippingAddressResponse | null>(null);
+    const [formSubmitted, setFormSubmitted] = React.useState(false);
+
+    const [form, setForm] = React.useState<ShippingAddressRequest>({
         addressLine1: '',
         addressLine2: '',
         city: '',
         state: '',
         postalCode: '',
         country: '',
+        isDefault: true
     });
 
-    const user = getCurrentUser();
-
-    useEffect(() => {
-        if (!user?.userId) return;
-        getProfile(user.userId).then((data) => {
-            setProfile(data);
-            setForm({
-                firstName: data.firstName,
-                lastName: data.lastName,
-                phoneNumber: data.phoneNumber,
-                oldPassword: '',
-                newPassword: '',
-                addressLine1: data.shippingAddress?.addressLine1 || '',
-                addressLine2: data.shippingAddress?.addressLine2 || '',
-                city: data.shippingAddress?.city || '',
-                state: data.shippingAddress?.state || '',
-                postalCode: data.shippingAddress?.postalCode || '',
-                country: data.shippingAddress?.country || '',
-            });
-            setLoading(false);
-        });
-    }, [user]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async () => {
+    const fetchAddresses = async () => {
         if (!user?.userId) return;
         try {
-            await updateProfile(user.userId, form);
-            alert('Profile updated successfully!');
-            setEditPersonal(false);
-            setEditPassword(false);
-            setEditShipping(false);
-        } catch (e) {
-            console.error('Update failed:', e);
-            alert('Failed to update profile.');
+            const addresses = await getShippingAddresses(user.userId);
+            setAddressList(addresses);
+        } catch (err) {
+            console.error('Failed to fetch addresses', err);
+            setAddressList([]);
+        } finally {
+            setLoading(false);
         }
     };
 
-    if (loading) {
-        return (
-            <Box display="flex" justifyContent="center" mt={5}>
-                <CircularProgress />
-            </Box>
+
+    React.useEffect(() => {
+        fetchAddresses();
+    }, [user?.userId]);
+
+    const handleEdit = (address: ShippingAddressResponse) => {
+        setForm(address);
+        setSelectedAddress(address);
+        setEditOpen(true);
+    };
+
+    const handleDelete = async (address: ShippingAddressResponse) => {
+        if (!user?.userId) return;
+        console.log("Deleting address ID:", address.id);
+        console.log("User id ID:", user.userId);
+        await deleteShippingAddress(user.userId, address.id);
+        await fetchAddresses();
+    };
+
+    const handleEditSave = async (custom?: ShippingAddressRequest) => {
+        setFormSubmitted(true);
+
+        const payload = custom ?? form;
+
+        const requiredFields: (keyof ShippingAddressRequest)[] = [
+            'addressLine1',
+            'city',
+            'state',
+            'postalCode',
+            'country',
+        ];
+
+        const hasEmpty = requiredFields.some(
+            (field) => !payload[field]?.toString().trim()
         );
-    }
+
+        if (hasEmpty) {
+            alert('Please fill all required fields.');
+            return;
+        }
+
+        if (!user?.userId) return;
+
+        await createOrUpdateShippingAddress(user.userId, payload);
+        setEditOpen(false);
+        await fetchAddresses();
+    };
+
 
     return (
-        <Container maxWidth="lg" sx={{ pt: { xs: 4, sm: 8 }, pb: { xs: 8, sm: 16 } }}>
-            <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-                <Typography variant="h5" gutterBottom sx={{ mb: 3 }}>
-                    My Profile
-                </Typography>
+        <Container sx={{ mt: 5 }}>
+            <Box
+                sx={{
+                    mx: 'auto',
+                    p: 3,
+                    borderRadius: 3,
+                    backgroundColor: '#fff',
+                    boxShadow: 3,
+                }}
+            >
+                {/* Profile Header */}
+                <Box
+                    sx={{
+                        backgroundImage: 'linear-gradient(135deg, #4469b4 0%, #96a6d2 100%)',
+                        borderRadius: 3,
+                        p: 4,
+                        position: 'relative',
+                        color: 'white',
+                    }}
+                >
+                    <Avatar
+                        src="/avatar-placeholder.png"
+                        sx={{
+                            width: 100,
+                            height: 100,
+                            border: '4px solid white',
+                            position: 'absolute',
+                            top: 24,
+                            left: 24,
+                        }}
+                    />
+                    <Box sx={{ ml: 16, pt: 3 }}>
+                        <Typography variant="h5" fontWeight={700}>
+                            {user?.person?.firstName} {user?.person?.lastName}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                            {user?.username}
+                        </Typography>
+                    </Box>
+                </Box>
 
-                {/* Personal Information */}
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                    Personal Information
-                </Typography>
+                <Box sx={{mx: 'auto', mt: 5 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography variant="h6">Shipping Addresses</Typography>
+                        <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => {
+                                setForm({
+                                    addressLine1: '',
+                                    addressLine2: '',
+                                    city: '',
+                                    state: '',
+                                    postalCode: '',
+                                    country: '',
+                                    isDefault: true,
+                                });
+                                setSelectedAddress(null);
+                                setEditOpen(true);
+                            }}
+                        >
+                            Add Address
+                        </Button>
+                    </Box>
 
-                {editPersonal ? (
-                    <>
-                        <Box display="flex" gap={2} flexDirection={{ xs: 'column', sm: 'row' }} mb={2}>
-                            <TextField fullWidth label="First Name" name="firstName" value={form.firstName} onChange={handleChange} />
-                            <TextField fullWidth label="Last Name" name="lastName" value={form.lastName} onChange={handleChange} />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField fullWidth label="Phone Number" name="phoneNumber" value={form.phoneNumber} onChange={handleChange} />
-                        </Box>
-                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                            <Button onClick={() => setEditPersonal(false)}>Cancel</Button>
-                            <Button variant="contained" onClick={handleSubmit}>Save</Button>
-                        </Box>
-                    </>
-                ) : (
-                    <>
-                        <Typography><strong>First Name:</strong> {form.firstName}</Typography>
-                        <Typography><strong>Last Name:</strong> {form.lastName}</Typography>
-                        <Typography><strong>Phone Number:</strong> {form.phoneNumber}</Typography>
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
-                            <Button variant="text" onClick={() => setEditPersonal(true)}>Edit</Button>
-                        </Box>
-                    </>
-                )}
+                    {loading ? (
+                        <CircularProgress size={24} />
+                    ) : addressList.length > 0 ? (
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexWrap: 'wrap',
+                                gap: 2,
+                                justifyContent: addressList.length === 1 ? 'center' : 'flex-start',
+                            }}
+                        >
+                            {addressList.map((addr) => (
+                                <Card
+                                    key={addr.id}
+                                    variant="outlined"
+                                    sx={{
+                                        flex: {
+                                            xs: '100%',
+                                            sm: 'calc(50% - 8px)',
+                                        },
+                                        borderRadius: 2,
+                                        boxShadow: 1,
+                                        p: 2,
+                                        backgroundColor: '#fdfdfd',
+                                        transition: '0.2s',
+                                        '&:hover': { boxShadow: 3 },
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight={600}>
+                                                {addr.addressLine1}
+                                            </Typography>
+                                            {addr.addressLine2 && (
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {addr.addressLine2}
+                                                </Typography>
+                                            )}
+                                            <Typography variant="body2" color="text.secondary">
+                                                {addr.city}, {addr.state} {addr.postalCode}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {addr.country}
+                                            </Typography>
 
-                <Divider sx={{ my: 3 }} />
+                                            {addr.isDefault && (
+                                                <Box
+                                                    sx={{
+                                                        mt: 1,
+                                                        display: 'inline-block',
+                                                        backgroundColor: '#e3f2fd',
+                                                        color: '#1976d2',
+                                                        px: 1.5,
+                                                        py: 0.5,
+                                                        borderRadius: 1,
+                                                        fontSize: '0.75rem',
+                                                        fontWeight: 'bold',
+                                                    }}
+                                                >
+                                                    DEFAULT
+                                                </Box>
+                                            )}
+                                        </Box>
 
-                {/* Change Password */}
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                    Change Password
-                </Typography>
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                            <Button size="small" variant="outlined" onClick={() => handleEdit(addr)} >
+                                                <EditIcon fontSize="small" />
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                color="error"
+                                                onClick={() => handleDelete(addr)}
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </Button>
+                                            {!addr.isDefault && (
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onClick={() => {
+                                                        handleEditSave({ ...addr, isDefault: true });
+                                                    }}
+                                                >
+                                                    Make Default
+                                                </Button>
+                                            )}
+                                        </Box>
+                                    </Box>
+                                </Card>
+                            ))}
+                        </Box>
+                    ) : (
+                        <Typography variant="body2" color="text.secondary">
+                            No shipping addresses found.
+                        </Typography>
+                    )}
+                </Box>
+            </Box>
 
-                {editPassword ? (
-                    <>
-                        <Box display="flex" gap={2} flexDirection={{ xs: 'column', sm: 'row' }} mb={2}>
-                            <TextField fullWidth label="Old Password" name="oldPassword" type="password" value={form.oldPassword} onChange={handleChange} />
-                            <TextField fullWidth label="New Password" name="newPassword" type="password" value={form.newPassword} onChange={handleChange} />
-                        </Box>
-                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                            <Button onClick={() => setEditPassword(false)}>Cancel</Button>
-                            <Button variant="contained" onClick={handleSubmit}>Save</Button>
-                        </Box>
-                    </>
-                ) : (
-                    <>
-                        <Typography>Password is hidden for security reasons.</Typography>
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
-                            <Button variant="text" onClick={() => setEditPassword(true)}>Change Password</Button>
-                        </Box>
-                    </>
-                )}
-
-                <Divider sx={{ my: 3 }} />
-
-                {/* Shipping Address */}
-                <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
-                    Shipping Address
-                </Typography>
-
-                {editShipping ? (
-                    <>
-                        <Box display="flex" gap={2} flexDirection={{ xs: 'column', sm: 'row' }} mb={2}>
-                            <TextField fullWidth label="Address Line 1" name="addressLine1" value={form.addressLine1} onChange={handleChange} />
-                            <TextField fullWidth label="Address Line 2" name="addressLine2" value={form.addressLine2} onChange={handleChange} />
-                        </Box>
-                        <Box display="flex" gap={2} flexDirection={{ xs: 'column', sm: 'row' }} mb={2}>
-                            <TextField fullWidth label="City" name="city" value={form.city} onChange={handleChange} />
-                            <TextField fullWidth label="State" name="state" value={form.state} onChange={handleChange} />
-                            <TextField fullWidth label="Postal Code" name="postalCode" value={form.postalCode} onChange={handleChange} />
-                        </Box>
-                        <Box mb={2}>
-                            <TextField fullWidth label="Country" name="country" value={form.country} onChange={handleChange} />
-                        </Box>
-                        <Box display="flex" justifyContent="flex-end" gap={1}>
-                            <Button onClick={() => setEditShipping(false)}>Cancel</Button>
-                            <Button variant="contained" onClick={handleSubmit}>Save</Button>
-                        </Box>
-                    </>
-                ) : (
-                    <>
-                        <Typography>{form.addressLine1}</Typography>
-                        {form.addressLine2 && <Typography>{form.addressLine2}</Typography>}
-                        <Typography>{form.city}, {form.state} {form.postalCode}</Typography>
-                        <Typography>{form.country}</Typography>
-                        <Box display="flex" justifyContent="flex-end" mt={1}>
-                            <Button variant="text" onClick={() => setEditShipping(true)}>Edit</Button>
-                        </Box>
-                    </>
-                )}
-            </Paper>
+            <Dialog open={editOpen} onClose={() => setEditOpen(false)} fullWidth maxWidth="sm">
+                <DialogTitle>{selectedAddress ? 'Edit Address' : 'Add Address'}</DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+                        {['addressLine1', 'addressLine2', 'city', 'state', 'postalCode', 'country'].map((field) => {
+                            const isRequired = field !== 'addressLine2';
+                            const showError = isRequired && formSubmitted && !form[field as keyof ShippingAddressRequest]?.toString().trim();
+                            return (
+                                <TextField
+                                    key={field}
+                                    label={field}
+                                    fullWidth
+                                    required={isRequired}
+                                    variant="outlined"
+                                    value={(form as any)[field]}
+                                    error={showError}
+                                    helperText={showError ? `${field} is required` : ''}
+                                    onChange={(e) => setForm((prev) => ({ ...prev, [field]: e.target.value }))}
+                                />
+                            );
+                        })}
+                    </Box>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setEditOpen(false)}>Cancel</Button>
+                    <Button variant="contained" onClick={() => handleEditSave()}>
+                        Save
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 }

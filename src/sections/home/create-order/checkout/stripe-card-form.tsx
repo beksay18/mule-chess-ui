@@ -59,7 +59,7 @@ export default function StripeCardForm({ onPaymentSuccess }: Props) {
     };
 
     return (
-        <Paper sx={{ p: 3, mt: 4 }} variant="outlined">
+        <Paper sx={{ p: 3, mt: 2 }} variant="outlined">
             <Typography variant="h6" gutterBottom>Card Details</Typography>
 
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
