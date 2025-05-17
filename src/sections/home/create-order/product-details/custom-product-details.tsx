@@ -18,8 +18,11 @@ export default function CustomProductDetails() {
     const [selectedDimension, setSelectedDimension] = useState('');
     const [customWidth, setCustomWidth] = useState('');
     const [customHeight, setCustomHeight] = useState('');
+    const [widthError, setWidthError] = React.useState(false);
+    const [heightError, setHeightError] = React.useState(false);
     const [selectedQuantity, setSelectedQuantity] = useState('');
     const [customQuantity, setCustomQuantity] = useState('');
+    const [quantityError, setQuantityError] = useState(false);
     const [selectedLamination, setSelectedLamination] = useState('');
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const { addItem } = useCart();
@@ -40,6 +43,37 @@ export default function CustomProductDetails() {
 
     const handleUploadArtworkClick = (id: number) => {
         setSubmitAttempted(true);
+
+        let isValid = true;
+
+
+        if (selectedDimension === 'custom') {
+            const width = parseFloat(customWidth);
+            const height = parseFloat(customHeight);
+            const widthValid = !isNaN(width) && width > 0;
+            const heightValid = !isNaN(height) && height > 0;
+
+            setWidthError(!widthValid);
+            setHeightError(!heightValid);
+
+            if (!widthValid || !heightValid) {
+                isValid = false;
+            }
+        }
+
+        if (selectedQuantity === 'customQuantity') {
+            const quantity = parseInt(customQuantity);
+            const quantityValid = !isNaN(quantity) && quantity > 0;
+            setQuantityError(!quantityValid);
+
+            if (!quantityValid) {
+                isValid = false;
+            }
+        } else {
+            setQuantityError(false);
+        }
+
+        if (!isValid) return;
 
         const dimensionValid = selectedDimension !== '';
         const quantityValid = selectedQuantity !== '';
@@ -184,22 +218,45 @@ export default function CustomProductDetails() {
                                             label="Custom Size"
                                         />
                                         {selectedDimension === 'custom' && (
-                                            <Box sx={{display: 'flex', alignItems: 'center', gap: 1, pl: 4}}>
-                                                <input
-                                                    type="number"
-                                                    placeholder="Width"
-                                                    value={customWidth}
-                                                    onChange={(e) => setCustomWidth(e.target.value)}
-                                                    style={{padding: '6px', width: '100px'}}
-                                                />
-                                                <Typography variant="h6" sx={{px: 1}}>×</Typography>
-                                                <input
-                                                    type="number"
-                                                    placeholder="Height"
-                                                    value={customHeight}
-                                                    onChange={(e) => setCustomHeight(e.target.value)}
-                                                    style={{padding: '6px', width: '100px'}}
-                                                />
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, pl: 4 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Width"
+                                                        value={customWidth}
+                                                        min="1"
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            setCustomWidth(value);
+                                                            setWidthError(value === '' || parseFloat(value) <= 0);
+                                                        }}
+                                                        style={{ padding: '6px', width: '100px', borderColor: widthError ? 'red' : undefined }}
+                                                    />
+                                                    <Typography variant="h6" sx={{ px: 1 }}>×</Typography>
+                                                    <input
+                                                        type="number"
+                                                        placeholder="Height"
+                                                        value={customHeight}
+                                                        min="1"
+                                                        onChange={(e) => {
+                                                            const value = e.target.value;
+                                                            setCustomHeight(value);
+                                                            setHeightError(value === '' || parseFloat(value) <= 0);
+                                                        }}
+                                                        style={{ padding: '6px', width: '100px', borderColor: heightError ? 'red' : undefined }}
+                                                    />
+                                                </Box>
+
+                                                {widthError && (
+                                                    <Typography variant="caption" color="error">
+                                                        Width must be greater than zero
+                                                    </Typography>
+                                                )}
+                                                {heightError && (
+                                                    <Typography variant="caption" color="error">
+                                                        Height must be greater than zero
+                                                    </Typography>
+                                                )}
                                             </Box>
                                         )}
                                     </RadioGroup>
@@ -284,14 +341,29 @@ export default function CustomProductDetails() {
                                             label="Custom Quantity"
                                         />
                                         {selectedQuantity === 'customQuantity' && (
-                                            <Box sx={{display: 'flex', alignItems: 'center', gap: 1, pl: 4}}>
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', pl: 4, gap: 0.5 }}>
                                                 <input
                                                     type="number"
                                                     placeholder="Quantity"
                                                     value={customQuantity}
-                                                    onChange={(e) => setCustomQuantity(e.target.value)}
-                                                    style={{padding: '6px', width: '100px'}}
+                                                    onChange={(e) => {
+                                                        const value = e.target.value;
+                                                        setCustomQuantity(value);
+                                                        if (submitAttempted) {
+                                                            setQuantityError(value === '' || parseInt(value) <= 0);
+                                                        }
+                                                    }}
+                                                    style={{
+                                                        padding: '6px',
+                                                        width: '100px',
+                                                        borderColor: quantityError ? 'red' : undefined,
+                                                    }}
                                                 />
+                                                {quantityError && (
+                                                    <Typography variant="caption" color="error">
+                                                        Quantity must be greater than zero
+                                                    </Typography>
+                                                )}
                                             </Box>
                                         )}
                                     </RadioGroup>
