@@ -4,8 +4,27 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import {useRouter} from "../../routes/hooks";
+import {useEffect, useState} from "react";
+import {getActiveProductTypes, ProductType} from "../../api/productType";
 
 export default function HomeOverview() {
+    const [randomProductType, setRandomProductType] = useState<ProductType | null>(null);
+    const router = useRouter();
+
+    useEffect(() => {
+        const loadTypes = async () => {
+            const types = await getActiveProductTypes();
+            if (types.length > 0) {
+                const random = types[Math.floor(Math.random() * types.length)];
+                setRandomProductType(random);
+            }
+        };
+
+        loadTypes();
+    }, []);
+
+
     return (
         <Box
             id="hero"
@@ -96,11 +115,14 @@ export default function HomeOverview() {
                                 transform: 'scale(1.05)',
                             },
                         }}
+                        disabled={!randomProductType}
                         onClick={() => {
-                            console.log('Contact Us clicked');
+                            if (randomProductType) {
+                                router.push(`/custom-products/${randomProductType.id}`);
+                            }
                         }}
                     >
-                        Shop Stickers
+                        Shop {randomProductType?.name || 'Stickers'}
                     </Button>
                 </Stack>
             </Container>
