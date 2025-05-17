@@ -31,6 +31,7 @@ import { getAllProductTypes, ProductType } from '../../api/productType';
 export default function ProductForm() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [submitAttempted, setSubmitAttempted] = useState(false);
 
     const [formData, setFormData] = useState<ProductRequest>({
         name: '',
@@ -144,6 +145,17 @@ export default function ProductForm() {
     };
 
     const handleSubmit = async () => {
+        setSubmitAttempted(true);
+
+        if (
+            !formData.name.trim() ||
+            !formData.description.trim() ||
+            formData.price === null ||
+            formData.productTypeId === null
+        ) {
+            return;
+        }
+
         setLoading(true);
         try {
             const filteredDimensions = formData.dimensions.filter(
@@ -194,6 +206,9 @@ export default function ProductForm() {
                                     </MenuItem>
                                 ))}
                             </Select>
+                            {submitAttempted && !formData.productTypeId && (
+                                <Typography variant="caption" color="error">Product type is required</Typography>
+                            )}
                         </FormControl>
 
                         <TextField
@@ -202,6 +217,9 @@ export default function ProductForm() {
                             value={formData.name}
                             onChange={handleChange}
                             fullWidth
+                            required
+                            error={submitAttempted && !formData.name.trim()}
+                            helperText={submitAttempted && !formData.name.trim() ? 'Product Name is required' : ''}
                         />
 
                         <TextField
@@ -212,6 +230,9 @@ export default function ProductForm() {
                             fullWidth
                             multiline
                             rows={4}
+                            required
+                            error={submitAttempted && !formData.description.trim()}
+                            helperText={submitAttempted && !formData.description.trim() ? 'Product Description is required' : ''}
                         />
 
                         <TextField
@@ -221,6 +242,13 @@ export default function ProductForm() {
                             value={formData.price ?? ''}
                             onChange={handleNumberChange}
                             fullWidth
+                            required
+                            error={submitAttempted && (formData.price === null || formData.price <= 0)}
+                            helperText={
+                                submitAttempted && (formData.price === null || formData.price <= 0)
+                                    ? 'Price must be greater than 0'
+                                    : ''
+                            }
                         />
 
                         <FormControlLabel

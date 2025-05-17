@@ -4,11 +4,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 const logos = [
-    'https://placehold.co/120x50?text=Logo+1',
-    'https://placehold.co/120x50?text=Logo+2',
-    'https://placehold.co/120x50?text=Logo+3',
-    'https://placehold.co/120x50?text=Logo+4',
-    'https://placehold.co/120x50?text=Logo+5',
+    '/assets/images/brands/logo.webp',
+    '/assets/images/brands/logo.webp',
+    '/assets/images/brands/logo.webp',
+    '/assets/images/brands/logo.webp',
+    '/assets/images/brands/logo.webp',
 ];
 
 export default function TrustedBrands() {

@@ -19,6 +19,7 @@ export default function ProductTypeForm() {
     const [name, setName] = useState('');
     const [isActive, setIsActive] = useState(true);
     const navigate = useNavigate();
+    const [submitAttempted, setSubmitAttempted] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -30,6 +31,12 @@ export default function ProductTypeForm() {
     }, [id]);
 
     const handleSubmit = async () => {
+        setSubmitAttempted(true);
+
+        if (!name.trim()) {
+            return;
+        }
+
         try {
             if (id) {
                 await updateProductType(Number(id), { name, isActive });
@@ -56,6 +63,9 @@ export default function ProductTypeForm() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             fullWidth
+                            required
+                            error={submitAttempted && !name.trim()}
+                            helperText={submitAttempted && !name.trim() ? 'Name is required' : ''}
                         />
 
                         <FormControlLabel
