@@ -97,20 +97,31 @@ export default function Header() {
         <Container>
             <StyledToolbar variant="dense">
                 <Box sx={{flexGrow: 1, display: 'flex', alignItems: 'center', px: 0}}>
-                    <Typography
+                    <Box
                         component="a"
                         href="/"
-                        variant="h5"
                         sx={{
-                            fontWeight: 600,
-                            letterSpacing: 1,
-                            color: 'primary.main',
+                            display: 'flex',
+                            alignItems: 'center',
                             textDecoration: 'none',
-                            '&:hover': {textDecoration: 'none', color: 'primary.dark'},
+                            '&:hover': { textDecoration: 'none' },
                         }}
                     >
-                        CG Stickers
-                    </Typography>
+                        <Box
+                            component="img"
+                            src="/assets/images/brands/logo.webp"
+                            alt="Logo"
+                            sx={{
+                                height: 40,
+                                width: 40,
+                                mr: 1.5,
+                                borderRadius: '8px',
+                                transition: 'transform 0.3s ease',
+                                boxShadow: 1,
+                                '&:hover': { transform: 'scale(1.1)' },
+                            }}
+                        />
+                    </Box>
                     <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, ml: 2}}>
                         <Button
                             size="medium"
