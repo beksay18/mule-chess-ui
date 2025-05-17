@@ -131,6 +131,7 @@ export default function Header() {
                                     key={type.id}
                                     onClick={() => {
                                         handleCloseMenu();
+                                        router.push(`/custom-products/${type.id}`);
                                     }}
                                 >
                                     {type.name}

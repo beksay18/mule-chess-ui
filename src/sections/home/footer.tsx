@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import {useEffect, useState} from "react";
 import {getActiveProductTypes, ProductType} from "../../api/productType";
+import {useRouter} from "../../routes/hooks";
 
 function Copyright() {
     return (
@@ -27,6 +28,7 @@ function Copyright() {
 
 export default function Footer() {
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+    const router = useRouter();
 
     useEffect(() => {
         loadProductTypes();
@@ -116,6 +118,9 @@ export default function Footer() {
                             color="text.secondary"
                             variant="body2"
                             underline="hover"
+                            onClick={() => {
+                                router.push(`/custom-products/${type.id}`);
+                            }}
                         >
                             {type.name}
                         </Link>
