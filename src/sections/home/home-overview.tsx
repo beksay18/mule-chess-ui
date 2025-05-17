@@ -70,8 +70,8 @@ export default function HomeOverview() {
                                 }),
                             })}
                         >
-                            stickers
-                        </Typography>,&nbsp;
+                            stickers,&nbsp;
+                        </Typography>
                         <Typography
                             component="span"
                             variant="h2"
