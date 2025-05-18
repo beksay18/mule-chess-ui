@@ -26,7 +26,7 @@ export default function HomeProducts() {
     };
 
     return (
-        <Box sx={{ py: 5, backgroundColor: '#eaecec' }}>
+        <Box sx={{ py: 2, backgroundColor: '#eaecec' }}>
             <Grid container spacing={3} justifyContent="center">
                 {productTypes.map((productType) => (
                         <Box
@@ -51,7 +51,7 @@ export default function HomeProducts() {
                                 <Box
                                     sx={{
                                         width: '100%',
-                                        height: 140,
+                                        height: 180,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
