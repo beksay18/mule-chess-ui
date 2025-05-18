@@ -1,14 +1,16 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import {useEffect, useState} from "react";
-import {getActiveProductTypes, ProductType} from "../../api/productType";
-import {Paper} from "@mui/material";
+import { useEffect, useState } from "react";
+import { getActiveProductTypes, ProductType } from "../../api/productType";
+import { Paper } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import {useRouter} from "../../routes/hooks";
+import { useRouter } from "../../routes/hooks";
 
 export default function HomeProducts() {
     const router = useRouter();
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
+    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     useEffect(() => {
         loadProductTypes();
@@ -33,12 +35,11 @@ export default function HomeProducts() {
                             sx={{
                                 p: 2,
                                 width: 160,
-                                height: 100,
+                                height: 160,
                                 display: 'flex',
+                                flexDirection: 'column',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                fontWeight: 600,
-                                fontSize: '1.1rem',
                                 textAlign: 'center',
                                 cursor: 'pointer',
                                 '&:hover': {
@@ -47,7 +48,34 @@ export default function HomeProducts() {
                                 },
                             }}
                         >
-                            {productType.name}
+                            {productType.imageUrl ? (
+                                <Box
+                                    sx={{
+                                        width: '100%',
+                                        height: 80,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden',
+                                        mb: 1,
+                                    }}
+                                >
+                                    <Box
+                                        component="img"
+                                        src={`${baseURL}${productType.imageUrl}`}
+                                        alt={productType.name}
+                                        sx={{
+                                            maxWidth: '100%',
+                                            maxHeight: '100%',
+                                            objectFit: 'contain',
+                                        }}
+                                    />
+                                </Box>
+                            ) : null}
+
+                            <Box sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                                {productType.name}
+                            </Box>
                         </Paper>
                 ))}
             </Grid>

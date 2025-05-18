@@ -23,17 +23,29 @@ export function ProductTypeItem({ product }: { product: ProductItemProps }) {
 
     const renderImage = product.coverUrl ? (
         <Box
-            component="img"
-            alt={product.name}
-            src={`${baseURL}${product.coverUrl}`}
             sx={{
                 width: '100%',
                 height: IMAGE_HEIGHT,
-                objectFit: 'cover',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
                 borderTopLeftRadius: 12,
                 borderTopRightRadius: 12,
             }}
-        />
+        >
+            <Box
+                component="img"
+                alt={product.name}
+                src={`${baseURL}${product.coverUrl}`}
+                sx={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain',
+                    display: 'block',
+                }}
+            />
+        </Box>
     ) : (
         <Box
             sx={{
