@@ -29,13 +29,12 @@ export default function HomeProducts() {
         <Box sx={{ py: 5, backgroundColor: '#eaecec' }}>
             <Grid container spacing={3} justifyContent="center">
                 {productTypes.map((productType) => (
-                        <Paper
-                            elevation={3}
+                        <Box
                             onClick={() => handleTypeClick(productType.id)}
                             sx={{
                                 p: 2,
-                                width: 160,
-                                height: 160,
+                                width: 180,
+                                height: 180,
                                 display: 'flex',
                                 flexDirection: 'column',
                                 justifyContent: 'center',
@@ -52,7 +51,7 @@ export default function HomeProducts() {
                                 <Box
                                     sx={{
                                         width: '100%',
-                                        height: 80,
+                                        height: 140,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
@@ -76,7 +75,7 @@ export default function HomeProducts() {
                             <Box sx={{ fontWeight: 600, fontSize: '1rem' }}>
                                 {productType.name}
                             </Box>
-                        </Paper>
+                        </Box>
                 ))}
             </Grid>
         </Box>

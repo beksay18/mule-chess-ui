@@ -1,12 +1,12 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import {useEffect, useState} from "react";
-import {Paper} from "@mui/material";
+import { useEffect, useState } from 'react';
+import { getActiveProducts, Product } from '../../../../api/product';
+import { useParams } from 'react-router-dom';
+import CustomProductTitle from './custom-product-title';
+import { useRouter } from '../../../../routes/hooks';
 import Grid from "@mui/material/Grid";
-import {getActiveProducts, Product} from "../../../../api/product";
-import {useParams} from "react-router-dom";
-import CustomProductTitle from "./custom-product-title";
-import {useRouter} from "../../../../routes/hooks";
+import Container from "@mui/material/Container";
 
 export default function CustomProducts() {
     const router = useRouter();
@@ -30,21 +30,30 @@ export default function CustomProducts() {
 
     return (
         <>
-        <CustomProductTitle />
-        <Box id="logoCollection" sx={{ py: 4 }}>
-            {customProducts.length === 0 ? (
-                <Box textAlign="center" mt={4}>
-                    No Products Found
-                </Box>
-            ) : (
-                <Grid container spacing={3} justifyContent="center">
-                    {customProducts.map((customProduct) => (
-                            <Paper
-                                elevation={3}
-                                onClick={() => handleProductClick(customProduct.id)}
+            <CustomProductTitle />
+            <Container sx={{mt: 3}}>
+                {customProducts.length === 0 ? (
+                    <Box textAlign="center" mt={4}>
+                        No Products Found
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                sm: '1fr 1fr',
+                                md: '1fr 1fr 1fr 1fr',
+                            },
+                            gap: 3,
+                        }}
+                    >
+                        {customProducts.map((product) => (
+                            <Box
+                                key={product.id}
+                                onClick={() => handleProductClick(product.id)}
                                 sx={{
                                     p: 2,
-                                    width: 160,
                                     height: 100,
                                     display: 'flex',
                                     justifyContent: 'center',
@@ -52,18 +61,23 @@ export default function CustomProducts() {
                                     fontWeight: 600,
                                     fontSize: '1.1rem',
                                     textAlign: 'center',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#fff',
+                                    borderRadius: 2,
+                                    boxShadow: 'none',
+                                    transition: '0.3s',
                                     '&:hover': {
                                         boxShadow: 4,
                                         transform: 'translateY(-2px)',
                                     },
                                 }}
                             >
-                                {customProduct.name}
-                            </Paper>
-                    ))}
-                </Grid>
-            )}
-        </Box>
+                                {product.name}
+                            </Box>
+                        ))}
+                    </Box>
+                )}
+            </Container>
         </>
     );
 }
