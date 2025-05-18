@@ -26,7 +26,7 @@ function mapToProductTypeItem(
         id: productType.id,
         name: productType.name,
         status: productType.isActive ? 'active' : 'inactive',
-        coverUrl: '',
+        coverUrl: productType.imageUrl || '',
         color: getRandomColor(),
         onEdit,
         onDelete,

@@ -94,7 +94,7 @@ export default function HomeOverview() {
                             width: { sm: '100%', md: '80%' },
                         }}
                     >
-                        Enjoy free digital proofs, quick production, and complimentary express shipping.
+                        Enjoy free digital proofs, quick production, and complimentary free shipping.
                     </Typography>
                     <Button
                         sx={{

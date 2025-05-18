@@ -20,6 +20,8 @@ export default function ProductTypeForm() {
     const [isActive, setIsActive] = useState(true);
     const navigate = useNavigate();
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [image, setImage] = useState<File | undefined>(undefined);
+
 
     useEffect(() => {
         if (id) {
@@ -39,9 +41,9 @@ export default function ProductTypeForm() {
 
         try {
             if (id) {
-                await updateProductType(Number(id), { name, isActive });
+                await updateProductType(Number(id), { name, isActive, image: image ?? undefined });
             } else {
-                await createProductType({ name, isActive });
+                await createProductType({ name, isActive, image: image ?? undefined });
             }
             navigate('/products-types');
         } catch (error) {
@@ -66,6 +68,18 @@ export default function ProductTypeForm() {
                             required
                             error={submitAttempted && !name.trim()}
                             helperText={submitAttempted && !name.trim() ? 'Name is required' : ''}
+                        />
+
+                        <TextField
+                            type="file"
+                            fullWidth
+                            inputProps={{ accept: 'image/*' }}
+                            onChange={(e) => {
+                                const target = e.target as HTMLInputElement;
+                                if (target.files && target.files.length > 0) {
+                                    setImage(target.files[0]);
+                                }
+                            }}
                         />
 
                         <FormControlLabel

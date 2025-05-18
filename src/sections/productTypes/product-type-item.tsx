@@ -19,12 +19,13 @@ export type ProductItemProps = {
 
 export function ProductTypeItem({ product }: { product: ProductItemProps }) {
     const IMAGE_HEIGHT = 200;
+    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     const renderImage = product.coverUrl ? (
         <Box
             component="img"
             alt={product.name}
-            src={product.coverUrl}
+            src={`${baseURL}${product.coverUrl}`}
             sx={{
                 width: '100%',
                 height: IMAGE_HEIGHT,

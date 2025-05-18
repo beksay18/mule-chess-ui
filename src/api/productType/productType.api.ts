@@ -2,16 +2,20 @@ import { axios } from "../http";
 import { ENDPOINTS } from "../constant";
 import { ProductType, ProductTypeRequest } from "./type";
 
-export const createProductType = (
-    payload: ProductTypeRequest
-): Promise<ProductType> =>
-    axios
-        .postWithRetries<ProductType, ProductTypeRequest>(
-            ENDPOINTS.PRODUCT_TYPE.CREATE_PRODUCT_TYPE,
-            payload,
-            undefined
-        )
-        .then(({ data }) => data);
+export const createProductType = (payload: ProductTypeRequest): Promise<ProductType> => {
+        const formData = new FormData();
+        formData.append("name", payload.name);
+        formData.append("isActive", String(payload.isActive));
+        if (payload.image) {
+                formData.append("image", payload.image);
+        }
+
+        return axios
+            .post<ProductType>(ENDPOINTS.PRODUCT_TYPE.CREATE_PRODUCT_TYPE, formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+            })
+            .then(({ data }) => data);
+};
 
 export const getAllProductTypes = (): Promise<ProductType[]> =>
     axios
@@ -32,14 +36,20 @@ export const getProductTypeById = (id: number): Promise<ProductType> =>
 export const updateProductType = (
     id: number,
     payload: ProductTypeRequest
-): Promise<ProductType> =>
-    axios
-        .putWithRetries<ProductType, ProductTypeRequest>(
-            ENDPOINTS.PRODUCT_TYPE.UPDATE_PRODUCT_TYPE(id),
-            payload,
-            undefined
-        )
-        .then(({ data }) => data);
+): Promise<ProductType> => {
+        const formData = new FormData();
+        formData.append("name", payload.name);
+        formData.append("isActive", String(payload.isActive));
+        if (payload.image) {
+                formData.append("image", payload.image);
+        }
+
+        return axios
+            .put<ProductType>(ENDPOINTS.PRODUCT_TYPE.UPDATE_PRODUCT_TYPE(id), formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+            })
+            .then(({ data }) => data);
+};
 
 
 export const deleteProductType = (id: number): Promise<void> =>

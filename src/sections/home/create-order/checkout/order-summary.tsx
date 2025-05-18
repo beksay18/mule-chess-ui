@@ -19,7 +19,7 @@ export default function OrderSummary({ subtotal }: OrderSummaryProps) {
             <Typography variant="body1" fontWeight="bold">Order Summary</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
                 <Typography variant="body1" fontWeight="bold" sx={{ mr: 1 }}>
-                    Subtotal:
+                    Order total:
                 </Typography>
                 <Typography variant="body1">${subtotal.toFixed(2)}</Typography>
             </Box>
