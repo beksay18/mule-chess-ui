@@ -5,13 +5,14 @@ import { getActiveProducts, Product } from '../../../../api/product';
 import { useParams } from 'react-router-dom';
 import CustomProductTitle from './custom-product-title';
 import { useRouter } from '../../../../routes/hooks';
-import Grid from "@mui/material/Grid";
-import Container from "@mui/material/Container";
+import Container from '@mui/material/Container';
 
 export default function CustomProducts() {
     const router = useRouter();
     const { typeId } = useParams();
     const [customProducts, setCustomProducts] = useState<Product[]>([]);
+
+    const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     useEffect(() => {
         if (typeId) {
@@ -31,7 +32,7 @@ export default function CustomProducts() {
     return (
         <>
             <CustomProductTitle />
-            <Container sx={{mt: 3}}>
+            <Container sx={{ mt: 3 }}>
                 {customProducts.length === 0 ? (
                     <Box textAlign="center" mt={4}>
                         No Products Found
@@ -54,12 +55,12 @@ export default function CustomProducts() {
                                 onClick={() => handleProductClick(product.id)}
                                 sx={{
                                     p: 2,
-                                    height: 100,
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     justifyContent: 'center',
                                     alignItems: 'center',
                                     fontWeight: 600,
-                                    fontSize: '1.1rem',
+                                    fontSize: '1rem',
                                     textAlign: 'center',
                                     cursor: 'pointer',
                                     backgroundColor: '#fff',
@@ -72,6 +73,30 @@ export default function CustomProducts() {
                                     },
                                 }}
                             >
+                                {product.imageUrl ? (
+                                    <Box
+                                        component="img"
+                                        src={`${baseImageUrl}${product.imageUrl}`}
+                                        alt={product.name}
+                                        sx={{
+                                            width: '100%',
+                                            maxHeight: 150,
+                                            objectFit: 'contain',
+                                            mb: 1,
+                                            borderRadius: 1,
+                                        }}
+                                    />
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            width: '100%',
+                                            height: 150,
+                                            backgroundColor: '#f5f5f5',
+                                            mb: 1,
+                                            borderRadius: 1,
+                                        }}
+                                    />
+                                )}
                                 {product.name}
                             </Box>
                         ))}

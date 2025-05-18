@@ -2,16 +2,32 @@ import { axios } from "../http";
 import { ENDPOINTS } from "../constant";
 import {Product, ProductRequest} from "./type";
 
-export const createProduct = (
-    payload: ProductRequest
-): Promise<Product> =>
-    axios
-        .postWithRetries<Product, ProductRequest>(
-            ENDPOINTS.PRODUCT.CREATE_PRODUCT,
-            payload,
-            undefined
-        )
-        .then(({ data }) => data);
+export const createProduct = (payload: ProductRequest): Promise<Product> => {
+        const formData = new FormData();
+
+        formData.append("name", payload.name);
+        formData.append("description", payload.description);
+        formData.append("price", String(payload.price ?? 0));
+        formData.append("isActive", String(payload.isActive));
+        formData.append("productTypeId", String(payload.productTypeId ?? 0));
+
+        if (payload.image) {
+                formData.append("image", payload.image);
+        }
+
+        if (payload.backgroundImage) {
+                formData.append("backgroundImage", payload.backgroundImage);
+        }
+
+        formData.append("dimensions", JSON.stringify(payload.dimensions));
+        formData.append("discounts", JSON.stringify(payload.discounts));
+
+        return axios
+            .post<Product>(ENDPOINTS.PRODUCT.CREATE_PRODUCT, formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then(({ data }) => data);
+};
 
 export const getAllProducts = (): Promise<Product[]> =>
     axios
@@ -29,18 +45,32 @@ export const getProductById = (id: number): Promise<Product> =>
         .then(({ data }) => data);
 
 
-export const updateProduct = (
-    id: number,
-    payload: ProductRequest
-): Promise<Product> =>
-    axios
-        .putWithRetries<Product, ProductRequest>(
-            ENDPOINTS.PRODUCT.UPDATE_PRODUCT(id),
-            payload,
-            undefined
-        )
-        .then(({ data }) => data);
+export const updateProduct = (id: number, payload: ProductRequest): Promise<Product> => {
+        const formData = new FormData();
 
+        formData.append("name", payload.name);
+        formData.append("description", payload.description);
+        formData.append("price", String(payload.price ?? 0));
+        formData.append("isActive", String(payload.isActive));
+        formData.append("productTypeId", String(payload.productTypeId ?? 0));
+
+        if (payload.image) {
+                formData.append("image", payload.image);
+        }
+
+        if (payload.backgroundImage) {
+                formData.append("backgroundImage", payload.backgroundImage);
+        }
+
+        formData.append("dimensions", JSON.stringify(payload.dimensions));
+        formData.append("discounts", JSON.stringify(payload.discounts));
+
+        return axios
+            .put<Product>(ENDPOINTS.PRODUCT.UPDATE_PRODUCT(id), formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then(({ data }) => data);
+};
 
 export const deleteProduct = (id: number): Promise<void> =>
     axios

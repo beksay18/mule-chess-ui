@@ -29,7 +29,7 @@ function mapToProductItem(
         price: product.price,
         productType: product.productType.name,
         status: product.isActive ? 'active' : 'inactive',
-        coverUrl: '',
+        coverUrl: product.imageUrl || '',
         color: getRandomColor(),
         onEdit,
         onDelete,

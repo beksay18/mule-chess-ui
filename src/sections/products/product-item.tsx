@@ -21,6 +21,7 @@ export type ProductItemProps = {
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
+    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
     return (
         <Box
             sx={{
@@ -36,12 +37,12 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
             <Avatar
                 variant="rounded"
                 alt={product.name}
-                src={product.coverUrl}
+                src={product.coverUrl ? `${baseURL}${product.coverUrl}` : undefined}
                 sx={{
                     width: 48,
                     height: 48,
                     flexShrink: 0,
-                    bgcolor: product.color ?? 'primary.main',
+                    bgcolor: !product.coverUrl ? product.color ?? 'primary.main' : 'transparent',
                     fontSize: 20,
                     fontWeight: 'bold',
                 }}

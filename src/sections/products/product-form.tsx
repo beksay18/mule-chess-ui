@@ -44,6 +44,8 @@ export default function ProductForm() {
     });
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
     const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState<File | undefined>(undefined);
+    const [backgroundImage, setBackgroundImage] = useState<File | undefined>(undefined);
 
     useEffect(() => {
         loadProductTypes();
@@ -169,9 +171,9 @@ export default function ProductForm() {
             const updatedFormData = { ...formData, dimensions: filteredDimensions, discounts: filteredDiscounts };
 
             if (id) {
-                await updateProduct(Number(id), updatedFormData);
+                await updateProduct(Number(id), { ...updatedFormData, image, backgroundImage });
             } else {
-                await createProduct(formData);
+                await createProduct({ ...updatedFormData, image, backgroundImage });
             }
             navigate('/products');
         } catch (err) {
@@ -261,6 +263,47 @@ export default function ProductForm() {
                             }
                             label="Active"
                         />
+
+                        <Typography variant="h6">Images</Typography>
+
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Button variant="outlined" component="label">
+                                Upload Image
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                            setImage(e.target.files[0]);
+                                        }
+                                    }}
+                                />
+                            </Button>
+                            <Typography variant="body2">
+                                {image?.name ?? 'No file selected'}
+                            </Typography>
+                        </Stack>
+
+                        <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
+                            <Button variant="outlined" component="label">
+                                Upload Background Image
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={(e) => {
+                                        if (e.target.files && e.target.files.length > 0) {
+                                            setBackgroundImage(e.target.files[0]);
+                                        }
+                                    }}
+                                />
+                            </Button>
+                            <Typography variant="body2">
+                                {backgroundImage?.name ?? 'No file selected'}
+                            </Typography>
+                        </Stack>
+
 
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}

@@ -15,6 +15,8 @@ export interface ProductRequest {
     description: string;
     price: number | null;
     isActive: boolean;
+    image?: File;
+    backgroundImage?: File;
     productTypeId: number | null;
     dimensions: ProductDimensionRequest[];
     discounts: ProductDiscountRequest[];
@@ -26,6 +28,8 @@ export interface Product {
     description: string;
     price: number;
     isActive: boolean;
+    imageUrl?: string;
+    backgroundImageUrl?: string;
     productType: ProductType;
     dimensions: ProductDimensionRequest[];
     discounts: ProductDiscountRequest[];
