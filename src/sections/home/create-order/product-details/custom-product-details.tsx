@@ -21,6 +21,7 @@ export default function CustomProductDetails() {
     const { productId } = useParams();
     const [customProduct, setCustomProduct] = useState<Product | null>(null);
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     const [dimension, setDimension] = useState<{
         label: string;
@@ -83,6 +84,7 @@ export default function CustomProductDetails() {
             customDimension: dimension.isCustom,
             lamination: lamination,
             discountTiers: customProduct?.discounts || [],
+            imageUrl: customProduct?.imageUrl || '',
         });
 
         router.push(`/product-upload/${customProduct?.id}`);
@@ -91,13 +93,17 @@ export default function CustomProductDetails() {
     return (
         <Box
             sx={{
-                width: '100%',
-                backgroundImage:
-                    'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
+                backgroundImage: customProduct?.backgroundImageUrl
+                    ? `url(${baseImageUrl}${customProduct.backgroundImageUrl})`
+                    : undefined,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
+                borderRadius: 2,
             }}
         >
-            <Container sx={{ py: { xs: 4, sm: 8 } }}>
+            <Container
+                sx={{py: { xs: 4, sm: 8 }}}>
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
                     <Box flex={1}>
                         <Typography variant="h4">{customProduct?.name}</Typography>

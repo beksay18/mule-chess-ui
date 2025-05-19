@@ -22,6 +22,7 @@ import {useRouter} from "../../../../routes/hooks";
 export default function CartPage() {
     const router = useRouter();
     const { cartItems, setCartItems, removeItem } = useCart();
+    const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     const getDiscountForQuantity = (
         quantity: number,
@@ -64,17 +65,7 @@ export default function CartPage() {
     };
 
     return (
-        <Box
-            id="hero"
-            sx={{
-                width: '100%',
-                backgroundRepeat: 'no-repeat',
-                backgroundImage:
-                    'radial-gradient(ellipse 80% 50% at 50% -20%, hsl(210, 100%, 90%), transparent)',
-                py: 8,
-            }}
-        >
-            <Container id="features">
+            <Container id="features" sx={{ py: 6}}>
                 <Typography
                     component="h2"
                     variant="h2"
@@ -124,16 +115,17 @@ export default function CartPage() {
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar
                                                     variant="rounded"
+                                                    src={item.imageUrl ? `${baseImageUrl}${item.imageUrl}` : undefined}
                                                     sx={{
                                                         width: 70,
                                                         height: 70,
                                                         flexShrink: 0,
-                                                        bgcolor: 'primary.main',
+                                                        bgcolor: item.imageUrl ? 'transparent' : 'primary.main',
                                                         fontSize: 20,
                                                         fontWeight: 'bold',
                                                     }}
                                                 >
-                                                    {item.name.charAt(0)}
+                                                    {!item.imageUrl && item.name.charAt(0)}
                                                 </Avatar>
 
                                                 <Box>
@@ -292,6 +284,5 @@ export default function CartPage() {
                     </Box>
                 </Box>
             </Container>
-        </Box>
     );
 }
