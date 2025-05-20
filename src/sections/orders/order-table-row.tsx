@@ -8,6 +8,7 @@ import MenuList from '@mui/material/MenuList';
 
 import { Label } from 'src/components/label';
 import { Iconify } from 'src/components/iconify';
+import {useRouter} from "../../routes/hooks";
 
 // ----------------------------------------------------------------------
 export type OrderProps = {
@@ -27,10 +28,12 @@ type OrderTableRowProps = {
     row: OrderProps;
     selected: boolean;
     onSelectRow: () => void;
+    currentPage: number;
 };
 
-export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps) {
+export function OrderTableRow({ row, selected, onSelectRow, currentPage }: OrderTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+    const router = useRouter();
 
     const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
         setOpenPopover(event.currentTarget);
@@ -40,9 +43,13 @@ export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps
         setOpenPopover(null);
     }, []);
 
+    const handleRowClick = () => {
+        router.push(`/order-details/${row.orderId}?page=${currentPage}`);
+    };
+
     return (
         <>
-            <TableRow hover tabIndex={-1} role="checkbox" selected={selected}>
+            <TableRow hover tabIndex={-1} role="checkbox" selected={selected} onClick={handleRowClick} sx={{ cursor: 'pointer' }}>
                 <TableCell>{row.orderNumber}</TableCell>
 
                 <TableCell>{row.customerFirstName} {row.customerLastName}</TableCell>
@@ -68,7 +75,14 @@ export function OrderTableRow({ row, selected, onSelectRow }: OrderTableRowProps
                 </TableCell>
 
 
-                <TableCell>{new Date(row.dateCreated).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(row.dateCreated).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                })}</TableCell>
 
                 <TableCell>
                     <Label
