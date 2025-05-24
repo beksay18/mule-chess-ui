@@ -33,17 +33,21 @@ export function OrderDetailsView() {
     return (
         <DashboardContent maxWidth="xl">
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Button
-                    startIcon={<ArrowBackIcon />}
-                    onClick={() => router.push(`/orders?page=${page}`)}
-                    variant="outlined"
-                >
-                    Back to Orders
-                </Button>
-            </Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                 <Box>
-                    <Typography variant="h4" gutterBottom>Order #{order.orderNumber}</Typography>
+                    <Box display="flex" alignItems="center" gap={2}>
+                        <Button
+                            startIcon={<ArrowBackIcon />}
+                            onClick={() => router.push(`/orders?page=${page}`)}
+                            variant="outlined"
+                            size="small"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            Back
+                        </Button>
+                        <Typography variant="h4" noWrap>
+                            Order #{order.orderNumber}
+                        </Typography>
+                    </Box>
                     <Typography variant="body2" color="text.secondary">
                         Placed on {new Date(order.dateCreated).toLocaleString()}
                     </Typography>

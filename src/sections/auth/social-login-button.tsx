@@ -14,7 +14,6 @@ declare global {
 export function SocialLoginButton() {
     const router = useRouter();
 
-    // Handle the credential returned by Google
     const handleCredentialResponse = async (response: any) => {
         console.log("Google credential response:", response);
 
@@ -44,7 +43,7 @@ export function SocialLoginButton() {
     useEffect(() => {
         if (window.google?.accounts?.id) {
             window.google.accounts.id.initialize({
-                client_id: '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', // 🔁 Replace with your actual Google Client ID
+                client_id: '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',
                 callback: handleCredentialResponse,
             });
 

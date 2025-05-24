@@ -40,7 +40,7 @@ export default function HomeOverview() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    pt: { xs: 10, sm: 16 },
+                    pt: { xs: 4, sm: 10 },
                     pb: { xs: 8, sm: 12 },
                 }}
             >

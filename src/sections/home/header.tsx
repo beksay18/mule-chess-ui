@@ -217,10 +217,16 @@ export default function Header() {
                             </Button>
                         )
                     ) : (
+                        <>
                         <Button color="primary" variant="text" size="medium" href="/sign-in"
                                 sx={{ border: '1px solid', borderColor: 'primary.main' }} >
-                            Sign in
+                            Log in
                         </Button>
+                        <Button color="primary" variant="text" size="medium" href="/sign-up"
+                                sx={{ border: '1px solid', borderColor: 'primary.main' }} >
+                            Sign up
+                        </Button>
+                        </>
                     )}
                 </Box>
                 <Box sx={{display: {xs: 'flex', md: 'none'}, gap: 1}}>
@@ -275,6 +281,9 @@ export default function Header() {
                                 <MenuItem>
                                     <Button color="primary" variant="outlined" fullWidth href="/sign-in">
                                         Sign in
+                                    </Button>
+                                    <Button color="primary" variant="outlined" fullWidth href="/sign-up">
+                                        Sign up
                                     </Button>
                                 </MenuItem>
                             )}

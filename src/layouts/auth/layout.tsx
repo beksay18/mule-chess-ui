@@ -51,13 +51,11 @@ export function AuthLayout({
       ),
       leftArea: (
         <>
-          {/** @slot Logo */}
           <Logo />
         </>
       ),
       rightArea: (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.5 } }}>
-          {/** @slot HelpOverview link */}
           <Link href="#" component={RouterLink} color="inherit" sx={{ typography: 'subtitle2' }}>
             Need help?
           </Link>
@@ -107,17 +105,8 @@ export function AuthLayout({
 
   return (
     <LayoutSection
-      /** **************************************
-       * @Header
-       *************************************** */
       headerSection={renderHeader()}
-      /** **************************************
-       * @Footer
-       *************************************** */
       footerSection={renderFooter()}
-      /** **************************************
-       * @Styles
-       *************************************** */
       cssVars={{ '--layout-auth-content-width': '420px', ...cssVars }}
       sx={[
         (theme) => ({

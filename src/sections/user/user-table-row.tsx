@@ -46,7 +46,7 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
 
                 <TableCell>{row.phoneNumber}</TableCell>
 
-                <TableCell>{row.firstName}, {row.lastName}</TableCell>
+                <TableCell>{row.firstName} {row.lastName}</TableCell>
 
                 <TableCell>{row.role}</TableCell>
 

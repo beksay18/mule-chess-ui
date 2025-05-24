@@ -7,7 +7,6 @@ import {varAlpha} from 'minimal-shared/utils';
 import Box from '@mui/material/Box';
 import LinearProgress, {linearProgressClasses} from '@mui/material/LinearProgress';
 
-import {AuthLayout} from 'src/layouts/auth';
 import {DashboardLayout} from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
 import {HomeView} from "../sections/home/view";
@@ -18,7 +17,6 @@ import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/create-order/cart/view";
 import {CheckoutView} from "../sections/home/create-order/checkout/view";
 import {OrderConfirmationView} from "../sections/home/create-order/order-confirmation/view";
-import {OrderView} from "../sections/orders/view";
 
 // ----------------------------------------------------------------------
 
@@ -75,6 +73,11 @@ export const routesSection: RouteObject[] = [
             {path: 'user', element: <UserPage/>},
             {
                 path: 'products-types',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <Outlet/>
+                    </RoleGuard>
+                ),
                 children: [
                     {path: '', element: <ProductTypesPage/>},
                     {
@@ -90,7 +93,7 @@ export const routesSection: RouteObject[] = [
                 path: 'products',
                 element: (
                     <RoleGuard allowedRoles={['ROLE_ADMIN']}>
-                        <Outlet />
+                        <Outlet/>
                     </RoleGuard>
                 ),
                 children: [
@@ -109,17 +112,13 @@ export const routesSection: RouteObject[] = [
     {
         path: 'sign-in',
         element: (
-            <AuthLayout>
-                <SignInPage/>
-            </AuthLayout>
+            <SignInPage/>
         ),
     },
     {
         path: 'sign-up',
         element: (
-            <AuthLayout>
-                <SignUpPage/>
-            </AuthLayout>
+            <SignUpPage/>
         ),
     },
     {
@@ -128,31 +127,31 @@ export const routesSection: RouteObject[] = [
     },
     {
         path: 'custom-products/:typeId',
-        element: <ProductsView />,
+        element: <ProductsView/>,
     },
     {
         path: 'custom-product-details/:productId',
-        element: <ProductDetailsView />,
+        element: <ProductDetailsView/>,
     },
     {
         path: 'product-upload/:id',
-        element: <ProductUploadView />,
+        element: <ProductUploadView/>,
     },
     {
         path: 'cart',
-        element: <CartView />,
+        element: <CartView/>,
     },
     {
         path: 'checkout',
-        element: <CheckoutView />,
+        element: <CheckoutView/>,
     },
     {
         path: 'order-confirmation',
-        element: <OrderConfirmationView />,
+        element: <OrderConfirmationView/>,
     },
     {
         path: 'profile',
-        element: <ProfilePage />,
+        element: <ProfilePage/>,
     },
     {
         path: '404',

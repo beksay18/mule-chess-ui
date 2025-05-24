@@ -1,7 +1,8 @@
-import { Box, Typography, Divider } from '@mui/material';
+import {Box, Typography, Divider, Card, CardContent} from '@mui/material';
 import { useRouter } from 'src/routes/hooks';
 import { SignUpForm } from '../sign-up-form';
 import {signUp} from "../../../../api/auth";
+import Container from "@mui/material/Container";
 
 export function SignUpView() {
     const router = useRouter();
@@ -23,7 +24,25 @@ export function SignUpView() {
     };
 
     return (
-        <>
+        <Container id="features" sx={{py: 15}}>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    bgcolor: 'background.default',
+                    px: 2,
+                }}
+            >
+                <Card
+                    sx={{
+                        width: '100%',
+                        maxWidth: 420,
+                        p: 3,
+                        borderRadius: 3,
+                        boxShadow: 3,
+                    }}
+                >
+                    <CardContent>
             <Box sx={{ gap: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 5 }}>
                 <Typography variant="h5">Create Account</Typography>
                 <Typography variant="body2" sx={{ color: 'text.secondary' }}>
@@ -35,6 +54,9 @@ export function SignUpView() {
             </Box>
 
             <SignUpForm onSubmit={handleSignUp} />
-        </>
+                    </CardContent>
+                </Card>
+            </Box>
+        </Container>
     );
 }
