@@ -29,6 +29,7 @@ interface QuantitySelectorProps {
         error: boolean;
     }) => void;
     showError: boolean;
+    maxQuantity: number;
 }
 
 export function QuantitySelector({
@@ -37,6 +38,7 @@ export function QuantitySelector({
                                      selected,
                                      setSelected,
                                      showError,
+                                     maxQuantity
                                  }: QuantitySelectorProps) {
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
@@ -61,7 +63,7 @@ export function QuantitySelector({
 
     const handleCustomQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const qty = parseInt(event.target.value, 10);
-        const isValid = !isNaN(qty) && qty > 0;
+        const isValid = !isNaN(qty) && qty > 0 && qty <= maxQuantity;
         setSelected({
             label: 'customQuantity',
             value: qty,
@@ -71,7 +73,7 @@ export function QuantitySelector({
     };
 
     return (
-        <Box>
+        <Box mb={2}>
             <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                     <Typography variant="h6">Select a quantity</Typography>
                     {showError && selected.value === 0 && (
@@ -90,7 +92,7 @@ export function QuantitySelector({
                             <FormControlLabel
                                 key={index}
                                 value={radioValue}
-                                control={<Radio />}
+                                control={<Radio sx={{ p: 0.5, ml: 1 }}/>}
                                 label={
                                     <Box
                                         sx={{
@@ -124,11 +126,11 @@ export function QuantitySelector({
 
                 <FormControlLabel
                     value="customQuantity"
-                    control={<Radio />}
+                    control={<Radio sx={{ p: 0.5, ml: 1 }}/>}
                     label="Custom Quantity"
                 />
                 {selected.isCustom && (
-                    <Box sx={{ pl: 4, mt: 1 }}>
+                    <Box sx={{ pl: 4, mt: 1, display: 'flex', flexDirection: 'column' }}>
                         <TextField
                             label="Quantity"
                             type="number"
@@ -136,10 +138,18 @@ export function QuantitySelector({
                             value={selected.value || ''}
                             onChange={handleCustomQuantityChange}
                             error={selected.error}
-                            helperText={selected.error ? 'Quantity must be greater than zero' : ''}
-                            inputProps={{ min: 1 }}
                             sx={{ width: 150 }}
                         />
+                        {showError && (!selected.value || selected.value <= 0) && (
+                            <Typography variant="caption" color="error">
+                                Quantity is required
+                            </Typography>
+                        )}
+                        {showError && selected.value > maxQuantity && (
+                            <Typography variant="caption" color="error">
+                                Max quantity is {maxQuantity}
+                            </Typography>
+                        )}
                     </Box>
                 )}
             </RadioGroup>

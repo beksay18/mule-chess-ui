@@ -30,6 +30,8 @@ interface DimensionSelectorProps {
         error: boolean;
     }>>;
     showError: boolean;
+    maxWidth: number;
+    maxHeight: number;
 }
 
 
@@ -38,6 +40,8 @@ export function DimensionSelector({
                                       selected,
                                       setSelected,
                                       showError,
+                                      maxWidth,
+                                      maxHeight,
                                   }: DimensionSelectorProps) {
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
@@ -69,15 +73,22 @@ export function DimensionSelector({
         const parsed = parseFloat(val);
         const isValid = !isNaN(parsed) && parsed > 0;
 
+        const width = field === 'width' ? parsed : selected.width;
+        const height = field === 'height' ? parsed : selected.height;
+
+        const error =
+            !width || !height || width > maxWidth || height > maxHeight;
+
         setSelected((prev) => ({
             ...prev,
             [field]: parsed,
-            error: field === 'width' ? !isValid || prev.height <= 0 : !isValid || prev.width <= 0,
+            error,
         }));
     };
 
+
     return (
-        <Box>
+        <Box mb={2}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <Typography variant="h6">Select a size</Typography>
                 {showError && !selected.label && (
@@ -100,14 +111,14 @@ export function DimensionSelector({
                             <FormControlLabel
                                 key={idx}
                                 value={label}
-                                control={<Radio />}
+                                control={<Radio sx={{ p: 0.5, ml: 1 }}/>}
                                 label={displayLabel}
                             />
                         );
                     })}
                 <FormControlLabel
                     value="custom"
-                    control={<Radio />}
+                    control={<Radio sx={{ p: 0.5, ml: 1 }}/>}
                     label="Custom Size"
                 />
             </RadioGroup>
@@ -119,15 +130,21 @@ export function DimensionSelector({
                             <TextField
                                 type="number"
                                 label="Width (in)"
-                                value={selected.width || ''}
+                                value={selected.width > 0 ? selected.width : ''}
                                 onChange={(e) => handleCustomChange('width', e.target.value)}
-                                error={showError && selected.width <= 0}
+                                error={showError && (selected.width <= 0 || selected.width > maxWidth)}
                                 sx={{ width: 150 }}
                                 size="small"
+                                required
                             />
-                            {showError && selected.width <= 0 && (
+                            {showError && (!selected.width || selected.width <= 0) && (
                                 <Typography variant="caption" color="error">
-                                    Width must be greater than 0
+                                    Width is required
+                                </Typography>
+                            )}
+                            {showError && selected.width > maxWidth && (
+                                <Typography variant="caption" color="error">
+                                    Max width is {maxWidth}
                                 </Typography>
                             )}
                         </Box>
@@ -138,13 +155,19 @@ export function DimensionSelector({
                                 label="Height (in)"
                                 value={selected.height || ''}
                                 onChange={(e) => handleCustomChange('height', e.target.value)}
-                                error={showError && selected.height <= 0}
+                                error={showError && (selected.height <= 0 || selected.height > maxHeight)}
                                 sx={{ width: 150 }}
                                 size="small"
+                                required
                             />
-                            {showError && selected.height <= 0 && (
+                            {showError && (!selected.height || selected.height <= 0) && (
                                 <Typography variant="caption" color="error">
-                                    Height must be greater than 0
+                                    Height is required
+                                </Typography>
+                            )}
+                            {showError && selected.height > maxHeight && (
+                                <Typography variant="caption" color="error">
+                                    Max height is {maxHeight}
                                 </Typography>
                             )}
                         </Box>
