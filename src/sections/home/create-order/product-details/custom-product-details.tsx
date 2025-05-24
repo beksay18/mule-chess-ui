@@ -96,8 +96,8 @@ export default function CustomProductDetails() {
                 backgroundImage: customProduct?.backgroundImageUrl
                     ? `url(${baseImageUrl}${customProduct.backgroundImageUrl})`
                     : undefined,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
+                backgroundSize: 'contain',
+                backgroundPosition: 'top 250px left 25%',
                 backgroundRepeat: 'no-repeat',
                 borderRadius: 2,
             }}
@@ -113,12 +113,6 @@ export default function CustomProductDetails() {
                                 (5,450 reviews)
                             </Typography>
                         </Box>
-                        <Typography variant="body1" sx={{ mt: 2 }}>
-                            Price per unit:{' '}
-                            <Box component="span" fontWeight="bold" color="primary.main">
-                                ${customProduct?.price}
-                            </Box>
-                        </Typography>
                         <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>
                             {customProduct?.description}
                         </Typography>

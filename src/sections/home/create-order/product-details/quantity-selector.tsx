@@ -72,10 +72,12 @@ export function QuantitySelector({
 
     return (
         <Box>
-            <Typography variant="h6">Select a quantity</Typography>
-            {showError && selected.value === 0 && (
-                <Typography color="error" variant="body2">This field is required</Typography>
-            )}
+            <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
+                    <Typography variant="h6">Select a quantity</Typography>
+                    {showError && selected.value === 0 && (
+                        <Typography color="error" variant="body2">Quantity is required</Typography>
+                    )}
+            </Box>
             <RadioGroup value={selected.label} onChange={handleRadioChange}>
                 {discounts
                     .sort((a, b) => a.quantity - b.quantity)

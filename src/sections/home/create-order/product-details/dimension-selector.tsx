@@ -78,12 +78,14 @@ export function DimensionSelector({
 
     return (
         <Box>
-            <Typography variant="h6">Select a size</Typography>
-            {showError && !selected.label && (
-                <Typography color="error" variant="body2">
-                    This field is required
-                </Typography>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <Typography variant="h6">Select a size</Typography>
+                {showError && !selected.label && (
+                    <Typography color="error" variant="body2">
+                        Dimensions are required
+                    </Typography>
+                )}
+            </Box>
 
             <RadioGroup
                 value={selected.label}
@@ -112,36 +114,41 @@ export function DimensionSelector({
 
             {selected.isCustom && (
                 <Box sx={{ pl: 4, display: 'flex', gap: 1, flexDirection: 'column' }}>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                        <TextField
-                            type="number"
-                            label="Width (in)"
-                            value={selected.width || ''}
-                            onChange={(e) => handleCustomChange('width', e.target.value)}
-                            error={showError && selected.width <= 0}
-                            sx={{ width: 150 }}
-                            size="small"
-                        />
-                        <TextField
-                            type="number"
-                            label="Height (in)"
-                            value={selected.height || ''}
-                            onChange={(e) => handleCustomChange('height', e.target.value)}
-                            error={showError && selected.height <= 0}
-                            sx={{ width: 150 }}
-                            size="small"
-                        />
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <TextField
+                                type="number"
+                                label="Width (in)"
+                                value={selected.width || ''}
+                                onChange={(e) => handleCustomChange('width', e.target.value)}
+                                error={showError && selected.width <= 0}
+                                sx={{ width: 150 }}
+                                size="small"
+                            />
+                            {showError && selected.width <= 0 && (
+                                <Typography variant="caption" color="error">
+                                    Width must be greater than 0
+                                </Typography>
+                            )}
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                            <TextField
+                                type="number"
+                                label="Height (in)"
+                                value={selected.height || ''}
+                                onChange={(e) => handleCustomChange('height', e.target.value)}
+                                error={showError && selected.height <= 0}
+                                sx={{ width: 150 }}
+                                size="small"
+                            />
+                            {showError && selected.height <= 0 && (
+                                <Typography variant="caption" color="error">
+                                    Height must be greater than 0
+                                </Typography>
+                            )}
+                        </Box>
                     </Box>
-                    {(showError && selected.width <= 0) && (
-                        <Typography variant="caption" color="error">
-                            Width must be greater than 0
-                        </Typography>
-                    )}
-                    {(showError && selected.height <= 0) && (
-                        <Typography variant="caption" color="error">
-                            Height must be greater than 0
-                        </Typography>
-                    )}
                 </Box>
             )}
         </Box>
