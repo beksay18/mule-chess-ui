@@ -107,6 +107,16 @@ export function OrderDetailsView() {
                         </CardContent>
                     </Card>
 
+                    <Card elevation={2} sx={{ borderRadius: 2 }}>
+                        <CardContent>
+                            <Typography variant="h6" gutterBottom>
+                                <Icon icon="mdi:file-document-outline" style={{ marginRight: 8 }} />
+                                Documents
+                            </Typography>
+                            <Divider sx={{ mb: 2 }} />
+                        </CardContent>
+                    </Card>
+
                 </Box>
 
                 <Box flex={1} display="flex" flexDirection="column" gap={3}>

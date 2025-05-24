@@ -20,6 +20,9 @@ export interface ProductRequest {
     productTypeId: number | null;
     dimensions: ProductDimensionRequest[];
     discounts: ProductDiscountRequest[];
+    maxWidth: number;
+    maxHeight: number;
+    maxQuantity: number;
 }
 
 export interface Product {
@@ -33,4 +36,7 @@ export interface Product {
     productType: ProductType;
     dimensions: ProductDimensionRequest[];
     discounts: ProductDiscountRequest[];
+    maxWidth: number;
+    maxHeight: number;
+    maxQuantity: number;
 }

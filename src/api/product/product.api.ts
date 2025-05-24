@@ -10,6 +10,9 @@ export const createProduct = (payload: ProductRequest): Promise<Product> => {
         formData.append("price", String(payload.price ?? 0));
         formData.append("isActive", String(payload.isActive));
         formData.append("productTypeId", String(payload.productTypeId ?? 0));
+        formData.append("maxHeight", String(payload.maxHeight ?? 0));
+        formData.append("maxWidth", String(payload.maxWidth ?? 0));
+        formData.append("maxQuantity", String(payload.maxQuantity ?? 0));
 
         if (payload.image) {
                 formData.append("image", payload.image);
@@ -53,6 +56,9 @@ export const updateProduct = (id: number, payload: ProductRequest): Promise<Prod
         formData.append("price", String(payload.price ?? 0));
         formData.append("isActive", String(payload.isActive));
         formData.append("productTypeId", String(payload.productTypeId ?? 0));
+        formData.append("maxHeight", String(payload.maxHeight ?? 0));
+        formData.append("maxWidth", String(payload.maxWidth ?? 0));
+        formData.append("maxQuantity", String(payload.maxQuantity ?? 0));
 
         if (payload.image) {
                 formData.append("image", payload.image);

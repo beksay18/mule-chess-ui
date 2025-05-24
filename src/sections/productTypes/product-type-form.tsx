@@ -52,7 +52,7 @@ export default function ProductTypeForm() {
     };
 
     return (
-        <DashboardContent>
+        <DashboardContent maxWidth="xl">
             <Box>
                 <Typography variant="h4" sx={{mb: 3}}>
                     Product Type
