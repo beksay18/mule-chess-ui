@@ -63,7 +63,12 @@ export function QuantitySelector({
 
     const handleCustomQuantityChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const qty = parseInt(event.target.value, 10);
-        const isValid = !isNaN(qty) && qty > 0 && qty <= maxQuantity;
+        const isValid =
+            !isNaN(qty) &&
+            Number.isInteger(qty) &&
+            qty > 0 &&
+            qty <= maxQuantity;
+
         setSelected({
             label: 'customQuantity',
             value: qty,
@@ -143,6 +148,11 @@ export function QuantitySelector({
                         {showError && (!selected.value || selected.value <= 0) && (
                             <Typography variant="caption" color="error">
                                 Quantity is required
+                            </Typography>
+                        )}
+                        {showError && !Number.isInteger(selected.value) && (
+                            <Typography variant="caption" color="error">
+                                Must be whole number
                             </Typography>
                         )}
                         {showError && selected.value > maxQuantity && (
