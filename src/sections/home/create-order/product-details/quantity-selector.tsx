@@ -6,7 +6,7 @@ import {
     Radio,
     TextField,
 } from '@mui/material';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 
 interface Discount {
     quantity: number;
@@ -40,6 +40,28 @@ export function QuantitySelector({
                                      showError,
                                      maxQuantity
                                  }: QuantitySelectorProps) {
+
+    const initialized = useRef(false);
+
+    useEffect(() => {
+        if (initialized.current) return;
+
+        if (discounts.length === 0) return;
+
+        if (!selected.label) {
+            const first = discounts[0];
+            setSelected({
+                label: `${first.quantity}|${first.percentage}`,
+                value: first.quantity,
+                isCustom: false,
+                error: false,
+            });
+            initialized.current = true;
+        }
+    }, [discounts, selected.label, setSelected]);
+
+
+
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
 

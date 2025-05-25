@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
     Box,
     Typography,
@@ -18,6 +18,12 @@ export function LaminationSelector({
                                        setSelected,
                                        showError,
                                    }: LaminationSelectorProps) {
+    useEffect(() => {
+        if (!selected) {
+            setSelected('gloss');
+        }
+    }, [selected, setSelected]);
+
     return (
         <Box mb={2}>
             <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>

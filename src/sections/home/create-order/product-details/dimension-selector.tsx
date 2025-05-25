@@ -6,7 +6,7 @@ import {
     RadioGroup,
     TextField,
 } from '@mui/material';
-import React from 'react';
+import React, {useEffect} from 'react';
 
 interface Dimension {
     width: number;
@@ -43,6 +43,38 @@ export function DimensionSelector({
                                       maxWidth,
                                       maxHeight,
                                   }: DimensionSelectorProps) {
+
+    useEffect(() => {
+        setSelected((prev) => {
+            const hasPredefined = dimensions.length > 0;
+            const isCustom = prev.label === 'custom';
+
+            if ((!prev.label || isCustom) && hasPredefined) {
+                const first = dimensions[0];
+                return {
+                    label: `${first.width}x${first.height}`,
+                    width: first.width,
+                    height: first.height,
+                    isCustom: false,
+                    error: false,
+                };
+            }
+
+            if (!prev.label && !hasPredefined) {
+                return {
+                    label: 'custom',
+                    width: 0,
+                    height: 0,
+                    isCustom: true,
+                    error: false,
+                };
+            }
+
+            return prev;
+        });
+    }, [dimensions, setSelected]);
+
+
     const handleRadioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
 
