@@ -41,7 +41,7 @@ export default function HomeOverview() {
                     flexDirection: 'column',
                     alignItems: 'center',
                     pt: { xs: 4, sm: 10 },
-                    pb: { xs: 8, sm: 12 },
+                    pb: { xs: 4, sm: 7 },
                 }}
             >
                 <Stack

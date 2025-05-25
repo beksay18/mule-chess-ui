@@ -16,6 +16,21 @@ export const createOrder = (
             })
         .then(({data}) => data);
 
+export const createPaymentIntent = (
+    payload: OrderRequest
+): Promise<{ clientSecret: string }> =>
+    axios
+        .postWithRetries<{ clientSecret: string }, OrderRequest>(
+            ENDPOINTS.ORDER.CREATE_PAYMENT_INTENT,
+            payload,
+            {
+                headers: {
+                    'x-skip-auth': 'true',
+                },
+            }
+        )
+        .then(({ data }) => data);
+
 export const getAllOrders = ({page, size, filter}: {
     page: number;
     size: number;

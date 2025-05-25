@@ -24,6 +24,7 @@ export const ENDPOINTS = {
     },
     ORDER: {
         CREATE_ORDER: "/cg-stickers/api/orders/create",
+        CREATE_PAYMENT_INTENT: "/cg-stickers/api/orders/create-payment-intent",
         GET_ALL_ORDERS: "/cg-stickers/api/orders/all-orders",
         GET_ORDER_BY_ID: (id: number | string) => `/cg-stickers/api/orders/overview/${id}`,
     },

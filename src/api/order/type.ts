@@ -7,7 +7,7 @@ export interface OrderRequest {
     totalAmount: number;
     lineItems: LineItemRequest[];
     shippingAddress: ShippingAddressRequest;
-    paymentMethodId: string;
+    paymentIntentId?: string;
 }
 
 export interface LineItemRequest {
