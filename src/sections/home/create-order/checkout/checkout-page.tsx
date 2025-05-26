@@ -161,10 +161,10 @@ export default function CheckoutPage() {
     }, [user?.userId]);
 
     return (
-        <Box sx={{ width: '100%', py: 8 }}>
+        <Box sx={{ width: '100%', py: 8,}}>
             <Container>
                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
-                    <Card sx={{ flex: 7, boxShadow: 'none' }}>
+                    <Box sx={{ flex: 7, boxShadow: 'none' }}>
                         {user ? (
                             <Paper sx={{ p: 2, mb: 2 }}>
                                 <Typography variant="h6" gutterBottom>
@@ -267,9 +267,9 @@ export default function CheckoutPage() {
                         >
                             {isPlacingOrder ? 'Placing Order...' : 'Place Order'}
                         </Button>
-                    </Card>
-                    <Box sx={{ flex: 3 }}>
-                        <OrderSummary subtotal={subtotal} />
+                    </Box>
+                    <Box sx={{ flex: 3}}>
+                        <OrderSummary items={cartItems} />
                     </Box>
                 </Box>
             </Container>
