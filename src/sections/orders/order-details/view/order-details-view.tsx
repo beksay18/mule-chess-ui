@@ -20,6 +20,7 @@ export function OrderDetailsView() {
     const router = useRouter();
     const { id } = useParams();
     const [order, setOrder] = useState<CustomerOrderResponse | null>(null);
+    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     const [searchParams] = useSearchParams();
     const page = searchParams.get('page') || '0';
@@ -101,19 +102,21 @@ export function OrderDetailsView() {
                                             {item.percentage}%
                                         </Typography>
                                     </Stack>
+                                    {item.artworks && item.artworks.length > 0 && (
+                                        <Box sx={{ mt: 1, ml: 8, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                            {item.artworks.map((url, i) => (
+                                                <img
+                                                    key={i}
+                                                    src={`${baseURL}${url}`}
+                                                    alt={`Artwork ${i + 1}`}
+                                                    style={{ width: 80, height: 'auto', borderRadius: 4, border: '1px solid #ccc' }}
+                                                />
+                                            ))}
+                                        </Box>
+                                    )}
                                     {index < order.lineItems.length - 1 && <Divider sx={{ my: 2 }} />}
                                 </Box>
                             ))}
-                        </CardContent>
-                    </Card>
-
-                    <Card elevation={2} sx={{ borderRadius: 2 }}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <Icon icon="mdi:file-document-outline" style={{ marginRight: 8 }} />
-                                Documents
-                            </Typography>
-                            <Divider sx={{ mb: 2 }} />
                         </CardContent>
                     </Card>
 

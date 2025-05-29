@@ -39,6 +39,7 @@ export type LineItemResponse = {
     quantity: number;
     percentage: number;
     isCustomDimension: boolean;
+    artworks: string[];
 };
 
 export type PaymentDTO = {
@@ -48,5 +49,5 @@ export type PaymentDTO = {
     amount: number;
     currency: string;
     order: string;
-    createdAt: string; // ISO string
+    createdAt: string;
 };
