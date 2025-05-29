@@ -102,18 +102,44 @@ export function OrderDetailsView() {
                                             {item.percentage}%
                                         </Typography>
                                     </Stack>
-                                    {item.artworks && item.artworks.length > 0 && (
-                                        <Box sx={{ mt: 1, ml: 8, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                            {item.artworks.map((url, i) => (
+                                    {item.artworks.map((url, i) => {
+                                        const artworkUrl = `${baseURL}${url}`;
+                                        return (
+                                            <Box
+                                                key={i}
+                                                sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2, ml: 8 }}
+                                            >
                                                 <img
-                                                    key={i}
-                                                    src={`${baseURL}${url}`}
+                                                    src={artworkUrl}
                                                     alt={`Artwork ${i + 1}`}
-                                                    style={{ width: 80, height: 'auto', borderRadius: 4, border: '1px solid #ccc' }}
+                                                    style={{
+                                                        width: 80,
+                                                        height: 'auto',
+                                                        borderRadius: 4,
+                                                        border: '1px solid #ccc',
+                                                    }}
                                                 />
-                                            ))}
-                                        </Box>
-                                    )}
+                                                <a
+                                                    href={artworkUrl}
+                                                    download={`artwork-${i + 1}.png`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    <Typography
+                                                        variant="caption"
+                                                        color="primary"
+                                                        sx={{
+                                                            cursor: 'pointer',
+                                                            textDecoration: 'underline',
+                                                            '&:hover': { color: 'primary.dark' },
+                                                        }}
+                                                    >
+                                                        Download Artwork {i + 1}
+                                                    </Typography>
+                                                </a>
+                                            </Box>
+                                        );
+                                    })}
                                     {index < order.lineItems.length - 1 && <Divider sx={{ my: 2 }} />}
                                 </Box>
                             ))}
