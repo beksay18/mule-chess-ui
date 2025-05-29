@@ -7,15 +7,39 @@ import TextField from "@mui/material/TextField";
 import {useParams} from "react-router-dom";
 import {useRouter} from "../../../../routes/hooks";
 import Button from "@mui/material/Button";
+import ListItem from "@mui/material/ListItem";
+import {IconButton} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ListItemText from "@mui/material/ListItemText";
+import List from '@mui/material/List';
+import {useCart} from "../cart/cart-context";
+
 
 export default function UploadArtwork() {
     const { id } = useParams();
     const router = useRouter();
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+    const { updateArtworkFilesForItem } = useCart();
 
     const handleUploadFiles = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files[0]) {
+            const newFile = event.target.files[0];
+            setSelectedFiles((prev) => [...prev, newFile]);
+            event.target.value = '';
+        }
+    };
+
+    const handleRemoveFile = (index: number) => {
+        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
     const handleAddToCart = () => {
+        updateArtworkFilesForItem(Number(id), selectedFiles);
         router.push(`/cart`);
     };
 
@@ -34,7 +58,6 @@ export default function UploadArtwork() {
             })}
         >
             <Container
-                id="pricing"
                 sx={{
                     pt: {xs: 4, sm: 8},
                     pb: {xs: 8, sm: 16},
@@ -68,7 +91,36 @@ export default function UploadArtwork() {
                     <Typography variant="body1" sx={{color: 'gray', mt: 1}}>
                         Drop files here to upload
                     </Typography>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        hidden
+                        multiple
+                        onChange={handleFileChange}
+                    />
                 </Box>
+                {selectedFiles.length > 0 && (
+                    <Box sx={{ width: '100%', maxWidth: 500 }}>
+                        <Typography variant="subtitle2" sx={{ mt: 2, fontWeight: 'bold' }}>
+                            Selected Files:
+                        </Typography>
+                        <List dense>
+                            {selectedFiles.map((file, index) => (
+                                <ListItem
+                                    key={index}
+                                    secondaryAction={
+                                        <IconButton edge="end" onClick={() => handleRemoveFile(index)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    }
+                                >
+                                    <ListItemText primary={file.name} />
+                                </ListItem>
+                            ))}
+                        </List>
+                    </Box>
+                )}
+
                 <Box sx={{ width: '100%', maxWidth: 500 }}>
                     <Typography
                         variant="subtitle2"

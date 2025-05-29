@@ -60,6 +60,7 @@ export default function CheckoutPage() {
         quantity: item.quantity,
         percentage: item.percentage,
         customDimension: item.customDimension,
+        artworkFiles: item.artworkFiles,
     }));
 
     const subtotal = cartItems.reduce((total, item) => {
