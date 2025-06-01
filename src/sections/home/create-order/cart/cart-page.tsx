@@ -22,7 +22,9 @@ import {useRouter} from "../../../../routes/hooks";
 export default function CartPage() {
     const router = useRouter();
     const { cartItems, setCartItems, removeItem } = useCart();
-    const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
+
+    const isDev = import.meta.env.MODE === 'development';
+    const baseImageUrl = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
 
     const getDiscountForQuantity = (
         quantity: number,
