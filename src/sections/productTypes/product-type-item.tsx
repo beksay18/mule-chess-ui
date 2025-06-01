@@ -19,7 +19,8 @@ export type ProductItemProps = {
 
 export function ProductTypeItem({ product }: { product: ProductItemProps }) {
     const IMAGE_HEIGHT = 200;
-    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
+    const isDev = import.meta.env.MODE === 'development';
+    const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
 
     const renderImage = product.coverUrl ? (
         <Box

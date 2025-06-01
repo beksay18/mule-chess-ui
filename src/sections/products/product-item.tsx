@@ -21,7 +21,8 @@ export type ProductItemProps = {
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
-    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
+    const isDev = import.meta.env.MODE === 'development';
+    const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
     return (
         <Box
             sx={{

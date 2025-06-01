@@ -13,7 +13,8 @@ export default function CustomProducts() {
     const { typeId } = useParams();
     const [customProducts, setCustomProducts] = useState<Product[]>([]);
 
-    const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
+    const isDev = import.meta.env.MODE === 'development';
+    const baseImageUrl = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
 
     useEffect(() => {
         if (typeId) {

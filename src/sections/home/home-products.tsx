@@ -10,7 +10,8 @@ export default function HomeProducts() {
     const router = useRouter();
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
 
-    const baseURL = import.meta.env.VITE_API_BASE_IMAGE_URL;
+    const isDev = import.meta.env.MODE === 'development';
+    const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
 
     useEffect(() => {
         loadProductTypes();
