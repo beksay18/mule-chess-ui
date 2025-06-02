@@ -40,4 +40,8 @@ export const ENDPOINTS = {
         GET_ALL_SHIPPING: (userId: number) => `/cg-stickers/api/shipping-address/${userId}`,
         DELETE_SHIPPING: (userId: number, id: number) => `/cg-stickers/api/shipping-address/${userId}/${id}`,
     },
+    CONTACTS: {
+        GET_ALL_CONTACTS: "/cg-stickers/api/contacts/all-contacts",
+        CREATE_CONTACT: "/cg-stickers/api/contacts/save-contacts",
+    },
 }

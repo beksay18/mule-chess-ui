@@ -29,6 +29,7 @@ export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const ProfilePage = lazy(() => import('src/pages/profile'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const ProductForm = lazy(() => import('src/sections/products/product-form'));
+export const ContactForm = lazy(() => import('src/pages/contacts-form'));
 export const ProductTypesPage = lazy(() => import('src/pages/product-types'));
 export const ProductTypeForm = lazy(() => import('src/sections/productTypes/product-type-form'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -119,6 +120,12 @@ export const routesSection: RouteObject[] = [
         path: 'sign-up',
         element: (
             <SignUpPage/>
+        ),
+    },
+    {
+        path: 'contact-us',
+        element: (
+            <ContactForm/>
         ),
     },
     {

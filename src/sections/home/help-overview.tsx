@@ -5,19 +5,27 @@ import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
+import {useRouter} from "../../routes/hooks";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    textAlign: 'left',
+    justifyContent: 'center',
+    textAlign: 'center',
     backdropFilter: 'blur(24px)',
-    padding: '50px 30px',
+    padding: theme.spacing(2.5, 3.75),
     flexWrap: 'wrap',
+    gap: theme.spacing(10),
 }));
 
 export default function HelpOverview() {
+    const router = useRouter();
+
+    const handleContactUsClick = () => {
+        router.push(`/contact-us`);
+    };
+
     return (
         <Box
             sx={{
@@ -59,9 +67,7 @@ export default function HelpOverview() {
                                 transform: 'scale(1.05)',
                             },
                         }}
-                        onClick={() => {
-                            console.log('Contact Us clicked');
-                        }}
+                        onClick={() => handleContactUsClick()}
                     >
                         Contact Us
                     </Button>

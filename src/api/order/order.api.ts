@@ -63,20 +63,26 @@ export const buildOrderFormData = (order: OrderRequest): FormData => {
         formData.append(`shippingAddress.${key}`, value);
     });
 
-    order.lineItems.forEach((item, index) => {
-        formData.append(`lineItems[${index}].productId`, item.productId.toString());
-        formData.append(`lineItems[${index}].width`, item.width.toString());
-        formData.append(`lineItems[${index}].height`, item.height.toString());
-        formData.append(`lineItems[${index}].quantity`, item.quantity.toString());
-        formData.append(`lineItems[${index}].percentage`, item.percentage.toString());
-        formData.append(`lineItems[${index}].customDimension`, item.customDimension.toString());
+    if (order.lineItems && order.lineItems.length > 0) {
+        order.lineItems.forEach((item, index) => {
+            formData.append(`lineItems[${index}].productId`, item.productId.toString());
+            formData.append(`lineItems[${index}].width`, item.width.toString());
+            formData.append(`lineItems[${index}].height`, item.height.toString());
+            formData.append(`lineItems[${index}].quantity`, item.quantity.toString());
+            formData.append(`lineItems[${index}].percentage`, item.percentage.toString());
+            formData.append(`lineItems[${index}].customDimension`, item.customDimension.toString());
 
-        if ((item as any).artworkFiles) {
-            (item as any).artworkFiles.forEach((file: File) => {
-                formData.append(`lineItems[${index}].artworkFiles`, file);
-            });
-        }
-    });
+            if ((item as any).artworkFiles) {
+                (item as any).artworkFiles.forEach((file: File) => {
+                    if (file instanceof File) {
+                        formData.append(`lineItems[${index}].artworkFiles`, file);
+                    } else {
+                        console.warn('Not a valid File:', file);
+                    }
+                });
+            }
+        });
+    }
 
     return formData;
 };

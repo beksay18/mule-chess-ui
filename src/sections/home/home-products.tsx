@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { useEffect, useState } from "react";
 import { getActiveProductTypes, ProductType } from "../../api/productType";
-import { Paper } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useRouter } from "../../routes/hooks";
 
