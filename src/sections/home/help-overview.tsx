@@ -16,7 +16,7 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     backdropFilter: 'blur(24px)',
     padding: theme.spacing(2.5, 3.75),
     flexWrap: 'wrap',
-    gap: theme.spacing(10),
+    gap: theme.spacing(25),
 }));
 
 export default function HelpOverview() {
@@ -50,7 +50,7 @@ export default function HelpOverview() {
 
                     <Button
                         sx={{
-                            mt: { xs: 2, sm: 0 }, // stack button on mobile
+                            mt: { xs: 2, sm: 0 },
                             px: 4,
                             py: 1.5,
                             fontWeight: 'bold',

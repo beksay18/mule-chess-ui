@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import { useEffect, useState } from "react";
 import { getActiveProductTypes, ProductType } from "../../api/productType";
-import Grid from "@mui/material/Grid";
 import { useRouter } from "../../routes/hooks";
 
 export default function HomeProducts() {
@@ -26,37 +26,48 @@ export default function HomeProducts() {
     };
 
     return (
-        <Box sx={{ py: 2, backgroundColor: '#eaecec' }}>
-            <Grid container spacing={3} justifyContent="center">
-                {productTypes.map((productType) => (
+        <Box sx={{ py: 2, backgroundColor: '#f4f6f8' }}>
+            <Container maxWidth="lg">
+                <Box
+                    sx={{
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            xs: 'repeat(1, 1fr)',
+                            sm: 'repeat(2, 1fr)',
+                            md: 'repeat(3, 1fr)',
+                            lg: 'repeat(4, 1fr)',
+                        },
+                        gap: 3,
+                    }}
+                >
+                    {productTypes.map((productType) => (
                         <Box
+                            key={productType.id}
                             onClick={() => handleTypeClick(productType.id)}
                             sx={{
                                 p: 2,
-                                width: 180,
-                                height: 180,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                textAlign: 'center',
+                                backgroundColor: '#dde4ef',
+                                borderRadius: 3,
+                                boxShadow: 1,
+                                transition: 'all 0.3s ease',
                                 cursor: 'pointer',
                                 '&:hover': {
                                     boxShadow: 4,
-                                    transform: 'translateY(-2px)',
+                                    transform: 'translateY(-5px)',
                                 },
                             }}
                         >
-                            {productType.imageUrl ? (
+                            {productType.imageUrl && (
                                 <Box
                                     sx={{
                                         width: '100%',
-                                        height: 180,
+                                        height: 140,
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         overflow: 'hidden',
-                                        mb: 1,
+                                        mb: 2,
+                                        borderRadius: 2,
                                     }}
                                 >
                                     <Box
@@ -70,14 +81,21 @@ export default function HomeProducts() {
                                         }}
                                     />
                                 </Box>
-                            ) : null}
-
-                            <Box sx={{ fontWeight: 600, fontSize: '1rem' }}>
+                            )}
+                            <Box
+                                sx={{
+                                    textAlign: 'center',
+                                    fontWeight: 600,
+                                    fontSize: '1rem',
+                                    color: '#333',
+                                }}
+                            >
                                 {productType.name}
                             </Box>
                         </Box>
-                ))}
-            </Grid>
+                    ))}
+                </Box>
+            </Container>
         </Box>
     );
 }
