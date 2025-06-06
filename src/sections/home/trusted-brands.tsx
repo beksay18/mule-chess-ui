@@ -4,11 +4,11 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 
 const logos = [
-    '/assets/images/brands/logo.webp',
-    '/assets/images/brands/logo.webp',
-    '/assets/images/brands/logo.webp',
-    '/assets/images/brands/logo.webp',
-    '/assets/images/brands/logo.webp',
+    '/assets/images/brands/avery-dennison.webp',
+    '/assets/images/brands/xpel.webp',
+    '/assets/images/brands/3m.webp',
+    '/assets/images/brands/arlon.webp',
+    '/assets/images/brands/orafol.webp',
 ];
 
 export default function TrustedBrands() {
