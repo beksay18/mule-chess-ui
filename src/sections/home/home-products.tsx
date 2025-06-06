@@ -45,48 +45,50 @@ export default function HomeProducts() {
                             key={productType.id}
                             onClick={() => handleTypeClick(productType.id)}
                             sx={{
-                                p: 2,
-                                backgroundColor: '#dde4ef',
-                                borderRadius: 3,
-                                boxShadow: 1,
-                                transition: 'all 0.3s ease',
+                                p: 3,
+                                background: 'linear-gradient(135deg, #f2f5f9, #ffffff)',
+                                borderRadius: 4,
+                                boxShadow: '0 6px 20px rgba(0, 0, 0, 0.05)',
+                                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
                                 cursor: 'pointer',
                                 '&:hover': {
-                                    boxShadow: 4,
-                                    transform: 'translateY(-5px)',
+                                    transform: 'translateY(-6px) scale(1.02)',
+                                    boxShadow: '0 10px 28px rgba(0, 0, 0, 0.1)',
                                 },
                             }}
                         >
-                            {productType.imageUrl && (
+                            {/* Sticker Image */}
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    mb: 2,
+                                }}
+                            >
                                 <Box
+                                    component="img"
+                                    src={`${baseURL}${productType.imageUrl}`}
+                                    alt={productType.name}
                                     sx={{
                                         width: '100%',
-                                        height: 140,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        overflow: 'hidden',
-                                        mb: 2,
+                                        maxHeight: 140,
+                                        objectFit: 'contain',
                                         borderRadius: 2,
+                                        transition: 'transform 0.3s ease',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                        },
                                     }}
-                                >
-                                    <Box
-                                        component="img"
-                                        src={`${baseURL}${productType.imageUrl}`}
-                                        alt={productType.name}
-                                        sx={{
-                                            maxWidth: '100%',
-                                            maxHeight: '100%',
-                                            objectFit: 'contain',
-                                        }}
-                                    />
-                                </Box>
-                            )}
+                                />
+                            </Box>
+
+                            {/* Product Name */}
                             <Box
                                 sx={{
                                     textAlign: 'center',
-                                    fontWeight: 600,
-                                    fontSize: '1rem',
+                                    fontWeight: 700,
+                                    fontSize: '1.05rem',
                                     color: '#333',
                                 }}
                             >

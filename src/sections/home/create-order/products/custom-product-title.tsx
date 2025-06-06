@@ -29,7 +29,7 @@ export default function CustomProductTitle() {
 
     return (
         <Box sx={{
-            background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+            background: '#04498e',
             py: 2
         }}>
             <Container>

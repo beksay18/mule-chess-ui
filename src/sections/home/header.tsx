@@ -91,6 +91,7 @@ export default function Header() {
             id="hero"
             sx={{
                 width: '100%',
+                background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}
         >
@@ -124,8 +125,8 @@ export default function Header() {
                     </Box>
                     <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, ml: 2}}>
                         <Button
-                            size="medium"
-                            sx={{color: 'text.primary', fontWeight: 500}}
+                            size="large"
+                            sx={{color: '#ffffff', fontWeight: 600}}
                             onClick={handleOpenMenu}
                             endIcon={<ArrowDropDownIcon/>}
                         >
@@ -150,7 +151,7 @@ export default function Header() {
                             ))}
                         </Menu>
 
-                        <Button size="medium" sx={{color: 'text.primary', fontWeight: 500}}>
+                        <Button size="large" sx={{color: '#ffffff', fontWeight: 800}}>
                             For Businesses
                         </Button>
                     </Box>
@@ -166,6 +167,7 @@ export default function Header() {
                         onClick={() => router.push('/cart')}
                         disabled={cartItems.length === 0}
                         sx={{
+                            color: '#ffffff',
                             '&:hover': {
                                 backgroundColor: 'transparent',
                             },
@@ -182,7 +184,7 @@ export default function Header() {
                                 sx={{
                                     textTransform: 'none',
                                     fontWeight: 500,
-                                    color: 'text.primary',
+                                    color: '#ffffff',
                                     border: '1px solid',
                                     borderColor: 'divider',
                                     borderRadius: 2,
@@ -201,9 +203,9 @@ export default function Header() {
                                 sx={{
                                     textTransform: 'none',
                                     fontWeight: 500,
-                                    color: 'text.primary',
+                                    color: '#ffffff',
+                                    borderColor: '#ffffff',
                                     border: '1px solid',
-                                    borderColor: 'divider',
                                     borderRadius: 2,
                                     px: 2,
                                     py: 1,
@@ -219,11 +221,11 @@ export default function Header() {
                     ) : (
                         <>
                         <Button color="primary" variant="text" size="medium" href="/sign-in"
-                                sx={{ border: '1px solid', borderColor: 'primary.main' }} >
+                                sx={{ border: '1px solid',color: '#ffffff', borderColor: '#ffffff' }} >
                             Log in
                         </Button>
                         <Button color="primary" variant="text" size="medium" href="/sign-up"
-                                sx={{ border: '1px solid', borderColor: 'primary.main' }} >
+                                sx={{ border: '1px solid',color: '#ffffff', borderColor: '#ffffff' }} >
                             Sign up
                         </Button>
                         </>
