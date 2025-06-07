@@ -43,5 +43,7 @@ export const ENDPOINTS = {
     CONTACTS: {
         GET_ALL_CONTACTS: "/cg-stickers/api/contacts/all-contacts",
         CREATE_CONTACT: "/cg-stickers/api/contacts/save-contacts",
+        MARK_DONE: (id: number) => `/cg-stickers/api/contacts/mark-done/${id}`,
+        NEW_COUNT: "/cg-stickers/api/contacts/new-count",
     },
 }

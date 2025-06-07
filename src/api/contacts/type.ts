@@ -8,6 +8,7 @@ export interface ContactsContent {
     message: string,
     fileUrl: string,
     dateCreated: string,
+    contactStatus: string;
 }
 
 export interface ContactsResponse {

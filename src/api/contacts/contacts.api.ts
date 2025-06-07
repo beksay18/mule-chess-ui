@@ -27,3 +27,9 @@ export const getAllContacts = ({page, size, filter}: {
     axios.getWithRetries<ContactResponsePage>(
         `${ENDPOINTS.CONTACTS.GET_ALL_CONTACTS}?page=${page}&size=${size}${filter ? `&filter=${encodeURIComponent(filter)}` : ''}`
     ).then(({data}) => data);
+
+export const markContactAsDone = (id: number): Promise<void> =>
+    axios.put<void>(ENDPOINTS.CONTACTS.MARK_DONE(id)).then(() => {});
+
+export const getNewContactCount = (): Promise<number> =>
+    axios.get<number>(ENDPOINTS.CONTACTS.NEW_COUNT).then(({ data }) => data);

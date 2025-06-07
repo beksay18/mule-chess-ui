@@ -96,6 +96,8 @@ export function ContactsView() {
                                         { id: 'orderNumber', label: 'Order Number' },
                                         { id: 'message', label: 'Message' },
                                         { id: 'dateCreated', label: 'Date' },
+                                        { id: 'contactStatus', label: 'Status' },
+                                        { id: '', label: '' },
                                     ]}
                                 />
                                 <TableBody>

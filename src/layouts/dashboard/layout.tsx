@@ -19,11 +19,15 @@ import { MenuButton } from '../components/menu-button';
 import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { AccountPopover } from '../components/account-popover';
+import IconButton from '@mui/material/IconButton';
 
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
 import Typography from "@mui/material/Typography";
+import {useRouter} from "../../routes/hooks";
+import {useEffect, useState} from "react";
+import {getNewContactCount} from "../../api/contacts";
 
 // ----------------------------------------------------------------------
 
@@ -45,6 +49,8 @@ export function DashboardLayout({
   layoutQuery = 'lg',
 }: DashboardLayoutProps) {
   const theme = useTheme();
+  const router = useRouter();
+  const [newContactCount, setNewContactCount] = useState(0);
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
@@ -59,6 +65,10 @@ export function DashboardLayout({
   };
 
   const pageTitle = getPageTitle(location.pathname);
+
+    useEffect(() => {
+        getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
+    }, []);
 
   const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
@@ -90,16 +100,24 @@ export function DashboardLayout({
       ),
       rightArea: (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 4 } }}>
-            <Badge badgeContent={3} color="error">
-              <MailIcon color="action"
-                        sx={{
-                          fontSize: {
-                            xs: 24,
-                            sm: 30,
-                          },
-                        }}
-              />
-            </Badge>
+              <IconButton
+                  onClick={() => router.push('/contacts')}
+                  sx={{
+                      p: 0,
+                  }}
+              >
+                  <Badge badgeContent={newContactCount} color="error">
+                      <MailIcon
+                          color="action"
+                          sx={{
+                              fontSize: {
+                                  xs: 24,
+                                  sm: 30,
+                              },
+                          }}
+                      />
+                  </Badge>
+              </IconButton>
             <AccountPopover data={_account} />
           </Box>
       ),
