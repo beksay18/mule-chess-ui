@@ -23,6 +23,7 @@ import {OrderConfirmationView} from "../sections/home/create-order/order-confirm
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const OrdersPage = lazy(() => import('src/pages/orders'));
+export const ContactsPage = lazy(() => import('src/pages/contacts'));
 export const OrderDetailsPage = lazy(() => import('src/pages/order-details'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const SignUpPage = lazy(() => import('src/pages/sign-up'));
@@ -72,6 +73,7 @@ export const routesSection: RouteObject[] = [
             {path: 'orders', element: <OrdersPage/>},
             {path: 'order-details/:id', element: <OrderDetailsPage/>},
             {path: 'user', element: <UserPage/>},
+            {path: 'contacts', element: <ContactsPage/>},
             {
                 path: 'products-types',
                 element: (

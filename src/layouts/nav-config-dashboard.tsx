@@ -2,6 +2,7 @@ import { Label } from 'src/components/label';
 import { SvgColor } from 'src/components/svg-color';
 import CategoryIcon from '@mui/icons-material/Category';
 import ExtensionIcon from '@mui/icons-material/Extension';
+import EmailIcon from '@mui/icons-material/Email';
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +35,11 @@ export const navData = [
     title: 'User',
     path: '/user',
     icon: icon('ic-user'),
+  },
+  {
+    title: 'Contacts',
+    path: '/contacts',
+    icon: <EmailIcon />,
   },
   {
     title: 'Product Types',
