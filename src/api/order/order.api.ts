@@ -86,3 +86,6 @@ export const buildOrderFormData = (order: OrderRequest): FormData => {
 
     return formData;
 };
+
+export const getNewOrdersCount = (): Promise<number> =>
+    axios.get<number>(ENDPOINTS.ORDER.NEW_COUNT).then(({ data }) => data);

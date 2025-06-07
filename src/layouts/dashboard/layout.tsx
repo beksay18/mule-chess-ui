@@ -11,7 +11,7 @@ import { NavMobile, NavDesktop } from './nav';
 import { layoutClasses } from '../core/classes';
 import { _account } from '../nav-config-account';
 import { dashboardLayoutVars } from './css-vars';
-import { navData } from '../nav-config-dashboard';
+import {getNavData} from '../nav-config-dashboard';
 import { MainSection } from '../core/main-section';
 import MailIcon from '@mui/icons-material/Mail';
 import Badge from '@mui/material/Badge';
@@ -28,6 +28,7 @@ import Typography from "@mui/material/Typography";
 import {useRouter} from "../../routes/hooks";
 import {useEffect, useState} from "react";
 import {getNewContactCount} from "../../api/contacts";
+import {getNewOrdersCount} from "../../api/order";
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ export function DashboardLayout({
   const theme = useTheme();
   const router = useRouter();
   const [newContactCount, setNewContactCount] = useState(0);
+  const [newOrderCount, setNewOrderCount] = useState(0);
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
 
@@ -68,9 +70,12 @@ export function DashboardLayout({
 
     useEffect(() => {
         getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
+        getNewOrdersCount().then(setNewOrderCount).catch(() => setNewOrderCount(0));
     }, []);
 
-  const renderHeader = () => {
+    const navData = getNavData(newOrderCount);
+
+    const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
       container: {
         maxWidth: false,

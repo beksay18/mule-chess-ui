@@ -4,8 +4,6 @@ import CategoryIcon from '@mui/icons-material/Category';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import EmailIcon from '@mui/icons-material/Email';
 
-// ----------------------------------------------------------------------
-
 const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} />;
 
 export type NavItem = {
@@ -15,7 +13,7 @@ export type NavItem = {
   info?: React.ReactNode;
 };
 
-export const navData = [
+export const getNavData = (newOrderCount: number): NavItem[] => [
   {
     title: 'Dashboard',
     path: '/dashboard',
@@ -25,11 +23,12 @@ export const navData = [
     title: 'Orders',
     path: '/orders',
     icon: icon('ic-cart'),
-    info: (
-        <Label color="error" variant="inverted">
-          +3
-        </Label>
-    ),
+    info:
+        newOrderCount > 0 ? (
+            <Label color="error" variant="inverted">
+              +{newOrderCount}
+            </Label>
+        ) : undefined,
   },
   {
     title: 'User',
@@ -49,6 +48,6 @@ export const navData = [
   {
     title: 'Products',
     path: '/products',
-    icon: <ExtensionIcon/>,
+    icon: <ExtensionIcon />,
   },
 ];
