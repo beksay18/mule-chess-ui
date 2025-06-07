@@ -13,7 +13,8 @@ import { _account } from '../nav-config-account';
 import { dashboardLayoutVars } from './css-vars';
 import { navData } from '../nav-config-dashboard';
 import { MainSection } from '../core/main-section';
-import { Searchbar } from '../components/searchbar';
+import MailIcon from '@mui/icons-material/Mail';
+import Badge from '@mui/material/Badge';
 import { MenuButton } from '../components/menu-button';
 import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
@@ -88,11 +89,19 @@ export function DashboardLayout({
         </>
       ),
       rightArea: (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0, sm: 0.75 } }}>
-
-          {/** @slot Account drawer */}
-          <AccountPopover data={_account} />
-        </Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 4 } }}>
+            <Badge badgeContent={3} color="error">
+              <MailIcon color="action"
+                        sx={{
+                          fontSize: {
+                            xs: 24,
+                            sm: 30,
+                          },
+                        }}
+              />
+            </Badge>
+            <AccountPopover data={_account} />
+          </Box>
       ),
     };
 
