@@ -45,7 +45,7 @@ export function OrderTableRow({ row, selected, onSelectRow, currentPage }: Order
         <>
             <TableRow hover tabIndex={-1} role="checkbox" selected={selected} onClick={handleRowClick} sx={{
                 cursor: 'pointer',
-                backgroundColor: row.orderStatus?.toLowerCase() === 'new' ? 'rgba(25, 118, 210, 0.08)' : 'inherit',
+                backgroundColor: row.orderStatus?.toLowerCase() === 'in_progress' ? 'rgba(25, 118, 210, 0.08)' : 'inherit',
             }}>
                 <TableCell>{row.orderNumber}</TableCell>
 

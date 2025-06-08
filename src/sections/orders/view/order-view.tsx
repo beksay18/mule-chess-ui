@@ -16,6 +16,7 @@ import { OrderTableHead } from '../order-table-head';
 import { OrderTableRow } from '../order-table-row';
 import { getAllOrders, OrderContent } from 'src/api/order';
 import { useRouter } from '../../../routes/hooks';
+import {OrderTableToolbar} from "../order-table-toolbar";
 
 export function OrderView() {
     const [searchParams] = useSearchParams();
@@ -29,6 +30,7 @@ export function OrderView() {
     const [filters, setFilters] = useState('');
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<string[]>([]);
+    const [orderNumber, setOrderNumber] = useState('');
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -81,6 +83,14 @@ export function OrderView() {
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Card>
+                <OrderTableToolbar
+                    filterName={orderNumber}
+                    onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = event.target.value;
+                        setOrderNumber(value);
+                        setFilters(value ? `orderNumber:${value}` : '');
+                    }}
+                />
                 <Scrollbar>
                     <TableContainer sx={{ overflow: 'unset' }}>
                         {loading ? (
