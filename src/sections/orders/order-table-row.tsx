@@ -1,7 +1,7 @@
-import { useState, useCallback } from 'react';
+import {useState, useCallback} from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import { Label } from 'src/components/label';
+import {Label} from 'src/components/label';
 import {useRouter} from "../../routes/hooks";
 
 // ----------------------------------------------------------------------
@@ -25,7 +25,7 @@ type OrderTableRowProps = {
     currentPage: number;
 };
 
-export function OrderTableRow({ row, selected, onSelectRow, currentPage }: OrderTableRowProps) {
+export function OrderTableRow({row, selected, onSelectRow, currentPage}: OrderTableRowProps) {
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
     const router = useRouter();
 
@@ -45,7 +45,7 @@ export function OrderTableRow({ row, selected, onSelectRow, currentPage }: Order
         <>
             <TableRow hover tabIndex={-1} role="checkbox" selected={selected} onClick={handleRowClick} sx={{
                 cursor: 'pointer',
-                backgroundColor: row.orderStatus?.toLowerCase() === 'in_progress' ? 'rgba(25, 118, 210, 0.08)' : 'inherit',
+                backgroundColor: row.orderStatus?.toLowerCase() === 'new' ? 'rgba(25, 118, 210, 0.08)' : 'inherit',
             }}>
                 <TableCell>{row.orderNumber}</TableCell>
 
@@ -62,9 +62,11 @@ export function OrderTableRow({ row, selected, onSelectRow, currentPage }: Order
                                 ? 'error'
                                 : row.orderStatus.toLowerCase() === 'ready_to_ship'
                                     ? 'warning'
-                                    : row.orderStatus.toLowerCase() === 'new'
-                                        ? 'primary'
-                                        : 'success'
+                                    : row.orderStatus.toLowerCase() === 'in_progress'
+                                        ? 'secondary'
+                                        : row.orderStatus.toLowerCase() === 'new'
+                                            ? 'primary'
+                                            : 'success'
                         }
                     >
                         {row.orderStatus}
@@ -85,8 +87,8 @@ export function OrderTableRow({ row, selected, onSelectRow, currentPage }: Order
                     <Label
                         color={
                             row.paymentStatus.toLowerCase() === 'paid'
-                                        ? 'success'
-                                        : 'warning'
+                                ? 'success'
+                                : 'warning'
                         }
                     >
                         {row.paymentStatus}

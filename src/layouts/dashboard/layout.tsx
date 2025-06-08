@@ -29,6 +29,7 @@ import {useRouter} from "../../routes/hooks";
 import {useEffect, useState} from "react";
 import {getNewContactCount} from "../../api/contacts";
 import {getNewOrdersCount} from "../../api/order";
+import {Chip} from "@mui/material";
 
 // ----------------------------------------------------------------------
 
@@ -40,6 +41,7 @@ export type DashboardLayoutProps = LayoutBaseProps & {
     header?: HeaderSectionProps;
     main?: MainSectionProps;
   };
+    orderStatus?: string;
 };
 
 export function DashboardLayout({
@@ -48,6 +50,7 @@ export function DashboardLayout({
   children,
   slotProps,
   layoutQuery = 'lg',
+                                    orderStatus,
 }: DashboardLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
@@ -100,6 +103,18 @@ export function DashboardLayout({
                 {pageTitle}
               </Typography>
           )}
+            {orderStatus && (
+                <Box display="flex" alignItems="center" ml={3} gap={2}>
+                    <Typography variant="h4" noWrap>{pageTitle}</Typography>
+                    {['NEW', 'IN_PROGRESS'].includes(orderStatus || '') && (
+                        <Chip
+                            label={orderStatus}
+                            color={orderStatus === 'NEW' ? 'primary' : 'secondary'}
+                            sx={{ fontWeight: 500 }}
+                        />
+                    )}
+                </Box>
+            )}
           <NavMobile data={navData} open={open} onClose={onClose} />
         </>
       ),

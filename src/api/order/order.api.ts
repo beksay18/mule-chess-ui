@@ -89,3 +89,10 @@ export const buildOrderFormData = (order: OrderRequest): FormData => {
 
 export const getNewOrdersCount = (): Promise<number> =>
     axios.get<number>(ENDPOINTS.ORDER.NEW_COUNT).then(({ data }) => data);
+
+export const startProcessingOrder = async (orderId: number | string): Promise<{ message: string }> => {
+    const { data } = await axios.put<{ message: string }>(
+        ENDPOINTS.ORDER.START_PROCESSING(orderId)
+    );
+    return data;
+};

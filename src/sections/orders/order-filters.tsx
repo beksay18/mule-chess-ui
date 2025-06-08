@@ -146,7 +146,7 @@ export function OrderFilters({
                 }
                 onClick={onOpenFilter}
             >
-               Advanced Filters
+                Filters
             </Button>
 
             <Drawer
@@ -155,7 +155,7 @@ export function OrderFilters({
                 onClose={onCloseFilter}
                 slotProps={{
                     paper: {
-                        sx: { width: 480, overflow: 'hidden' },
+                        sx: { width: 360, overflow: 'hidden' },
                     },
                 }}
             >

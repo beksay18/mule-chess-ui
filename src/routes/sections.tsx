@@ -71,7 +71,6 @@ export const routesSection: RouteObject[] = [
         children: [
             {path: 'dashboard', element: <DashboardPage/>},
             {path: 'orders', element: <OrdersPage/>},
-            {path: 'order-details/:id', element: <OrderDetailsPage/>},
             {path: 'user', element: <UserPage/>},
             {path: 'contacts', element: <ContactsPage/>},
             {
@@ -111,6 +110,16 @@ export const routesSection: RouteObject[] = [
                 ],
             },
         ],
+    },
+    {
+        path: 'order-details/:id',
+        element: (
+            <AuthGuard>
+                <Suspense fallback={renderFallback()}>
+                    <OrderDetailsPage/>
+                </Suspense>
+            </AuthGuard>
+        ),
     },
     {
         path: 'sign-in',
