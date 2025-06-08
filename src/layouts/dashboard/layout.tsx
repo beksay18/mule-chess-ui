@@ -69,6 +69,14 @@ export function DashboardLayout({
     return '';
   };
 
+    const statusColorMap: Record<string, 'default' | 'secondary' | 'secondary' | 'error' | 'primary' | 'success' | 'warning'> = {
+        NEW: 'primary',
+        IN_PROGRESS: 'secondary',
+        READY_TO_SHIP: 'warning',
+        SHIPPED: 'success',
+        CANCELLED: 'error',
+    };
+
   const pageTitle = getPageTitle(location.pathname);
 
     useEffect(() => {
@@ -106,10 +114,10 @@ export function DashboardLayout({
             {orderStatus && (
                 <Box display="flex" alignItems="center" ml={3} gap={2}>
                     <Typography variant="h4" noWrap>{pageTitle}</Typography>
-                    {['NEW', 'IN_PROGRESS'].includes(orderStatus || '') && (
+                    {['NEW', 'IN_PROGRESS', 'READY_TO_SHIP', 'CANCELLED', 'SHIPPED'].includes(orderStatus || '') && (
                         <Chip
                             label={orderStatus}
-                            color={orderStatus === 'NEW' ? 'primary' : 'secondary'}
+                            color={statusColorMap[orderStatus as keyof typeof statusColorMap] || 'default'}
                             sx={{ fontWeight: 500 }}
                         />
                     )}

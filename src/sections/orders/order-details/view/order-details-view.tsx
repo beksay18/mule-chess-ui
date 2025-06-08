@@ -10,7 +10,7 @@ import {CustomerOrderResponse, getOrderById} from '../../../../api/orderDetails'
 import {useRouter} from "../../../../routes/hooks";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {toast} from 'react-toastify';
-import {startProcessingOrder} from "../../../../api/order";
+import {markOrderReadyToShip, startProcessingOrder} from "../../../../api/order";
 import {OrderSummary} from "../order-summary";
 import {CustomerInfo} from "../customer-info";
 import {ShippingInfo} from "../shipping-info";
@@ -31,7 +31,7 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
     const [searchParams] = useSearchParams();
     const page = searchParams.get('page') || '0';
     const [openDialog, setOpenDialog] = useState(false);
-
+    const [dialogMode, setDialogMode] = useState<'IN_PROGRESS' | 'READY_TO_SHIP' | null>(null);
 
     useEffect(() => {
         if (id) getOrderById(Number(id)).then(setOrder);
@@ -49,6 +49,21 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             setOrderStatus(updated.orderStatus);
         } catch (error: any) {
             toast.error(error?.response?.data?.message || "Failed to start processing.");
+        }
+    };
+
+    const handleReadyToShip = async () => {
+        if (!id) return;
+
+        try {
+            await markOrderReadyToShip(id);
+            toast.success("Order marked as READY_TO_SHIP.");
+
+            const updated = await getOrderById(Number(id));
+            setOrder(updated);
+            setOrderStatus(updated.orderStatus);
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to mark ready to ship.");
         }
     };
 
@@ -82,10 +97,25 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                     {order.orderStatus === 'NEW' && (
                         <Button
                             variant="contained"
-                            color="info"
-                            onClick={() => setOpenDialog(true)}
+                            color="secondary"
+                            onClick={() => {
+                                setDialogMode('IN_PROGRESS');
+                                setOpenDialog(true);
+                            }}
                         >
                             Start Processing
+                        </Button>
+                    )}
+                    {order.orderStatus === 'IN_PROGRESS' && (
+                        <Button
+                            variant="contained"
+                            color="warning"
+                            onClick={() => {
+                                setDialogMode('READY_TO_SHIP');
+                                setOpenDialog(true);
+                            }}
+                        >
+                            Mark Ready to Ship
                         </Button>
                     )}
                 </Box>
@@ -107,10 +137,12 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <Box p={3}>
                     <Typography variant="h6" gutterBottom>
-                        Confirm Start Processing
+                        {dialogMode === 'IN_PROGRESS' ? 'Confirm Start Processing' : 'Confirm Ready to Ship'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Are you sure you want to mark this order as <strong>IN_PROGRESS</strong>?
+                        {dialogMode === 'IN_PROGRESS'
+                            ? 'Are you sure you want to mark this order as IN_PROGRESS?'
+                            : 'Are you sure you want to mark this order as READY_TO_SHIP?'}
                     </Typography>
                     <Box display="flex" justifyContent="flex-end" gap={1}>
                         <Button onClick={() => setOpenDialog(false)} color="inherit">
@@ -118,10 +150,14 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                         </Button>
                         <Button
                             variant="contained"
-                            color="info"
+                            color={dialogMode === 'IN_PROGRESS' ? 'secondary' : 'warning'}
                             onClick={async () => {
                                 setOpenDialog(false);
-                                await handleStartProcessing();
+                                if (dialogMode === 'IN_PROGRESS') {
+                                    await handleStartProcessing();
+                                } else if (dialogMode === 'READY_TO_SHIP') {
+                                    await handleReadyToShip();
+                                }
                             }}
                         >
                             Confirm

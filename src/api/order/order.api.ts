@@ -96,3 +96,10 @@ export const startProcessingOrder = async (orderId: number | string): Promise<{ 
     );
     return data;
 };
+
+export const markOrderReadyToShip = async (orderId: number | string): Promise<{ message: string }> => {
+    const { data } = await axios.put<{ message: string }>(
+        ENDPOINTS.ORDER.READY_TO_SHIP(orderId)
+    );
+    return data;
+};
