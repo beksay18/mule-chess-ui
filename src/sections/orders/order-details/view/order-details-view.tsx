@@ -1,28 +1,27 @@
 import {
     Box,
     Typography,
-    Card,
-    CardContent,
-    Divider,
-    Avatar,
-    Stack,
-    Chip, Button,
+    Button,
 } from '@mui/material';
 import {DashboardContent} from 'src/layouts/dashboard';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import {CustomerOrderResponse, getOrderById} from '../../../../api/orderDetails';
-import {Icon} from '@iconify/react';
 import {useRouter} from "../../../../routes/hooks";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {toast} from 'react-toastify';
 import {startProcessingOrder} from "../../../../api/order";
+import {OrderSummary} from "../order-summary";
+import {CustomerInfo} from "../customer-info";
+import {ShippingInfo} from "../shipping-info";
+import {ProductList} from "../product-list";
+import Dialog from "@mui/material/Dialog";
 
 type OrderDetailProps = {
     setOrderStatus: (status: string) => void;
 };
 
-export function OrderDetailsView({ setOrderStatus }: OrderDetailProps) {
+export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
     const router = useRouter();
     const {id} = useParams();
     const [order, setOrder] = useState<CustomerOrderResponse | null>(null);
@@ -31,6 +30,8 @@ export function OrderDetailsView({ setOrderStatus }: OrderDetailProps) {
 
     const [searchParams] = useSearchParams();
     const page = searchParams.get('page') || '0';
+    const [openDialog, setOpenDialog] = useState(false);
+
 
     useEffect(() => {
         if (id) getOrderById(Number(id)).then(setOrder);
@@ -82,7 +83,7 @@ export function OrderDetailsView({ setOrderStatus }: OrderDetailProps) {
                         <Button
                             variant="contained"
                             color="info"
-                            onClick={handleStartProcessing}
+                            onClick={() => setOpenDialog(true)}
                         >
                             Start Processing
                         </Button>
@@ -90,153 +91,44 @@ export function OrderDetailsView({ setOrderStatus }: OrderDetailProps) {
                 </Box>
             </Box>
 
-
             <Box display="flex" flexDirection={{xs: 'column', lg: 'row'}} gap={3}>
 
                 <Box flex={2} display="flex" flexDirection="column" gap={3}>
-
-                    <Card elevation={2} sx={{borderRadius: 2}}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <Icon icon="mdi:cart" style={{marginRight: 8}}/>
-                                Products
-                            </Typography>
-                            <Divider sx={{mb: 2}}/>
-                            {order.lineItems.map((item, index) => (
-                                <Box key={index} sx={{mb: 2}}>
-                                    <Stack direction="row" spacing={2} alignItems="center">
-                                        <Box display="flex" alignItems="center" flex={1}>
-                                            <Avatar src={item.imageUrl} variant="rounded"
-                                                    sx={{width: 56, height: 56, mr: 2}}/>
-                                            <Box>
-                                                <Typography fontWeight={500}>{item.productName}</Typography>
-                                                <Typography variant="body2" color="text.secondary">
-                                                    {item.width}&quot; x {item.height}&quot; · {item.isCustomDimension ? 'Custom' : 'Standard'}
-                                                </Typography>
-                                            </Box>
-                                        </Box>
-
-                                        <Typography variant="body2" color="text.secondary" flex={1}>
-                                            Qty: {item.quantity}
-                                        </Typography>
-
-                                        <Typography variant="body2" color="text.secondary" sx={{ml: 'auto'}}>
-                                            {item.percentage}%
-                                        </Typography>
-                                    </Stack>
-                                    {item.artworks.map((url, i) => {
-                                        const artworkUrl = `${baseURL}${url}`;
-                                        return (
-                                            <Box
-                                                key={i}
-                                                sx={{display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2, ml: 8}}
-                                            >
-                                                <img
-                                                    src={artworkUrl}
-                                                    alt={`Artwork ${i + 1}`}
-                                                    style={{
-                                                        width: 80,
-                                                        height: 'auto',
-                                                        borderRadius: 4,
-                                                        border: '1px solid #ccc',
-                                                    }}
-                                                />
-                                                <a
-                                                    href={artworkUrl}
-                                                    download={`artwork-${i + 1}.png`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                >
-                                                    <Typography
-                                                        variant="caption"
-                                                        color="primary"
-                                                        sx={{
-                                                            cursor: 'pointer',
-                                                            textDecoration: 'underline',
-                                                            '&:hover': {color: 'primary.dark'},
-                                                        }}
-                                                    >
-                                                        Download Artwork {i + 1}
-                                                    </Typography>
-                                                </a>
-                                            </Box>
-                                        );
-                                    })}
-                                    {index < order.lineItems.length - 1 && <Divider sx={{my: 2}}/>}
-                                </Box>
-                            ))}
-                        </CardContent>
-                    </Card>
-
+                    <ProductList lineItems={order.lineItems} baseURL={baseURL}/>
                 </Box>
 
                 <Box flex={1} display="flex" flexDirection="column" gap={3}>
-
-                    <Card elevation={2} sx={{borderRadius: 2}}>
-                        <CardContent>
-                            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                <Typography variant="h6">
-                                    Order Summary
-                                </Typography>
-                                {order.payment ? (
-                                    <Chip
-                                        label={order.payment.paymentStatus.toUpperCase()}
-                                        color={order.payment.paymentStatus === 'paid' ? 'success' : 'warning'}
-                                        sx={{fontWeight: 500}}
-                                    />
-                                ) : (
-                                    <Chip
-                                        label="UNPAID"
-                                        color="warning"
-                                        sx={{fontWeight: 500}}
-                                    />
-                                )}
-                            </Box>
-
-                            <Divider sx={{mb: 2}}/>
-
-                            <Stack spacing={1}>
-                                <Typography> Subtotal:
-                                    ${order.payment ? order.payment.amount.toFixed(2) : '0.00'}</Typography>
-                                <Typography>Discount: $0.00</Typography>
-                                <Typography>Shipping: $0.00</Typography>
-                                <Typography variant="subtitle1" fontWeight={600} mt={1}>
-                                    Order Total: ${order.totalAmount.toFixed(2)}
-                                </Typography>
-                            </Stack>
-                        </CardContent>
-                    </Card>
-
-                    <Card elevation={2} sx={{borderRadius: 2}}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <Icon icon="mdi:account-outline" style={{marginRight: 8}}/>
-                                Customer
-                            </Typography>
-                            <Divider sx={{mb: 2}}/>
-                            <Typography fontWeight={500}>{order.customerFirstName} {order.customerLastName}</Typography>
-                            <Typography variant="body2">{order.customerEmail}</Typography>
-                            <Typography variant="body2">{order.customerPhone}</Typography>
-                        </CardContent>
-                    </Card>
-
-                    <Card elevation={2} sx={{borderRadius: 2}}>
-                        <CardContent>
-                            <Typography variant="h6" gutterBottom>
-                                <Icon icon="mdi:truck-delivery-outline" style={{marginRight: 8}}/>
-                                Shipping Address
-                            </Typography>
-                            <Divider sx={{mb: 2}}/>
-                            <Typography>{order.shippingAddress.addressLine1}</Typography>
-                            {order.shippingAddress.addressLine2 && (
-                                <Typography>{order.shippingAddress.addressLine2}</Typography>
-                            )}
-                            <Typography>{order.shippingAddress.city}, {order.shippingAddress.state}</Typography>
-                            <Typography>{order.shippingAddress.postalCode}, {order.shippingAddress.country}</Typography>
-                        </CardContent>
-                    </Card>
+                    <OrderSummary payment={order.payment} totalAmount={order.totalAmount}/>
+                    <CustomerInfo order={order}/>
+                    <ShippingInfo shippingAddress={order.shippingAddress}/>
                 </Box>
             </Box>
+
+            <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+                <Box p={3}>
+                    <Typography variant="h6" gutterBottom>
+                        Confirm Start Processing
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        Are you sure you want to mark this order as <strong>IN_PROGRESS</strong>?
+                    </Typography>
+                    <Box display="flex" justifyContent="flex-end" gap={1}>
+                        <Button onClick={() => setOpenDialog(false)} color="inherit">
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="info"
+                            onClick={async () => {
+                                setOpenDialog(false);
+                                await handleStartProcessing();
+                            }}
+                        >
+                            Confirm
+                        </Button>
+                    </Box>
+                </Box>
+            </Dialog>
         </DashboardContent>
     );
 }
