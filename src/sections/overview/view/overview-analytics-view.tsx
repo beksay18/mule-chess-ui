@@ -1,20 +1,47 @@
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import FiberNewIcon from '@mui/icons-material/FiberNew';
-import AlarmOnIcon from '@mui/icons-material/AlarmOn';
-import DoneIcon from '@mui/icons-material/Done';
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { AnalyticsWidgetSummary } from '../analytics-widget-summary';
 import {getCurrentUser} from "../../../api";
+import {useEffect, useState} from "react";
+import {getOrderStatusCount, OrderStatusCount} from "../../../api/order";
+import {Box} from "@mui/material";
 
 // ----------------------------------------------------------------------
 
 export function OverviewAnalyticsView() {
-
   const user = getCurrentUser();
+  const [statusCounts, setStatusCounts] = useState<OrderStatusCount[]>([]);
+
+  useEffect(() => {
+    getOrderStatusCount().then(setStatusCounts);
+  }, []);
+
+  const getColorForStatus = (status: string) => {
+    switch (status) {
+      case 'NEW':
+        return 'info';
+      case 'IN_PROGRESS':
+        return 'secondary';
+      case 'READY_TO_SHIP':
+        return 'warning';
+      case 'SHIPPED':
+        return 'success';
+      case 'CANCELLED':
+        return 'error';
+      default:
+        return 'primary';
+    }
+  };
+
+  const statusOrder = ['NEW', 'IN_PROGRESS', 'READY_TO_SHIP', 'SHIPPED', 'CANCELLED'];
+
+  const sortedStatusCounts = [...statusCounts].sort(
+      (a, b) => statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status)
+  );
+
 
   return (
     <DashboardContent maxWidth="xl">
@@ -22,47 +49,26 @@ export function OverviewAnalyticsView() {
           {user ? `Hi, ${user.person.firstName} ${user.person.lastName} 👋` : 'Hi, Unknown User 👋'}
       </Typography>
 
-      <Grid container spacing={3}>
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <AnalyticsWidgetSummary
-            title="New Orders"
-            percent={2.6}
-            total={714000}
-            icon={<FiberNewIcon />}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <AnalyticsWidgetSummary
-            title="Ready To Ship Orders"
-            percent={-0.1}
-            total={1352831}
-            color="secondary"
-            icon={<AlarmOnIcon />}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <AnalyticsWidgetSummary
-            title="Shipped orders"
-            percent={2.8}
-            total={1723315}
-            color="success"
-            icon={<DoneIcon/>}
-          />
-        </Grid>
-
-        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <AnalyticsWidgetSummary
-            title="Cancelled Orders"
-            percent={3.6}
-            total={234}
-            color="error"
-            icon={<DoDisturbIcon />}
-          />
-        </Grid>
-
-      </Grid>
+      <Box
+          display="grid"
+          gap={3}
+          gridTemplateColumns={{
+            xs: '1fr',
+            sm: '1fr 1fr',
+            md: 'repeat(3, 1fr)',
+            lg: 'repeat(5, 1fr)',
+          }}
+      >
+        {sortedStatusCounts.map((stat) => (
+            <Box key={stat.status}>
+              <AnalyticsWidgetSummary
+                  title={stat.status.replace(/_/g, ' ')}
+                  total={stat.count}
+                  color={getColorForStatus(stat.status)}
+              />
+            </Box>
+        ))}
+      </Box>
     </DashboardContent>
   );
 }

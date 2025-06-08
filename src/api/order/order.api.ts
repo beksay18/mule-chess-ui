@@ -1,6 +1,6 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {OrderRequest, OrderResponse, OrderResponsePage} from "./type";
+import {OrderRequest, OrderResponse, OrderResponsePage, OrderStatusCount} from "./type";
 
 export const createOrder = async (
     payload: OrderRequest
@@ -103,3 +103,8 @@ export const markOrderReadyToShip = async (orderId: number | string): Promise<{ 
     );
     return data;
 };
+
+export const getOrderStatusCount = (): Promise<OrderStatusCount[]> =>
+    axios
+        .get<OrderStatusCount[]>(ENDPOINTS.ORDER.STATUS_COUNT)
+        .then(({ data }) => data);

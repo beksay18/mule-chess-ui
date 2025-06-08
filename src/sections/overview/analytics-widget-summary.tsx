@@ -5,8 +5,7 @@ import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import { useTheme } from '@mui/material/styles';
 
-import { fPercent, fShortenNumber } from 'src/utils/format-number';
-import { Iconify } from 'src/components/iconify';
+import { fShortenNumber } from 'src/utils/format-number';
 import { SvgColor } from 'src/components/svg-color';
 import { varAlpha } from 'minimal-shared/utils';
 
@@ -15,47 +14,24 @@ import { varAlpha } from 'minimal-shared/utils';
 type Props = CardProps & {
     title: string;
     total: number;
-    percent: number;
     color?: PaletteColorKey;
-    icon: React.ReactNode;
 };
 
 export function AnalyticsWidgetSummary({
                                            sx,
-                                           icon,
                                            title,
                                            total,
-                                           percent,
                                            color = 'primary',
                                            ...other
                                        }: Props) {
     const theme = useTheme();
-
-    const renderTrending = () => (
-        <Box
-            sx={{
-                top: 16,
-                gap: 0.5,
-                right: 16,
-                display: 'flex',
-                position: 'absolute',
-                alignItems: 'center',
-            }}
-        >
-            <Iconify width={20} icon={percent < 0 ? 'eva:trending-down-fill' : 'eva:trending-up-fill'} />
-            <Box component="span" sx={{ typography: 'subtitle2' }}>
-                {percent > 0 && '+'}
-                {fPercent(percent)}
-            </Box>
-        </Box>
-    );
 
     return (
         <Card
             sx={[
                 () => ({
                     p: 3,
-                    boxShadow: 'none',
+                    boxShadow: theme.shadows[4],
                     position: 'relative',
                     color: `${color}.darker`,
                     backgroundColor: 'common.white',
@@ -68,12 +44,6 @@ export function AnalyticsWidgetSummary({
             ]}
             {...other}
         >
-            <Box sx={{ width: 64, height: 64, mb: 3, '& svg': { fontSize: 32 } }}>
-                {icon}
-            </Box>
-
-            {renderTrending()}
-
             <Box
                 sx={{
                     display: 'flex',
@@ -94,9 +64,9 @@ export function AnalyticsWidgetSummary({
                 sx={{
                     top: 0,
                     left: -20,
-                    width: 240,
+                    width: 200,
                     zIndex: -1,
-                    height: 240,
+                    height: 150,
                     opacity: 0.24,
                     position: 'absolute',
                     color: `${color}.main`,

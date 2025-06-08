@@ -117,3 +117,8 @@ export const usStates = [
     'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
     'Wisconsin', 'Wyoming'
 ];
+
+export interface OrderStatusCount {
+    status: string;
+    count: number;
+}
