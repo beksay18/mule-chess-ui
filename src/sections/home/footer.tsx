@@ -9,6 +9,8 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import InstagramIcon from '@mui/icons-material/Instagram';
+import YouTubeIcon from '@mui/icons-material/YouTube';
+import FacebookIcon from '@mui/icons-material/Facebook';
 import {useEffect, useState} from "react";
 import {getActiveProductTypes, ProductType} from "../../api/productType";
 import {useRouter} from "../../routes/hooks";
@@ -67,39 +69,27 @@ export default function Footer() {
                     }}
                 >
                     <Box sx={{ width: { xs: '100%', sm: '60%' } }}>
-                        <Typography variant="body2" gutterBottom sx={{ fontWeight: 600, mt: 2 }}>
-                            Join the CG Stickers
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
-                            Subscribe for weekly updates. No spams ever!
-                        </Typography>
-                        <InputLabel htmlFor="email-newsletter">Email</InputLabel>
-                        <Stack direction="row" spacing={1} useFlexGap>
-                            <TextField
-                                id="email-newsletter"
-                                hiddenLabel
-                                size="small"
-                                variant="outlined"
-                                fullWidth
-                                aria-label="Enter your email address"
-                                placeholder="Your email address"
-                                slotProps={{
-                                    htmlInput: {
-                                        autoComplete: 'off',
-                                        'aria-label': 'Enter your email address',
-                                    },
-                                }}
-                                sx={{ width: '250px' }}
-                            />
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                size="small"
-                                sx={{ flexShrink: 0 }}
-                            >
-                                Subscribe
-                            </Button>
+                        <Stack direction="row" spacing={1}>
+                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                                <InstagramIcon fontSize="large" />
+                            </IconButton>
+                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                                <YouTubeIcon fontSize="large" />
+                            </IconButton>
+                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
+                                <FacebookIcon fontSize="large" />
+                            </IconButton>
                         </Stack>
+                        <Typography variant="body2" gutterBottom color="text.secondary" sx={{ fontWeight: 600, mt: 2 }}>
+                            © {new Date().getFullYear()} CG Stickers. All rights reserved.&nbsp;
+                            <Link href="/privacy" underline="hover" color="text.secondary" sx={{ ml: 1 }}>
+                                Privacy
+                            </Link>
+                            <Typography component="span" sx={{ mx: 0.5 }} variant="caption">·</Typography>
+                            <Link href="/terms" underline="hover" color="text.secondary">
+                                Terms
+                            </Link>
+                        </Typography>
                     </Box>
                 </Box>
                 <Box
@@ -140,10 +130,7 @@ export default function Footer() {
                         About us
                     </Link>
                     <Link color="text.secondary" variant="body2" href="#">
-                        Careers
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Press
+                        Blog
                     </Link>
                 </Box>
                 <Box
@@ -154,57 +141,15 @@ export default function Footer() {
                     }}
                 >
                     <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                        Legal
+                        Support
                     </Typography>
                     <Link color="text.secondary" variant="body2" href="#">
-                        Terms
+                        Help
                     </Link>
                     <Link color="text.secondary" variant="body2" href="#">
-                        Privacy
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Contact
+                        Returns
                     </Link>
                 </Box>
-            </Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    pt: { xs: 4, sm: 8 },
-                    width: '100%',
-                    borderTop: '1px solid',
-                    borderColor: 'divider',
-                }}
-            >
-                <div>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Privacy Policy
-                    </Link>
-                    <Typography sx={{ display: 'inline', mx: 0.5, opacity: 0.5 }}>
-                        &nbsp;•&nbsp;
-                    </Typography>
-                    <Link color="text.secondary" variant="body2" href="#">
-                        Terms of Service
-                    </Link>
-                    <Copyright />
-                </div>
-                <Stack
-                    direction="row"
-                    spacing={1}
-                    useFlexGap
-                    sx={{ justifyContent: 'left', color: 'text.secondary' }}
-                >
-                    <IconButton
-                        color="inherit"
-                        size="small"
-                        href="3"
-                        aria-label="GitHub"
-                        sx={{ alignSelf: 'center' }}
-                    >
-                        <InstagramIcon />
-                    </IconButton>
-                </Stack>
             </Box>
         </Container>
     );
