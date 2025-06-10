@@ -1,12 +1,13 @@
 import Grid from '@mui/material/Grid';
-import { DashboardContent } from 'src/layouts/dashboard';
+import {DashboardContent} from 'src/layouts/dashboard';
 import Button from "@mui/material/Button";
-import { Iconify } from "../../../components/iconify";
+import {Iconify} from "../../../components/iconify";
 import Box from "@mui/material/Box";
-import { useEffect, useState } from "react";
-import { useRouter } from 'src/routes/hooks';
-import { FaqItem, FaqItemProps } from '../faq-item';
-import { deleteFaqTitle, FaqTitle, getAllFaqs } from "../../../api/faq";
+import {useEffect, useState} from "react";
+import {useRouter} from 'src/routes/hooks';
+import {FaqItem, FaqItemProps} from '../faq-item';
+import {deleteFaq, deleteFaqTitle, FaqTitle, getAllFaqs} from "../../../api/faq";
+import {Masonry} from "@mui/lab";
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +15,9 @@ function mapToFaqItem(
     faqTitle: FaqTitle,
     onEdit: (id: number) => void,
     onDelete: (id: number) => void,
-    onAddFaq: (id: number) => void
+    onAddFaq: (id: number) => void,
+    onEditFaq: (faqId: number, titleId: number) => void,
+    onDeleteFaq: (faqId: number) => void
 ): FaqItemProps {
     return {
         id: faqTitle.id,
@@ -22,7 +25,9 @@ function mapToFaqItem(
         faqs: faqTitle.faqs,
         onEdit,
         onDelete,
-        onAddFaq
+        onAddFaq,
+        onEditFaq,
+        onDeleteFaq
     };
 }
 
@@ -58,6 +63,21 @@ export function FaqView() {
         }
     };
 
+    const handleEditFaq = (faqId: number, titleId: number) => {
+        router.push(`/faq/faq-form/${titleId}/${faqId}`);
+    };
+
+    const handleDeleteFaq = async (faqId: number) => {
+        if (window.confirm('Are you sure you want to delete this FAQ?')) {
+            try {
+                await deleteFaq(faqId);
+                loadAllFaqs();
+            } catch (err) {
+                console.error('Failed to delete FAQ:', err);
+            }
+        }
+    };
+
     return (
         <DashboardContent maxWidth="xl">
             <Box
@@ -70,18 +90,23 @@ export function FaqView() {
                 <Button
                     variant="contained"
                     color="inherit"
-                    startIcon={<Iconify icon="mingcute:add-line" />}
+                    startIcon={<Iconify icon="mingcute:add-line"/>}
                     onClick={() => router.push('faq-title-form')}
                 >
                     New FAQ Title
                 </Button>
             </Box>
 
-            <Grid container spacing={2}>
+            <Masonry columns={2} spacing={2}>
                 {faqTitle.map((item) => (
-                    <FaqItem key={item.id} {...mapToFaqItem(item, handleEdit, handleDelete, handleAddFaq)} />
+                    <FaqItem
+                        key={item.id}
+                        {...mapToFaqItem(item, handleEdit, handleDelete, handleAddFaq, handleEditFaq, handleDeleteFaq)}
+                    />
                 ))}
-            </Grid>
+            </Masonry>
+
+
         </DashboardContent>
     );
 }
