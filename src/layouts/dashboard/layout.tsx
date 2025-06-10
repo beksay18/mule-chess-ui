@@ -63,6 +63,7 @@ export function DashboardLayout({
     if (pathname.startsWith('/orders')) return 'Orders';
     if (pathname.startsWith('/user')) return 'Users';
     if (pathname.startsWith('/contacts')) return 'Contacts';
+    if (pathname.startsWith('/faq')) return 'FAQ';
     if (pathname.startsWith('/products-types')) return 'Product Types';
     if (pathname.startsWith('/products')) return 'Products';
     if (pathname.startsWith('/dashboard')) return 'Dashboard';

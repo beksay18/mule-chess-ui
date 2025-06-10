@@ -17,6 +17,7 @@ import RoleGuard from "./role-guard";
 import {CartView} from "../sections/home/create-order/cart/view";
 import {CheckoutView} from "../sections/home/create-order/checkout/view";
 import {OrderConfirmationView} from "../sections/home/create-order/order-confirmation/view";
+import FaqForm from "../sections/faq/faq-form";
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +34,8 @@ export const ProductForm = lazy(() => import('src/sections/products/product-form
 export const ContactForm = lazy(() => import('src/pages/contacts-form'));
 export const ProductTypesPage = lazy(() => import('src/pages/product-types'));
 export const ProductTypeForm = lazy(() => import('src/sections/productTypes/product-type-form'));
+export const FaqPage = lazy(() => import('src/pages/faq'));
+export const FaqTitleForm = lazy(() => import('src/sections/faq/faq-title-form'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 
@@ -106,6 +109,28 @@ export const routesSection: RouteObject[] = [
                             {index: true, element: <ProductForm/>},
                             {path: ':id', element: <ProductForm/>},
                         ],
+                    },
+                ],
+            },
+            {
+                path: 'faq',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <Outlet/>
+                    </RoleGuard>
+                ),
+                children: [
+                    {path: '', element: <FaqPage/>},
+                    {
+                        path: 'faq-title-form',
+                        children: [
+                            {index: true, element: <FaqTitleForm/>},
+                            {path: ':id', element: <FaqTitleForm/>},
+                        ],
+                    },
+                    {
+                        path: 'faq-form/:titleId/:faqId?',
+                        element: <FaqForm />,
                     },
                 ],
             },

@@ -50,4 +50,15 @@ export const ENDPOINTS = {
         MARK_DONE: (id: number) => `/cg-stickers/api/contacts/mark-done/${id}`,
         NEW_COUNT: "/cg-stickers/api/contacts/new-count",
     },
+    FAQ: {
+        CREATE_TITLE: "/cg-stickers/api/faq/create-title",
+        UPDATE_TITLE: (id: number) => `/cg-stickers/api/faq/${id}`,
+        GET_ALL: "/cg-stickers/api/faq/all-faqs",
+        GET_TITLE_BY_ID: (id: number) => `/cg-stickers/api/faq/${id}`,
+        GET_FAQ_BY_ID: (id: number) => `/cg-stickers/api/faq/faq/${id}`,
+        CREATE_FAQ_UNDER_TITLE: (titleId: number) => `/cg-stickers/api/faq/${titleId}/create-faq`,
+        UPDATE_FAQ_UNDER_TITLE: (faqId: number) => `/cg-stickers/api/faq/faq/${faqId}`,
+        DELETE_FAQ: (faqId: number) => `/cg-stickers/api/faq/${faqId}`,
+        DELETE_TITLE: (titleId: number) => `/cg-stickers/api/faq/delete-title/${titleId}`,
+    },
 }

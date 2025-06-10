@@ -3,6 +3,7 @@ import { SvgColor } from 'src/components/svg-color';
 import CategoryIcon from '@mui/icons-material/Category';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import EmailIcon from '@mui/icons-material/Email';
+import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 
 const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} />;
 
@@ -39,6 +40,11 @@ export const getNavData = (newOrderCount: number): NavItem[] => [
     title: 'Contacts',
     path: '/contacts',
     icon: <EmailIcon />,
+  },
+  {
+    title: 'FAQ',
+    path: '/faq',
+    icon: <QuestionAnswerIcon />,
   },
   {
     title: 'Product Types',
