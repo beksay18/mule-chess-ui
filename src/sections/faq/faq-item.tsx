@@ -36,7 +36,7 @@ export function FaqItem({ id, title, faqs, onEdit, onDelete, onAddFaq, onEditFaq
         <Card variant="outlined">
             <CardContent>
                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                    <Typography color="secondary" variant="h6">{title}</Typography>
+                    <Typography color="primary" variant="h6">{title}</Typography>
                     <Stack direction="row" spacing={1}>
                         <IconButton onClick={() => onAddFaq(id)}><AddIcon /></IconButton>
                         <IconButton onClick={() => onEdit(id)}><EditIcon /></IconButton>
