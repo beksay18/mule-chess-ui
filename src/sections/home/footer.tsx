@@ -143,10 +143,10 @@ export default function Footer() {
                     <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
                         Support
                     </Typography>
-                    <Link color="text.secondary" variant="body2" href="#">
+                    <Link color="text.secondary" variant="body2" href="/help">
                         Help
                     </Link>
-                    <Link color="text.secondary" variant="body2" href="#">
+                    <Link color="text.secondary" variant="body2" href="/returns">
                         Returns
                     </Link>
                 </Box>
