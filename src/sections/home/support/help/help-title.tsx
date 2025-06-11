@@ -4,17 +4,27 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import {useRouter} from "../../../../routes/hooks";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    flexShrink: 0,
+    justifyContent: 'center',
+    textAlign: 'center',
     backdropFilter: 'blur(24px)',
-    padding: '15px 12px',
+    padding: theme.spacing(2.5, 3.75),
+    flexWrap: 'wrap',
+    gap: theme.spacing(25),
 }));
 
 export default function HelpTitle() {
+    const router = useRouter();
+
+    const handleContactUsClick = () => {
+        router.push(`/contact-us`);
+    };
 
     return (
         <Box sx={{
@@ -33,6 +43,30 @@ export default function HelpTitle() {
                     >
                         HELP
                     </Typography>
+
+                    <Button
+                        sx={{
+                            mt: { xs: 2, sm: 0 },
+                            px: 4,
+                            py: 1.5,
+                            fontWeight: 'bold',
+                            fontSize: '1rem',
+                            borderRadius: 2,
+                            backgroundColor: 'white',
+                            color: '#1976d2',
+                            textTransform: 'none',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            transition: 'all 0.3s ease',
+                            '&:hover': {
+                                backgroundColor: '#f0f0f0',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                        onClick={() => handleContactUsClick()}
+                    >
+                        Email support
+                    </Button>
                 </StyledToolbar>
             </Container>
         </Box>

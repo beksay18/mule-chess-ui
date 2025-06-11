@@ -30,7 +30,7 @@ export default function Help() {
                         <Card variant="outlined">
                             <CardContent>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                                    <Typography color="secondary" variant="h6">{item.title}</Typography>
+                                    <Typography color="primary" variant="h6">{item.title}</Typography>
 
                                 </Stack>
 
