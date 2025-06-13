@@ -1,81 +1,76 @@
 import * as React from 'react';
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Typography from '@mui/material/Typography';
-import {styled} from '@mui/material/styles';
-import Container from "@mui/material/Container";
+import { Box, Typography, Container } from '@mui/material';
+import { styled } from '@mui/material/styles';
 
-const StyledTypography = styled(Typography)(({theme}) => ({
-    display: 'block',
+const StyledTypography = styled(Typography)(({ theme }) => ({
     color: theme.palette.text.secondary,
-    lineHeight: 1.75,
+    lineHeight: 1.8,
     fontSize: theme.typography.body1.fontSize,
     whiteSpace: 'pre-line',
     textAlign: 'justify',
 }));
 
-const TitleTypography = styled(Typography)(({theme}) => ({
+const TitleTypography = styled(Typography)(({ theme }) => ({
+    fontWeight: 600,
     position: 'relative',
-    textDecoration: 'none',
-    '&:hover': {cursor: 'pointer'},
-    '& .arrow': {
-        visibility: 'hidden',
-        position: 'absolute',
-        right: 0,
-        top: '50%',
-        transform: 'translateY(-50%)',
-    },
-    '&:hover .arrow': {
-        visibility: 'visible',
-        opacity: 0.7,
-    },
+    marginBottom: theme.spacing(2),
+    '&:hover': { cursor: 'pointer' },
     '&::before': {
         content: '""',
         position: 'absolute',
         width: 0,
-        height: '1px',
+        height: 2,
         bottom: 0,
         left: 0,
-        backgroundColor: (theme.vars || theme).palette.text.primary,
-        opacity: 0.3,
-        transition: 'width 0.3s ease, opacity 0.3s ease',
+        backgroundColor: theme.palette.primary.main,
+        transition: 'width 0.3s ease',
     },
     '&:hover::before': {
         width: '100%',
     },
 }));
 
-export default function AboutUs() {
+const StyledImage = styled('img')(({ theme }) => ({
+    width: '100%',
+    maxWidth: 480,
+    borderRadius: 16,
+    boxShadow: theme.shadows[3],
+    objectFit: 'cover',
+    margin: 'auto',
+}));
 
+export default function AboutUs() {
     return (
-        <Container sx={{py: 5}}>
+        <Container sx={{ py: 10 }}>
             <Typography variant="h2" color="primary" gutterBottom>
                 Hello, we are CG Stickers
             </Typography>
-            <Grid container spacing={8} columns={12} sx={{my: 4}}>
-                <Grid size={{xs: 12, sm: 12}}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'space-between',
-                            gap: 1,
-                            height: '100%',
-                        }}
-                    >
-                        <TitleTypography gutterBottom variant="h5" tabIndex={0}>
-                            At CG Stickers, we’re obsessed with making custom sticker ordering effortless and enjoyable.
-                        </TitleTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            We know your time is valuable — that’s why we’ve streamlined the entire process from start
-                            to finish. Place your order in seconds, get your custom stickers delivered in just days.
-                            You’ll get free digital proofs, free artwork assistance, fast production, and free shipping
-                            — everything you need for a smooth, stress-free experience. That’s what makes CG Stickers a
-                            favorite among creatives, small businesses, and sticker lovers alike.
-                        </StyledTypography>
-                    </Box>
-                </Grid>
-            </Grid>
+
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: 'center',
+                    gap: 6,
+                    mt: 4,
+                }}
+            >
+                <Box sx={{ flex: 1, textAlign: 'center' }}>
+                    <StyledImage src="/assets/images/product/product-14.webp" alt="About CG Stickers" />
+                </Box>
+
+                <Box sx={{ flex: 1 }}>
+                    <TitleTypography variant="h5">
+                        At CG Stickers, we’re obsessed with making custom sticker ordering effortless and enjoyable.
+                    </TitleTypography>
+                    <StyledTypography variant="body1">
+                        We know your time is valuable — that’s why we’ve streamlined the entire process from start to finish.
+                        Place your order in seconds and get your custom stickers in just days.
+                        Enjoy free digital proofs, artwork assistance, fast turnaround, and shipping — all on us.
+                        That’s why creators, small businesses, and sticker lovers trust CG Stickers.
+                    </StyledTypography>
+                </Box>
+            </Box>
         </Container>
     );
 }

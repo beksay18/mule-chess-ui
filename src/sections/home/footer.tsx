@@ -129,6 +129,9 @@ export default function Footer() {
                     <Link color="text.secondary" variant="body2" href="/about-us">
                         About us
                     </Link>
+                    <Link color="text.secondary" variant="body2" href="/blog">
+                        Blog
+                    </Link>
                 </Box>
                 <Box
                     sx={{
