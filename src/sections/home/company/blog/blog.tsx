@@ -53,7 +53,7 @@ export default function Blog() {
         },
         {
             id: '3',
-            title: 'The Magic of Custom Sticker Packs for Events',
+            title: 'The Magic of Custom Sticker Packs for Events and Make them',
             coverUrl: '/assets/images/product/product-3.webp',
             description: 'Engage event guests with themed sticker packs.',
             totalViews: 691,

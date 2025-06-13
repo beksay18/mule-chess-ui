@@ -1,17 +1,11 @@
 import type { CardProps } from '@mui/material/Card';
-import type { IconifyName } from 'src/components/iconify';
 
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Card from '@mui/material/Card';
-import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
 
-import { Iconify } from 'src/components/iconify';
-import { SvgColor } from 'src/components/svg-color';
-
 import { fDate } from 'src/utils/format-time';
-import { fShortenNumber } from 'src/utils/format-number';
 import { varAlpha } from 'minimal-shared/utils';
 
 // ----------------------------------------------------------------------
@@ -80,33 +74,6 @@ export function PostItem({
                         objectFit: 'cover',
                     }}
                 />
-
-                {(latestPostLarge || latestPost) && (
-                    <>
-                        <SvgColor
-                            src="/assets/icons/shape-avatar.svg"
-                            sx={{
-                                position: 'absolute',
-                                left: 0,
-                                bottom: -16,
-                                width: 88,
-                                height: 36,
-                                zIndex: 2,
-                                color: 'background.paper',
-                            }}
-                        />
-                        <Avatar
-                            src={post.author.avatarUrl}
-                            alt={post.author.name}
-                            sx={{
-                                position: 'absolute',
-                                left: 24,
-                                top: 24,
-                                zIndex: 2,
-                            }}
-                        />
-                    </>
-                )}
             </Box>
 
             <Box
@@ -145,26 +112,6 @@ export function PostItem({
                 >
                     {post.title}
                 </Link>
-
-                <Box
-                    sx={{
-                        mt: 2,
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: 1.5,
-                        color: (latestPostLarge || latestPost) ? 'common.white' : 'text.disabled',
-                    }}
-                >
-                    {[{ icon: 'solar:chat-round-dots-bold', number: post.totalComments },
-                        { icon: 'solar:eye-bold', number: post.totalViews },
-                        { icon: 'solar:share-bold', number: post.totalShares },
-                    ].map((item, index) => (
-                        <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
-                            <Iconify icon={item.icon as IconifyName} width={16} sx={{ mr: 0.5 }} />
-                            <Typography variant="caption">{fShortenNumber(item.number)}</Typography>
-                        </Box>
-                    ))}
-                </Box>
             </Box>
         </Card>
     );
