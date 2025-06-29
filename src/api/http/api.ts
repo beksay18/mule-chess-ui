@@ -6,7 +6,7 @@ import axios, {
 } from "axios";
 import pRetry, {AbortError} from "p-retry";
 import {get} from "lodash";
-import {requestInterceptor, responseInterceptor} from "./interceptors";
+import {requestInterceptor, responseErrorInterceptor, responseInterceptor} from "./interceptors";
 
 type AllowedActions = "get" | "post" | "put" | "delete";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -44,7 +44,7 @@ const instance: RetryableAxiosInstance = axios.create({
 }) as RetryableAxiosInstance;
 
 instance.interceptors.request.use(requestInterceptor);
-instance.interceptors.response.use(responseInterceptor);
+instance.interceptors.response.use(responseInterceptor, responseErrorInterceptor);
 
 const executeAxiosRequest = async <T>({
                                           action,

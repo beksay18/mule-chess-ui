@@ -1,5 +1,6 @@
-import { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import {fetchAndValidateAccessToken} from "./utils";
+import {SessionStorage} from "../session-storage";
 
 export const requestInterceptor = (
     req: InternalAxiosRequestConfig
@@ -22,3 +23,14 @@ export const requestInterceptor = (
 };
 
 export const responseInterceptor = (res: AxiosResponse): AxiosResponse => res;
+
+export const responseErrorInterceptor = (error: AxiosError): Promise<never> => {
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
+        SessionStorage.clear();
+        window.location.href = "/";
+    }
+
+    return Promise.reject(error);
+};

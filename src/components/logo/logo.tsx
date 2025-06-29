@@ -47,7 +47,7 @@ export function Logo({
           ]}
           {...other}
       >
-        CG Stickers
+        Stickers
       </LogoRoot>
   );
 }

@@ -110,7 +110,7 @@ export default function Header() {
                     >
                         <Box
                             component="img"
-                            src="/assets/images/brands/logo.webp"
+                            src="/assets/stickers.png"
                             alt="Logo"
                             sx={{
                                 height: 40,
