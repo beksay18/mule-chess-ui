@@ -1,7 +1,7 @@
 import {
     Box,
     Typography,
-    Button,
+    Button, Snackbar, Alert,
 } from '@mui/material';
 import {DashboardContent} from 'src/layouts/dashboard';
 import {useParams, useSearchParams} from 'react-router-dom';
@@ -10,7 +10,7 @@ import {CustomerOrderResponse, getOrderById} from '../../../../api/orderDetails'
 import {useRouter} from "../../../../routes/hooks";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {toast} from 'react-toastify';
-import {markOrderReadyToShip, startProcessingOrder} from "../../../../api/order";
+import {createLabel, markOrderReadyToShip, startProcessingOrder} from "../../../../api/order";
 import {OrderSummary} from "../order-summary";
 import {CustomerInfo} from "../customer-info";
 import {ShippingInfo} from "../shipping-info";
@@ -31,7 +31,21 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
     const [searchParams] = useSearchParams();
     const page = searchParams.get('page') || '0';
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState<'IN_PROGRESS' | 'READY_TO_SHIP' | null>(null);
+    const [dialogMode, setDialogMode] = useState<'IN_PROGRESS' | 'READY_TO_SHIP' | 'SHIPPED' | null>(null);
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+
+    const showSnackbar = (message: string, severity: 'success' | 'error' = 'success') => {
+        setSnackbarMessage(message);
+        setSnackbarSeverity(severity);
+        setSnackbarOpen(true);
+    };
+
+    const handleCloseSnackbar = () => {
+        setSnackbarOpen(false);
+    };
 
     useEffect(() => {
         if (id) getOrderById(Number(id)).then(setOrder);
@@ -42,13 +56,13 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
 
         try {
             await startProcessingOrder(id);
-            toast.success("Order marked as IN_PROGRESS.");
+            showSnackbar("Order marked as IN_PROGRESS.", 'success');
 
             const updated = await getOrderById(Number(id));
             setOrder(updated);
             setOrderStatus(updated.orderStatus);
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to start processing.");
+            showSnackbar(error?.response?.data?.message || "Failed to start processing.", 'error');
         }
     };
 
@@ -57,13 +71,28 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
 
         try {
             await markOrderReadyToShip(id);
-            toast.success("Order marked as READY_TO_SHIP.");
+            showSnackbar("Order marked as READY_TO_SHIP.", 'success');
 
             const updated = await getOrderById(Number(id));
             setOrder(updated);
             setOrderStatus(updated.orderStatus);
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to mark ready to ship.");
+            showSnackbar(error?.response?.data?.message || "Failed to mark ready to ship.", 'error');
+        }
+    };
+
+    const handleCreateLabel = async () => {
+        if (!id) return;
+
+        try {
+            await createLabel(id);
+            showSnackbar("Label Created", 'success');
+
+            const updated = await getOrderById(Number(id));
+            setOrder(updated);
+            setOrderStatus(updated.orderStatus);
+        } catch (error: any) {
+            showSnackbar(error?.response?.data?.message || "Failed to create label", 'error');
         }
     };
 
@@ -118,6 +147,18 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                             Mark Ready to Ship
                         </Button>
                     )}
+                    {order.orderStatus === 'READY_TO_SHIP' && (
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={() => {
+                                setDialogMode('SHIPPED');
+                                setOpenDialog(true);
+                            }}
+                        >
+                            Create Shipping Label
+                        </Button>
+                    )}
                 </Box>
             </Box>
 
@@ -137,12 +178,18 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
                 <Box p={3}>
                     <Typography variant="h6" gutterBottom>
-                        {dialogMode === 'IN_PROGRESS' ? 'Confirm Start Processing' : 'Confirm Ready to Ship'}
+                        {dialogMode === 'IN_PROGRESS'
+                            ? 'Confirm Start Processing'
+                            : dialogMode === 'READY_TO_SHIP'
+                                ? 'Confirm Ready to Ship'
+                                : 'Confirm Create Shipping Label'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                         {dialogMode === 'IN_PROGRESS'
                             ? 'Are you sure you want to mark this order as IN_PROGRESS?'
-                            : 'Are you sure you want to mark this order as READY_TO_SHIP?'}
+                            : dialogMode === 'READY_TO_SHIP'
+                                ? 'Are you sure you want to mark this order as READY_TO_SHIP?'
+                                : 'Are you sure you want to create a shipping label for this order?'}
                     </Typography>
                     <Box display="flex" justifyContent="flex-end" gap={1}>
                         <Button onClick={() => setOpenDialog(false)} color="inherit">
@@ -157,6 +204,8 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                                     await handleStartProcessing();
                                 } else if (dialogMode === 'READY_TO_SHIP') {
                                     await handleReadyToShip();
+                                } else if (dialogMode === 'SHIPPED') {
+                                    await handleCreateLabel();
                                 }
                             }}
                         >
@@ -165,6 +214,21 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                     </Box>
                 </Box>
             </Dialog>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={4000}
+                onClose={handleCloseSnackbar}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleCloseSnackbar}
+                    severity={snackbarSeverity}
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {snackbarMessage}
+                </Alert>
+            </Snackbar>
         </DashboardContent>
     );
 }

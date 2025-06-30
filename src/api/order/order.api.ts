@@ -104,6 +104,13 @@ export const markOrderReadyToShip = async (orderId: number | string): Promise<{ 
     return data;
 };
 
+export const createLabel = async (orderId: number | string): Promise<{ message: string }> => {
+    const { data } = await axios.put<{ message: string }>(
+        ENDPOINTS.ORDER.CREATE_LABEL(orderId)
+    );
+    return data;
+};
+
 export const getOrderStatusCount = (): Promise<OrderStatusCount[]> =>
     axios
         .get<OrderStatusCount[]>(ENDPOINTS.ORDER.STATUS_COUNT)

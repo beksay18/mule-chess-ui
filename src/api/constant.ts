@@ -31,6 +31,7 @@ export const ENDPOINTS = {
         STATUS_COUNT: "/cg-stickers/api/orders/status-count",
         START_PROCESSING: (id: number | string) => `/cg-stickers/api/orders/${id}/start-processing`,
         READY_TO_SHIP: (id: number | string) => `/cg-stickers/api/orders/${id}/ready-to-ship`,
+        CREATE_LABEL: (id: number | string) => `/cg-stickers/api/orders/${id}/create-label`,
     },
     USER: {
         GET_ALL_USERS: "/cg-stickers/api/user/all-users",
