@@ -5,14 +5,16 @@ import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
-import FormGroup from '@mui/material/FormGroup';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import FormControlLabel from '@mui/material/FormControlLabel';
 
-import { Iconify } from 'src/components/iconify';
-import { Scrollbar } from 'src/components/scrollbar';
+import {Iconify} from 'src/components/iconify';
+import {Scrollbar} from 'src/components/scrollbar';
 import {useEffect, useState} from "react";
+import {Select} from "@mui/material";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemText from "@mui/material/ListItemText";
 
 // ----------------------------------------------------------------------
 
@@ -34,15 +36,15 @@ type ProductFiltersProps = {
 };
 
 export function OrderFilters({
-                                   filters,
-                                   options,
-                                   canReset,
-                                   openFilter,
-                                   onSetFilters,
-                                   onOpenFilter,
-                                   onCloseFilter,
-                                   onResetFilter,
-                               }: ProductFiltersProps) {
+                                 filters,
+                                 options,
+                                 canReset,
+                                 openFilter,
+                                 onSetFilters,
+                                 onOpenFilter,
+                                 onCloseFilter,
+                                 onResetFilter,
+                             }: ProductFiltersProps) {
 
     const [tempFilters, setTempFilters] = useState<FiltersProps>(filters);
 
@@ -50,32 +52,37 @@ export function OrderFilters({
         setTempFilters(filters);
     }, []);
 
-    const handleStatusToggle = (status: string) => {
-        const currentStatuses = tempFilters.orderStatus ?? [];
-        const updated = currentStatuses.includes(status)
-            ? currentStatuses.filter((s) => s !== status)
-            : [...currentStatuses, status];
-
-        setTempFilters((prev) => ({ ...prev, orderStatus: updated }));
-    };
-
-    const renderGender = (
+    const renderStatus = (
         <Stack spacing={1}>
-            <Typography variant="subtitle2">Status</Typography>
-            <FormGroup>
+            <Select
+                multiple
+                displayEmpty
+                value={tempFilters.orderStatus ?? []}
+                onChange={(event: any) => {
+                    const selected = typeof event.target.value === 'string'
+                        ? event.target.value.split(',')
+                        : event.target.value;
+
+                    setTempFilters((prev) => ({
+                        ...prev,
+                        orderStatus: selected,
+                    }));
+                }}
+                input={<OutlinedInput />}
+                renderValue={(selected: any) =>
+                    selected.length === 0 ? 'Select Status' : (selected as string[]).join(', ')
+                }
+                sx={{ width: '100%' }}
+            >
                 {options.orderStatus.map((option) => (
-                    <FormControlLabel
-                        key={option.value}
-                        control={
-                            <Checkbox
-                                checked={(tempFilters.orderStatus ?? []).includes(option.value)}
-                                onChange={() => handleStatusToggle(option.value)}
-                            />
-                        }
-                        label={option.label}
-                    />
+                    <MenuItem key={option.value} value={option.value}>
+                        <Checkbox
+                            checked={(tempFilters.orderStatus ?? []).includes(option.value)}
+                        />
+                        <ListItemText primary={option.label} />
+                    </MenuItem>
                 ))}
-            </FormGroup>
+            </Select>
         </Stack>
     );
 
@@ -86,7 +93,7 @@ export function OrderFilters({
                 color="inherit"
                 endIcon={
                     <Badge color="error" variant="dot" invisible={!canReset}>
-                        <Iconify icon="ic:round-filter-list" />
+                        <Iconify icon="ic:round-filter-list"/>
                     </Badge>
                 }
                 onClick={onOpenFilter}
@@ -100,7 +107,7 @@ export function OrderFilters({
                 onClose={onCloseFilter}
                 slotProps={{
                     paper: {
-                        sx: { width: 360, overflow: 'hidden' },
+                        sx: {width: 360, overflow: 'hidden'},
                     },
                 }}
             >
@@ -113,31 +120,32 @@ export function OrderFilters({
                         alignItems: 'center',
                     }}
                 >
-                    <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                       Advanced Filters
+                    <Typography variant="h6" sx={{flexGrow: 1}}>
+                        Advanced Filters
                     </Typography>
 
-                    <IconButton onClick={() => {
-                        const resetFilters = { orderStatus: [] };
-                        setTempFilters(resetFilters);
-                        onSetFilters(resetFilters);
-                        onResetFilter();
-                    }}>
+                    <IconButton
+                        onClick={() => {
+                            const resetFilters = {orderStatus: []};
+                            setTempFilters(resetFilters);
+                            onSetFilters(resetFilters);
+                            onResetFilter();
+                        }}>
                         <Badge color="error" variant="dot" invisible={!canReset}>
-                            <Iconify icon="solar:restart-bold" />
+                            <Iconify icon="solar:restart-bold"/>
                         </Badge>
                     </IconButton>
 
                     <IconButton onClick={onCloseFilter}>
-                        <Iconify icon="mingcute:close-line" />
+                        <Iconify icon="mingcute:close-line"/>
                     </IconButton>
                 </Box>
 
-                <Divider />
+                <Divider/>
 
                 <Scrollbar>
-                    <Stack spacing={3} sx={{ p: 3 }}>
-                        {renderGender}
+                    <Stack spacing={3} sx={{p: 3}}>
+                        {renderStatus}
                     </Stack>
                 </Scrollbar>
 
@@ -150,7 +158,7 @@ export function OrderFilters({
                     <Button
                         fullWidth
                         variant="contained"
-                        sx={{ height: 50 }}
+                        sx={{height: 50}}
                         onClick={() => {
                             onSetFilters(tempFilters);
                             onCloseFilter();
