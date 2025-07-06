@@ -134,14 +134,13 @@ export function OrderTableToolbar({
                     openFilter={openFilter}
                     onOpenFilter={handleOpenFilter}
                     onCloseFilter={handleCloseFilter}
-                    onResetFilter={() => setTempFilters({ orderStatus: [] })}
+                    onResetFilter={() => {
+                        const resetFilters: FiltersProps = { orderStatus: [] };
+                        setTempFilters(resetFilters);
+                        onApplyFilters(resetFilters, orderNumber);
+                    }}
                     options={{
                         orderStatus: STATUS_OPTIONS,
-                    }}
-                    orderNumber={orderNumber}
-                    onApply={() => {
-                        onApplyFilters(tempFilters, orderNumber);
-                        setOpenFilter(false);
                     }}
                 />
             </Box>

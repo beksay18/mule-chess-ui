@@ -28,8 +28,6 @@ type ProductFiltersProps = {
     onCloseFilter: () => void;
     onResetFilter: () => void;
     onSetFilters: (updateState: FiltersProps | Partial<FiltersProps>) => void;
-    orderNumber: string;
-    onApply: (filters: FiltersProps, orderNumber: string) => void;
     options: {
         orderStatus: { value: string; label: string }[];
     };
@@ -44,8 +42,6 @@ export function OrderFilters({
                                    onOpenFilter,
                                    onCloseFilter,
                                    onResetFilter,
-                                   orderNumber,
-                                   onApply,
                                }: ProductFiltersProps) {
 
     const [tempFilters, setTempFilters] = useState<FiltersProps>(filters);
@@ -121,7 +117,12 @@ export function OrderFilters({
                        Advanced Filters
                     </Typography>
 
-                    <IconButton onClick={onResetFilter}>
+                    <IconButton onClick={() => {
+                        const resetFilters = { orderStatus: [] };
+                        setTempFilters(resetFilters);
+                        onSetFilters(resetFilters);
+                        onResetFilter();
+                    }}>
                         <Badge color="error" variant="dot" invisible={!canReset}>
                             <Iconify icon="solar:restart-bold" />
                         </Badge>
