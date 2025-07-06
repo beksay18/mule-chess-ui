@@ -1,30 +1,23 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import Radio from '@mui/material/Radio';
 import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import Rating from '@mui/material/Rating';
 import Divider from '@mui/material/Divider';
 import Checkbox from '@mui/material/Checkbox';
 import FormGroup from '@mui/material/FormGroup';
-import RadioGroup from '@mui/material/RadioGroup';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import FormControlLabel from '@mui/material/FormControlLabel';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-import { ColorPicker } from 'src/components/color-utils';
+import {useEffect, useState} from "react";
 
 // ----------------------------------------------------------------------
 
 export type FiltersProps = {
-    price: string;
-    rating: string;
-    gender: string[];
-    colors: string[];
-    category: string;
+    orderStatus: string[];
 };
 
 type ProductFiltersProps = {
@@ -35,12 +28,9 @@ type ProductFiltersProps = {
     onCloseFilter: () => void;
     onResetFilter: () => void;
     onSetFilters: (updateState: Partial<FiltersProps>) => void;
+    onApply: (filters: FiltersProps) => void;
     options: {
-        colors: string[];
-        ratings: string[];
-        categories: { value: string; label: string }[];
-        genders: { value: string; label: string }[];
-        price: { value: string; label: string }[];
+        orderStatus: { value: string; label: string }[];
     };
 };
 
@@ -53,84 +43,39 @@ export function OrderFilters({
                                    onOpenFilter,
                                    onCloseFilter,
                                    onResetFilter,
+                                   onApply,
                                }: ProductFiltersProps) {
+
+    const [tempFilters, setTempFilters] = useState<FiltersProps>(filters);
+
+    useEffect(() => {
+        setTempFilters(filters);
+    }, [filters]);
+
+    const handleStatusToggle = (status: string) => {
+        const updated = tempFilters.orderStatus.includes(status)
+            ? tempFilters.orderStatus.filter((s) => s !== status)
+            : [...tempFilters.orderStatus, status];
+        setTempFilters((prev) => ({ ...prev, orderStatus: updated }));
+    };
+
     const renderGender = (
         <Stack spacing={1}>
-            <Typography variant="subtitle2">Gender</Typography>
+            <Typography variant="subtitle2">Status</Typography>
             <FormGroup>
-                {options.genders.map((option) => (
+                {options.orderStatus.map((option) => (
                     <FormControlLabel
                         key={option.value}
                         control={
                             <Checkbox
-                                checked={filters.gender.includes(option.value)}
-                                onChange={() => {
-                                    const checked = filters.gender.includes(option.value)
-                                        ? filters.gender.filter((value) => value !== option.value)
-                                        : [...filters.gender, option.value];
-
-                                    onSetFilters({ gender: checked });
-                                }}
+                                checked={tempFilters.orderStatus.includes(option.value)}
+                                onChange={() => handleStatusToggle(option.value)}
                             />
                         }
                         label={option.label}
                     />
                 ))}
             </FormGroup>
-        </Stack>
-    );
-
-    const renderCategory = (
-        <Stack spacing={1}>
-            <Typography variant="subtitle2">Category</Typography>
-            <RadioGroup>
-                {options.categories.map((option) => (
-                    <FormControlLabel
-                        key={option.value}
-                        value={option.value}
-                        control={
-                            <Radio
-                                checked={filters.category.includes(option.value)}
-                                onChange={() => onSetFilters({ category: option.value })}
-                            />
-                        }
-                        label={option.label}
-                    />
-                ))}
-            </RadioGroup>
-        </Stack>
-    );
-
-    const renderColors = (
-        <Stack spacing={1}>
-            <Typography variant="subtitle2">Colors</Typography>
-            <ColorPicker
-                options={options.colors}
-                value={filters.colors}
-                onChange={(colors) => onSetFilters({ colors: colors as string[] })}
-                limit={6}
-            />
-        </Stack>
-    );
-
-    const renderPrice = (
-        <Stack spacing={1}>
-            <Typography variant="subtitle2">Price</Typography>
-            <RadioGroup>
-                {options.price.map((option) => (
-                    <FormControlLabel
-                        key={option.value}
-                        value={option.value}
-                        control={
-                            <Radio
-                                checked={filters.price.includes(option.value)}
-                                onChange={() => onSetFilters({ price: option.value })}
-                            />
-                        }
-                        label={option.label}
-                    />
-                ))}
-            </RadioGroup>
         </Stack>
     );
 
@@ -188,11 +133,28 @@ export function OrderFilters({
                 <Scrollbar>
                     <Stack spacing={3} sx={{ p: 3 }}>
                         {renderGender}
-                        {renderCategory}
-                        {renderColors}
-                        {renderPrice}
                     </Stack>
                 </Scrollbar>
+
+                <Box
+                    sx={{
+                        p: 2,
+                        borderTop: '1px solid #e0e0e0',
+                    }}
+                >
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        sx={{ height: 50 }}
+                        onClick={() => {
+                            onSetFilters(tempFilters);
+                            onApply(tempFilters);
+                            onCloseFilter();
+                        }}
+                    >
+                        Apply Filters
+                    </Button>
+                </Box>
             </Drawer>
         </>
     );

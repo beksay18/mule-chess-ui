@@ -17,6 +17,7 @@ import { OrderTableRow } from '../order-table-row';
 import { getAllOrders, OrderContent } from 'src/api/order';
 import { useRouter } from '../../../routes/hooks';
 import {OrderTableToolbar} from "../order-table-toolbar";
+import {FiltersProps} from "../order-filters";
 
 export function OrderView() {
     const [searchParams] = useSearchParams();
@@ -28,6 +29,7 @@ export function OrderView() {
     const [orders, setOrders] = useState<OrderContent[]>([]);
     const [totalOrders, setTotalOrders] = useState(0);
     const [filters, setFilters] = useState('');
+    const [filterState, setFilterState] = useState<FiltersProps>({ orderStatus: [] });
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<string[]>([]);
     const [orderNumber, setOrderNumber] = useState('');
@@ -75,6 +77,17 @@ export function OrderView() {
         router.push(`/orders?page=0`);
     };
 
+    const applyCombinedFilters = (orderNum: string, statuses: string[]) => {
+        let filterString = '';
+        if (statuses.length > 0) {
+            filterString += `orderStatus:${statuses.join('|')}`;
+        }
+        if (orderNum) {
+            filterString += `${filterString ? ',' : ''}orderNumber:${orderNum}`;
+        }
+        setFilters(filterString);
+    };
+
     const from = page * rowsPerPage + 1;
     const to = Math.min((page + 1) * rowsPerPage, totalOrders);
 
@@ -85,12 +98,20 @@ export function OrderView() {
             <Card>
                 <OrderTableToolbar
                     filterName={orderNumber}
+                    filters={filterState}
                     onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
                         const value = event.target.value;
                         setOrderNumber(value);
-                        setFilters(value ? `orderNumber:${value}` : '');
+                        applyCombinedFilters(value, filterState.orderStatus);
+                    }}
+
+                    onApplyFilters={(appliedFilters) => {
+                        setFilterState(appliedFilters);
+                        applyCombinedFilters(orderNumber, appliedFilters.orderStatus);
                     }}
                 />
+
+
                 <Scrollbar>
                     <TableContainer sx={{ overflow: 'unset' }}>
                         {loading ? (

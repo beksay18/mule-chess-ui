@@ -1,6 +1,4 @@
-import Tooltip from '@mui/material/Tooltip';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 
@@ -11,70 +9,43 @@ import Box from "@mui/material/Box";
 
 // ----------------------------------------------------------------------
 
-const GENDER_OPTIONS = [
-    {value: 'men', label: 'Men'},
-    {value: 'women', label: 'Women'},
-    {value: 'kids', label: 'Kids'},
+const STATUS_OPTIONS = [
+    {value: 'NEW', label: 'NEW'},
+    {value: 'IN_PROGRESS', label: 'In Progress'},
+    {value: 'READY_TO_SHIP', label: 'Ready to Ship'},
+    {value: 'SHIPPED', label: 'Shipped'},
 ];
-
-const CATEGORY_OPTIONS = [
-    {value: 'all', label: 'All'},
-    {value: 'shose', label: 'Shose'},
-    {value: 'apparel', label: 'Apparel'},
-    {value: 'accessories', label: 'Accessories'},
-];
-
-const RATING_OPTIONS = ['up4Star', 'up3Star', 'up2Star', 'up1Star'];
-
-const PRICE_OPTIONS = [
-    {value: 'below', label: 'Below $25'},
-    {value: 'between', label: 'Between $25 - $75'},
-    {value: 'above', label: 'Above $75'},
-];
-
-const COLOR_OPTIONS = [
-    '#00AB55',
-    '#000000',
-    '#FFFFFF',
-    '#FFC0CB',
-    '#FF4842',
-    '#1890FF',
-    '#94D82D',
-    '#FFC107',
-];
-
-const defaultFilters = {
-    price: '',
-    gender: [GENDER_OPTIONS[0].value],
-    colors: [COLOR_OPTIONS[4]],
-    rating: RATING_OPTIONS[0],
-    category: CATEGORY_OPTIONS[0].value,
-};
 
 type OrderTableToolbarProps = {
     filterName: string;
     onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    filters: FiltersProps;
+    onApplyFilters: (filters: FiltersProps) => void;
 };
 
-export function OrderTableToolbar({filterName, onFilterName}: OrderTableToolbarProps) {
+export function OrderTableToolbar({
+                                      filterName,
+                                      onFilterName,
+                                      filters,
+                                      onApplyFilters,
+                                  }: OrderTableToolbarProps) {
     const [openFilter, setOpenFilter] = useState(false);
-    const [filters, setFilters] = useState<FiltersProps>(defaultFilters);
+    const [tempFilters, setTempFilters] = useState<FiltersProps>(filters);
 
     const handleOpenFilter = useCallback(() => {
+        setTempFilters(filters); // keep in sync
         setOpenFilter(true);
-    }, []);
+    }, [filters]);
 
     const handleCloseFilter = useCallback(() => {
         setOpenFilter(false);
     }, []);
 
     const handleSetFilters = useCallback((updateState: Partial<FiltersProps>) => {
-        setFilters((prevValue) => ({...prevValue, ...updateState}));
+        setTempFilters((prev) => ({ ...prev, ...updateState }));
     }, []);
 
-    const canReset = Object.keys(filters).some(
-        (key) => filters[key as keyof FiltersProps] !== defaultFilters[key as keyof FiltersProps]
-    );
+    const canReset = JSON.stringify(tempFilters) !== JSON.stringify({ orderStatus: [] });
 
     return (
         <Toolbar
@@ -92,7 +63,7 @@ export function OrderTableToolbar({filterName, onFilterName}: OrderTableToolbarP
                 placeholder="Search order number..."
                 startAdornment={
                     <InputAdornment position="start">
-                        <Iconify width={20} icon="eva:search-fill" sx={{color: 'text.disabled'}}/>
+                        <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
                     </InputAdornment>
                 }
                 sx={{
@@ -123,18 +94,18 @@ export function OrderTableToolbar({filterName, onFilterName}: OrderTableToolbarP
                 >
                     <OrderFilters
                         canReset={canReset}
-                        filters={filters}
+                        filters={tempFilters}
                         onSetFilters={handleSetFilters}
                         openFilter={openFilter}
                         onOpenFilter={handleOpenFilter}
                         onCloseFilter={handleCloseFilter}
-                        onResetFilter={() => setFilters(defaultFilters)}
+                        onResetFilter={() => setTempFilters({ orderStatus: [] })}
                         options={{
-                            genders: GENDER_OPTIONS,
-                            categories: CATEGORY_OPTIONS,
-                            ratings: RATING_OPTIONS,
-                            price: PRICE_OPTIONS,
-                            colors: COLOR_OPTIONS,
+                            orderStatus: STATUS_OPTIONS,
+                        }}
+                        onApply={() => {
+                            onApplyFilters(tempFilters);
+                            setOpenFilter(false);
                         }}
                     />
                 </Box>
