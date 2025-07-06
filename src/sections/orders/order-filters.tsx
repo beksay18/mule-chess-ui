@@ -151,7 +151,6 @@ export function OrderFilters({
                         variant="contained"
                         sx={{ height: 50 }}
                         onClick={() => {
-                            console.log('Applying filters === ', tempFilters);
                             onSetFilters(tempFilters);
                             onCloseFilter();
                         }}
