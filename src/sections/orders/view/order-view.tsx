@@ -33,6 +33,7 @@ export function OrderView() {
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<string[]>([]);
     const [orderNumber, setOrderNumber] = useState('');
+    const [filterVersion, setFilterVersion] = useState(0);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -63,7 +64,7 @@ export function OrderView() {
         };
 
         fetchOrders();
-    }, [page, rowsPerPage, filters]);
+    }, [page, rowsPerPage, filters, filterVersion]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -78,6 +79,7 @@ export function OrderView() {
     };
 
     const applyCombinedFilters = (orderNum: string, statuses: string[]) => {
+        console.log("statuses === " + statuses)
         let filterString = '';
         if (statuses.length > 0) {
             filterString += `orderStatus:${statuses.join('|')}`;
@@ -86,6 +88,7 @@ export function OrderView() {
             filterString += `${filterString ? ',' : ''}orderNumber:${orderNum}`;
         }
         setFilters(filterString);
+        setFilterVersion((prev) => prev + 1);
     };
 
     const from = page * rowsPerPage + 1;
@@ -97,20 +100,19 @@ export function OrderView() {
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Card>
                 <OrderTableToolbar
-                    filterName={orderNumber}
+                    orderNumber={orderNumber}
                     filters={filterState}
-                    onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
+                    onFilterOrderNumber={(event: React.ChangeEvent<HTMLInputElement>) => {
                         const value = event.target.value;
                         setOrderNumber(value);
-                        applyCombinedFilters(value, filterState.orderStatus);
+                        applyCombinedFilters(value, filterState.orderStatus ?? []);
                     }}
-
-                    onApplyFilters={(appliedFilters) => {
+                    onApplyFilters={(appliedFilters, inputOrderNumber) => {
                         setFilterState(appliedFilters);
-                        applyCombinedFilters(orderNumber, appliedFilters.orderStatus);
+                        setOrderNumber(inputOrderNumber);
+                        applyCombinedFilters(inputOrderNumber, appliedFilters.orderStatus ?? []);
                     }}
                 />
-
 
                 <Scrollbar>
                     <TableContainer sx={{ overflow: 'unset' }}>

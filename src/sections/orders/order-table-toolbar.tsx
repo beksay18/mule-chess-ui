@@ -17,15 +17,15 @@ const STATUS_OPTIONS = [
 ];
 
 type OrderTableToolbarProps = {
-    filterName: string;
-    onFilterName: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onFilterOrderNumber: (event: React.ChangeEvent<HTMLInputElement>) => void;
     filters: FiltersProps;
-    onApplyFilters: (filters: FiltersProps) => void;
+    orderNumber: string;
+    onApplyFilters: (filters: FiltersProps, orderNumber: string) => void;
 };
 
 export function OrderTableToolbar({
-                                      filterName,
-                                      onFilterName,
+                                      orderNumber,
+                                      onFilterOrderNumber,
                                       filters,
                                       onApplyFilters,
                                   }: OrderTableToolbarProps) {
@@ -33,7 +33,7 @@ export function OrderTableToolbar({
     const [tempFilters, setTempFilters] = useState<FiltersProps>(filters);
 
     const handleOpenFilter = useCallback(() => {
-        setTempFilters(filters); // keep in sync
+        setTempFilters(filters);
         setOpenFilter(true);
     }, [filters]);
 
@@ -41,9 +41,11 @@ export function OrderTableToolbar({
         setOpenFilter(false);
     }, []);
 
-    const handleSetFilters = useCallback((updateState: Partial<FiltersProps>) => {
-        setTempFilters((prev) => ({ ...prev, ...updateState }));
-    }, []);
+    const handleSetFilters = (newFilters: FiltersProps) => {
+        setTempFilters(newFilters);
+        console.log('Updated tempFilters:', newFilters);
+        onApplyFilters(newFilters, orderNumber);
+    };
 
     const canReset = JSON.stringify(tempFilters) !== JSON.stringify({ orderStatus: [] });
 
@@ -58,8 +60,8 @@ export function OrderTableToolbar({
         >
             <OutlinedInput
                 fullWidth
-                value={filterName}
-                onChange={onFilterName}
+                value={orderNumber}
+                onChange={onFilterOrderNumber}
                 placeholder="Search order number..."
                 startAdornment={
                     <InputAdornment position="start">
@@ -103,8 +105,10 @@ export function OrderTableToolbar({
                         options={{
                             orderStatus: STATUS_OPTIONS,
                         }}
+                        orderNumber={orderNumber}
                         onApply={() => {
-                            onApplyFilters(tempFilters);
+                            console.log('Applying filters inside toolbar === ', tempFilters);
+                            onApplyFilters(tempFilters, orderNumber);
                             setOpenFilter(false);
                         }}
                     />

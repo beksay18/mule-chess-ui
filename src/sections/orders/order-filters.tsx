@@ -17,7 +17,7 @@ import {useEffect, useState} from "react";
 // ----------------------------------------------------------------------
 
 export type FiltersProps = {
-    orderStatus: string[];
+    orderStatus?: string[];
 };
 
 type ProductFiltersProps = {
@@ -27,8 +27,9 @@ type ProductFiltersProps = {
     onOpenFilter: () => void;
     onCloseFilter: () => void;
     onResetFilter: () => void;
-    onSetFilters: (updateState: Partial<FiltersProps>) => void;
-    onApply: (filters: FiltersProps) => void;
+    onSetFilters: (updateState: FiltersProps | Partial<FiltersProps>) => void;
+    orderNumber: string;
+    onApply: (filters: FiltersProps, orderNumber: string) => void;
     options: {
         orderStatus: { value: string; label: string }[];
     };
@@ -43,6 +44,7 @@ export function OrderFilters({
                                    onOpenFilter,
                                    onCloseFilter,
                                    onResetFilter,
+                                   orderNumber,
                                    onApply,
                                }: ProductFiltersProps) {
 
@@ -50,12 +52,14 @@ export function OrderFilters({
 
     useEffect(() => {
         setTempFilters(filters);
-    }, [filters]);
+    }, []);
 
     const handleStatusToggle = (status: string) => {
-        const updated = tempFilters.orderStatus.includes(status)
-            ? tempFilters.orderStatus.filter((s) => s !== status)
-            : [...tempFilters.orderStatus, status];
+        const currentStatuses = tempFilters.orderStatus ?? [];
+        const updated = currentStatuses.includes(status)
+            ? currentStatuses.filter((s) => s !== status)
+            : [...currentStatuses, status];
+
         setTempFilters((prev) => ({ ...prev, orderStatus: updated }));
     };
 
@@ -68,7 +72,7 @@ export function OrderFilters({
                         key={option.value}
                         control={
                             <Checkbox
-                                checked={tempFilters.orderStatus.includes(option.value)}
+                                checked={(tempFilters.orderStatus ?? []).includes(option.value)}
                                 onChange={() => handleStatusToggle(option.value)}
                             />
                         }
@@ -147,8 +151,8 @@ export function OrderFilters({
                         variant="contained"
                         sx={{ height: 50 }}
                         onClick={() => {
+                            console.log('Applying filters === ', tempFilters);
                             onSetFilters(tempFilters);
-                            onApply(tempFilters);
                             onCloseFilter();
                         }}
                     >
