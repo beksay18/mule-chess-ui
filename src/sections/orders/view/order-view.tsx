@@ -18,10 +18,12 @@ import { getAllOrders, OrderContent } from 'src/api/order';
 import { useRouter } from '../../../routes/hooks';
 import {OrderTableToolbar} from "../order-table-toolbar";
 import {FiltersProps} from "../order-filters";
+import {useLocation} from "react-router";
 
 export function OrderView() {
     const [searchParams] = useSearchParams();
     const router = useRouter();
+    const location = useLocation();
 
     const initialPage = parseInt(searchParams.get('page') || '0', 10);
     const [page, setPage] = useState(initialPage);
@@ -37,6 +39,9 @@ export function OrderView() {
 
     useEffect(() => {
         const fetchOrders = async () => {
+            if (filters === '' && location.search.includes('filter=')) {
+                return;
+            }
             setLoading(true);
             try {
                 const response = await getAllOrders({
@@ -67,19 +72,39 @@ export function OrderView() {
     }, [page, rowsPerPage, filters, filterVersion]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
+        const params = new URLSearchParams(location.search);
+        params.set('page', newPage.toString());
+        router.push(`/orders?${params.toString()}`);
         setPage(newPage);
-        router.push(`/orders?page=${newPage}`);
     };
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         const newSize = parseInt(event.target.value, 10);
+        const params = new URLSearchParams(location.search);
+        params.set('page', '0');
+        router.push(`/orders?${params.toString()}`);
         setRowsPerPage(newSize);
         setPage(0);
-        router.push(`/orders?page=0`);
     };
 
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const filterQuery = params.get('filter') || '';
+        setFilters(filterQuery);
+
+        const statusMatch = filterQuery.match(/orderStatus:([^,]*)/);
+        const numberMatch = filterQuery.match(/orderNumber:([^,]*)/);
+
+        const orderStatus = statusMatch ? statusMatch[1].split('|') : [];
+        const extractedOrderNumber = numberMatch ? numberMatch[1] : '';
+
+        setFilterState({ orderStatus });
+        setOrderNumber(extractedOrderNumber);
+
+        setFilterVersion((prev) => prev + 1);
+    }, [location.search]);
+
     const applyCombinedFilters = (orderNum: string, statuses: string[]) => {
-        console.log("statuses === " + statuses)
         let filterString = '';
         if (statuses.length > 0) {
             filterString += `orderStatus:${statuses.join('|')}`;
@@ -87,7 +112,17 @@ export function OrderView() {
         if (orderNum) {
             filterString += `${filterString ? ',' : ''}orderNumber:${orderNum}`;
         }
+        searchParams.set('page', '0');
+        if (filterString) {
+            searchParams.set('filter', filterString);
+        } else {
+            searchParams.delete('filter');
+        }
+
+        router.push(`/orders?${searchParams.toString()}`);
+
         setFilters(filterString);
+        setPage(0);
         setFilterVersion((prev) => prev + 1);
     };
 

@@ -106,7 +106,7 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
                     <Box display="flex" alignItems="center" gap={2}>
                         <Button
                             startIcon={<ArrowBackIcon/>}
-                            onClick={() => router.push(`/orders?page=${page}`)}
+                            onClick={() => router.back()}
                             variant="outlined"
                             size="small"
                             sx={{textTransform: 'none'}}

@@ -50,7 +50,7 @@ export function OrderFilters({
 
     useEffect(() => {
         setTempFilters(filters);
-    }, []);
+    }, [filters]);
 
     const renderStatus = (
         <Stack spacing={1}>
