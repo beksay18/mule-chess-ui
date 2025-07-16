@@ -28,7 +28,9 @@ export const ContactsPage = lazy(() => import('src/pages/contacts'));
 export const OrderDetailsPage = lazy(() => import('src/pages/order-details'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const SignUpPage = lazy(() => import('src/pages/sign-up'));
-export const ProfilePage = lazy(() => import('src/pages/profile'));
+export const ProfilePage = lazy(() => import('src/pages/profile/profile'));
+export const MyOrdersPage = lazy(() => import('src/pages/profile/my-orders'));
+export const MyShippingAddressesPage = lazy(() => import('src/pages/profile/my-shipping-addresses'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
 export const ProductForm = lazy(() => import('src/sections/products/product-form'));
 export const ContactForm = lazy(() => import('src/pages/contacts-form'));
@@ -199,6 +201,14 @@ export const routesSection: RouteObject[] = [
     {
         path: 'profile',
         element: <ProfilePage/>,
+    },
+    {
+        path: 'my-orders',
+        element: <MyOrdersPage/>,
+    },
+    {
+        path: 'my-shipping-addresses',
+        element: <MyShippingAddressesPage/>,
     },
     {
         path: 'help',

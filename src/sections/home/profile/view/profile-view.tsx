@@ -1,13 +1,13 @@
 import ProfilePage from "../profile-page";
 import Header from "../../header";
-import Footer from "../../footer";
+import {ProfileMenu} from "./profile-menu";
 
 export function ProfileView() {
   return (
     <>
       <Header/>
+      <ProfileMenu/>
       <ProfilePage/>
-      <Footer/>
     </>
   );
 }

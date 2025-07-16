@@ -1,15 +1,14 @@
 import { CONFIG } from 'src/config-global';
-
-import {ProfileView} from "../sections/home/profile/view";
+import {MyOrdersView} from "../../sections/home/profile/my-orders/view";
 
 // ----------------------------------------------------------------------
 
 export default function Page() {
   return (
     <>
-      <title>{`Profile - ${CONFIG.appName}`}</title>
+      <title>{`My Orders - ${CONFIG.appName}`}</title>
 
-      <ProfileView />
+      <MyOrdersView />
     </>
   );
 }
