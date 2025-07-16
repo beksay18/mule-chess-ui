@@ -9,7 +9,7 @@ export default function MyShippingAddressesPage() {
     const user = getCurrentUser();
 
     return (
-        <Container sx={{mt: 5}}>
+        <Container>
             {user?.userId && (
                 <>
                     <ShippingAddressSection userId={user.userId}/>

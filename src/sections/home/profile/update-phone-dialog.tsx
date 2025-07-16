@@ -13,7 +13,7 @@ interface Props {
     initialData: ProfileRequest;
 }
 
-export default function UpdateProfileDialog({ open, onClose, userId, initialData }: Props) {
+export default function UpdatePhoneDialog({ open, onClose, userId, initialData }: Props) {
     const [form, setForm] = React.useState<ProfileRequest>(initialData);
     const [error, setError] = React.useState<string | null>(null);
     const [success, setSuccess] = React.useState<string | null>(null);
@@ -62,40 +62,24 @@ export default function UpdateProfileDialog({ open, onClose, userId, initialData
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Update Profile Info</DialogTitle>
+            <DialogTitle>Update Phone Number</DialogTitle>
             <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
                 {error && <Alert severity="error">{error}</Alert>}
                 {success && <Alert severity="success">{success}</Alert>}
 
-                <TextField
-                    label="First Name"
-                    name="firstName"
-                    value={form.firstName}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                    sx={{mt: 2}}
-                />
-                <TextField
-                    label="Last Name"
-                    name="lastName"
-                    value={form.lastName}
-                    onChange={handleChange}
-                    fullWidth
-                    required
-                />
                 <TextField
                     label="Phone Number"
                     name="phoneNumber"
                     value={form.phoneNumber}
                     onChange={handleChange}
                     fullWidth
+                    sx={{mt: 2}}
                 />
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleSubmit} variant="contained" disabled={loading}>
-                    {loading ? 'Updating...' : 'Update Info'}
+                    {loading ? 'Updating...' : 'Update'}
                 </Button>
             </DialogActions>
         </Dialog>

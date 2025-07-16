@@ -3,17 +3,18 @@ import {
     Box,
     Typography,
     Avatar,
-    Container, Button,
+    Container, Button,Link
 } from '@mui/material';
 import {getCurrentUser} from '../../../api';
-import ShippingAddressSection from "./shipping-address-section";
 import ChangePasswordDialog from "./change-password-dialog";
-import UpdateProfileDialog from "./update-profile-dialog";
+import UpdateFullnameDialog from "./update-fullname-dialog";
+import UpdatePhoneDialog from "./update-phone-dialog";
 
 export default function ProfilePage() {
     const user = getCurrentUser();
     const [changePasswordOpen, setChangePasswordOpen] = React.useState(false);
     const [updateProfileOpen, setUpdateProfileOpen] = React.useState(false);
+    const [updatePhoneOpen, setUpdatePhoneOpen] = React.useState(false);
 
     const initialProfile = {
         firstName: user?.person?.firstName || '',
@@ -55,6 +56,9 @@ export default function ProfilePage() {
                     p: 2,
                     position: 'relative',
                     borderBottom: '1px solid #e0e0e0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                 }}
             >
                 <Box>
@@ -66,9 +70,9 @@ export default function ProfilePage() {
                     </Typography>
                 </Box>
                 <Box>
-                    <Typography fontWeight={700}>
+                    <Link onClick={() => setUpdateProfileOpen(true)} fontWeight={700} sx={{ cursor: 'pointer' }}>
                         edit
-                    </Typography>
+                    </Link>
                 </Box>
             </Box>
             <Box
@@ -92,6 +96,9 @@ export default function ProfilePage() {
                     p: 2,
                     position: 'relative',
                     borderBottom: '1px solid #e0e0e0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                 }}
             >
                 <Box>
@@ -102,12 +109,20 @@ export default function ProfilePage() {
                         ***********
                     </Typography>
                 </Box>
+                <Box>
+                    <Link onClick={() => setChangePasswordOpen(true)} fontWeight={700} sx={{ cursor: 'pointer' }}>
+                        edit
+                    </Link>
+                </Box>
             </Box>
             <Box
                 sx={{
                     p: 2,
                     position: 'relative',
                     borderBottom: '1px solid #e0e0e0',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                 }}
             >
                 <Box>
@@ -118,26 +133,29 @@ export default function ProfilePage() {
                         {user?.person?.phoneNumber}
                     </Typography>
                 </Box>
+                <Box>
+                    <Link onClick={() => setUpdatePhoneOpen(true)} fontWeight={700} sx={{ cursor: 'pointer' }}>
+                        edit
+                    </Link>
+                </Box>
             </Box>
 
             {user?.userId && (
                 <>
-                    <Box sx={{mt: 3}}>
-                        <Button variant="outlined" onClick={() => setChangePasswordOpen(true)}>
-                            Change Password
-                        </Button>
-                        <Button variant="outlined" onClick={() => setUpdateProfileOpen(true)} sx={{ml: 2}}>
-                            Update Profile Info
-                        </Button>
-                    </Box>
                     <ChangePasswordDialog
                         open={changePasswordOpen}
                         onClose={() => setChangePasswordOpen(false)}
                         userId={user.userId}
                     />
-                    <UpdateProfileDialog
+                    <UpdateFullnameDialog
                         open={updateProfileOpen}
                         onClose={() => setUpdateProfileOpen(false)}
+                        userId={user.userId}
+                        initialData={initialProfile}
+                    />
+                    <UpdatePhoneDialog
+                        open={updatePhoneOpen}
+                        onClose={() => setUpdatePhoneOpen(false)}
                         userId={user.userId}
                         initialData={initialProfile}
                     />
