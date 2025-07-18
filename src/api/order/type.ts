@@ -1,3 +1,5 @@
+import {CustomerOrderResponse} from "../orderDetails";
+
 export interface OrderRequest {
     userId?: number;
     customerEmail: string;
@@ -62,6 +64,7 @@ export interface LineItemResponse {
 }
 
 export type OrderResponsePage = PaginatedResponse<OrderContent>;
+export type MyOrderResponsePage = PaginatedResponse<CustomerOrderResponse>;
 
 export interface OrderContent {
     orderId: number;

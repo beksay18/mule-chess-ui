@@ -1,6 +1,6 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {OrderRequest, OrderResponse, OrderResponsePage, OrderStatusCount} from "./type";
+import {MyOrderResponsePage, OrderRequest, OrderResponse, OrderResponsePage, OrderStatusCount} from "./type";
 
 export const createOrder = async (
     payload: OrderRequest
@@ -45,6 +45,17 @@ export const getAllOrders = ({page, size, filter}: {
         `${ENDPOINTS.ORDER.GET_ALL_ORDERS}?page=${page}&size=${size}${filter ? `&filter=${encodeURIComponent(filter)}` : ''}`
     ).then(({data}) => data);
 
+export const getMyOrders = ({ page, size, filter, userId }: {
+    page: number;
+    size: number;
+    filter?: string;
+    userId?: number;
+}): Promise<MyOrderResponsePage> =>
+    axios.getWithRetries<MyOrderResponsePage>(
+        `${ENDPOINTS.ORDER.GET_MY_ORDERS}?page=${page}&size=${size}` +
+        `${filter ? `&filter=${encodeURIComponent(filter)}` : ''}` +
+        `${userId ? `&userId=${userId}` : ''}`
+    ).then(({ data }) => data);
 
 export const buildOrderFormData = (order: OrderRequest): FormData => {
     const formData = new FormData();

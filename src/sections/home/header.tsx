@@ -337,6 +337,9 @@ export default function Header() {
                         <MenuItem onClick={() => handleClickItem('/my-orders')}>
                             My Orders
                         </MenuItem>
+                        <MenuItem onClick={() => handleClickItem('/my-shipping-addresses')}>
+                            Shipping Addresses
+                        </MenuItem>
                     </MenuList>
                     <Divider sx={{ borderStyle: 'dashed' }} />
                     <Box sx={{ p: 1 }}>
