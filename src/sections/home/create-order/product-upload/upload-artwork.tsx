@@ -150,10 +150,15 @@ export default function UploadArtwork() {
                 >
                     <Button
                         variant="contained"
-                        color="primary"
                         size="large"
                         onClick={handleAddToCart}
-                        sx={{ fontWeight: 'bold', textTransform: 'none', px: 4 }}
+                        sx={{
+                            fontWeight: 'bold', textTransform: 'none', px: 4, backgroundColor: '#08A24B',
+                            color: '#ffffff',
+                            '&:hover': {
+                                backgroundColor: '#06853D',
+                            },
+                        }}
                     >
                         Add to cart
                     </Button>

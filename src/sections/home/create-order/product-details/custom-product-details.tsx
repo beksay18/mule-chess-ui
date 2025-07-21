@@ -171,6 +171,11 @@ export default function CustomProductDetails() {
                                         fontSize: '1rem',
                                         borderRadius: 2,
                                         boxShadow: 2,
+                                        backgroundColor: '#08A24B',
+                                        color: '#ffffff',
+                                        '&:hover': {
+                                            backgroundColor: '#06853D',
+                                        },
                                         textTransform: 'none',
                                     }}
                                     fullWidth

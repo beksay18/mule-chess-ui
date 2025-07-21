@@ -29,7 +29,7 @@ export default function CustomProductTitle() {
 
     return (
         <Box sx={{
-            background: '#04498e',
+            background: '#f4f4f4',
             py: 2
         }}>
             <Container>
@@ -39,7 +39,7 @@ export default function CustomProductTitle() {
                         variant="h2"
                         sx={(theme) => ({
                             fontSize: 'inherit',
-                            color: 'white',
+                            color: '#4f7277',
                         })}
                     >
                         Custom {productType?.name}
@@ -51,7 +51,7 @@ export default function CustomProductTitle() {
                         precision={0.5}
                         sx={{ ml: 4 }}
                     />
-                    <Box sx={{ ml: 2, color: 'white' }}>10,000 reviews</Box>
+                    <Box sx={{ ml: 2, color: '#4f7277' }}>10,000 reviews</Box>
                 </StyledToolbar>
             </Container>
         </Box>

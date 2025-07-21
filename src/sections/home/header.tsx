@@ -91,13 +91,13 @@ export default function Header() {
             id="hero"
             sx={{
                 width: '100%',
-                background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+                background: 'linear-gradient(90deg, #08A24B 0%, #08A24B 100%)',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}
         >
         <Container>
             <StyledToolbar variant="dense">
-                <Box sx={{flexGrow: 1, display: 'flex', alignItems: 'center', px: 0}}>
+                <Box sx={{flexGrow: 1, display: 'flex', alignItems: 'flex-start', px: 0}}>
                     <Box
                         component="a"
                         href="/"
@@ -109,19 +109,21 @@ export default function Header() {
                         }}
                     >
                         <Box
-                            component="img"
-                            src="/assets/stickers.png"
-                            alt="Logo"
+                            component="span"
                             sx={{
-                                height: 40,
-                                width: 40,
-                                mr: 1.5,
-                                borderRadius: '8px',
-                                transition: 'transform 0.3s ease',
-                                boxShadow: 1,
-                                '&:hover': { transform: 'scale(1.1)' },
+                                fontWeight: 800,
+                                fontSize: '2rem',
+                                fontFamily: `'Sora', sans-serif`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                letterSpacing: '0.15em',
+                                textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+                                textTransform: 'uppercase',
+                                backgroundColor: '#ffffff',
                             }}
-                        />
+                        >
+                            SAKAI
+                        </Box>
                     </Box>
                     <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, ml: 2}}>
                         <Button

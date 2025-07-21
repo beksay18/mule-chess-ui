@@ -7,10 +7,14 @@ import Typography from '@mui/material/Typography';
 import { useRouter } from "../../routes/hooks";
 import { useEffect, useState } from "react";
 import { getActiveProductTypes, ProductType } from "../../api/productType";
+import {useMediaQuery} from "@mui/material";
+import {useTheme} from "@mui/material/styles";
 
 export default function HomeOverview() {
     const [randomProductType, setRandomProductType] = useState<ProductType | null>(null);
     const router = useRouter();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const headerImage = '/assets/images/hello.png';
 
@@ -49,42 +53,19 @@ export default function HomeOverview() {
                 <Box sx={{ width: { xs: '100%', md: '50%' }, pr: { md: 4 } }}>
                     <Stack spacing={2} useFlexGap>
                         <Typography
-                            variant="h3"
                             sx={{
                                 display: 'flex',
                                 flexDirection: { xs: 'column', sm: 'row' },
-                                alignItems: 'center',
-                                fontSize: 'clamp(3rem, 10vw, 3.5rem)',
+                                flexWrap: 'wrap',
+                                fontWeight: 700,
+                                fontSize: '25px',
+                                gap: 1,
                             }}
                         >
-                            Create&nbsp;custom&nbsp;
-                            <Typography
-                                component="span"
-                                variant="h3"
-                                sx={(theme) => ({
-                                    fontSize: 'inherit',
-                                    color: 'primary.main',
-                                    ...theme.applyStyles?.('dark', {
-                                        color: 'primary.light',
-                                    }),
-                                })}
-                            >
-                                stickers,&nbsp;
-                            </Typography>
-                            <Typography
-                                component="span"
-                                variant="h3"
-                                sx={(theme) => ({
-                                    fontSize: 'inherit',
-                                    color: 'primary.main',
-                                    ...theme.applyStyles?.('dark', {
-                                        color: 'primary.light',
-                                    }),
-                                })}
-                            >
-                                labels
-                            </Typography>
-                            &nbsp;and&nbsp;more
+                            Create custom stickers, labels with
+                            <Box component="span" sx={{ color: '#08A24B', whiteSpace: 'nowrap' }}>
+                                AI
+                            </Box>
                         </Typography>
 
                         <Typography
@@ -106,7 +87,7 @@ export default function HomeOverview() {
                                     fontWeight: 'bold',
                                     fontSize: '1rem',
                                     borderRadius: 2,
-                                    backgroundColor: '#1469d7',
+                                    backgroundColor: '#08A24B',
                                     color: '#ffffff',
                                     textTransform: 'none',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -158,6 +139,7 @@ export default function HomeOverview() {
                         width: { xs: '100%', md: '50%' },
                         mt: { xs: 4, md: 0 },
                         textAlign: 'center',
+                        display: { xs: 'none', md: 'block' },
                     }}
                 >
                     <Box

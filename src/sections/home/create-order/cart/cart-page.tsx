@@ -256,7 +256,6 @@ export default function CartPage() {
                         <Button
                             fullWidth
                             variant="contained"
-                            color="primary"
                             size="large"
                             endIcon={<LockIcon />}
                             sx={{
@@ -264,6 +263,11 @@ export default function CartPage() {
                                 height: 60,
                                 fontSize: '1.2rem',
                                 fontWeight: 'bold',
+                                backgroundColor: '#08A24B',
+                                color: '#ffffff',
+                                '&:hover': {
+                                    backgroundColor: '#06853D',
+                                },
                             }}
                             onClick={handleCheckout}
                         >

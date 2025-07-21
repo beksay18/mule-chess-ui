@@ -29,7 +29,7 @@ export default function HelpOverview() {
     return (
         <Box
             sx={{
-                background: 'linear-gradient(90deg, #1976d2 0%, #42a5f5 100%)',
+                background: 'linear-gradient(90deg, #08A24B 0%, #08A24B 100%)',
                 py: 4,
             }}
         >
@@ -57,7 +57,7 @@ export default function HelpOverview() {
                             fontSize: '1rem',
                             borderRadius: 2,
                             backgroundColor: 'white',
-                            color: '#1976d2',
+                            color: '#08A24B',
                             textTransform: 'none',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                             transition: 'all 0.3s ease',
