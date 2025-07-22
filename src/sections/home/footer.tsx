@@ -20,7 +20,7 @@ function Copyright() {
         <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
             {'Copyright © '}
             <Link color="text.secondary" href="#">
-                CG Stickers
+                SAKAI
             </Link>
             &nbsp;
             {new Date().getFullYear()}
@@ -81,7 +81,7 @@ export default function Footer() {
                             </IconButton>
                         </Stack>
                         <Typography variant="body2" gutterBottom color="text.secondary" sx={{ fontWeight: 600, mt: 2 }}>
-                            © {new Date().getFullYear()} CG Stickers. All rights reserved.&nbsp;
+                            © {new Date().getFullYear()} SAKAI. All rights reserved.&nbsp;
                             <Link href="/privacy" underline="hover" color="text.secondary" sx={{ ml: 1 }}>
                                 Privacy
                             </Link>

@@ -71,7 +71,7 @@ export default function HomeProducts() {
                                     src={`${baseURL}${productType.imageUrl}`}
                                     alt={productType.name}
                                     sx={{
-                                        width: '100%',
+                                        width: 140,
                                         maxHeight: 140,
                                         objectFit: 'contain',
                                         borderRadius: 2,
@@ -83,7 +83,6 @@ export default function HomeProducts() {
                                 />
                             </Box>
 
-                            {/* Product Name */}
                             <Box
                                 sx={{
                                     textAlign: 'center',
