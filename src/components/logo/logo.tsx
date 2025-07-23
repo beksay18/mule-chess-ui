@@ -47,7 +47,7 @@ export function Logo({
           ]}
           {...other}
       >
-        Stickers
+        SAKAI
       </LogoRoot>
   );
 }

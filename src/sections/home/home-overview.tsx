@@ -55,7 +55,7 @@ export default function HomeOverview() {
                         <Typography
                             sx={{
                                 display: 'flex',
-                                flexDirection: { xs: 'column', sm: 'row' },
+                                flexDirection: {xs: 'column', sm: 'row'},
                                 flexWrap: 'wrap',
                                 fontWeight: 700,
                                 fontSize: '25px',
@@ -63,9 +63,9 @@ export default function HomeOverview() {
                             }}
                         >
                             Create custom stickers, labels with
-                            <Box component="span" sx={{ color: '#08A24B', whiteSpace: 'nowrap' }}>
+                            <span style={{color: '#08A24B', whiteSpace: 'nowrap'}}>
                                 AI
-                            </Box>
+                            </span>
                         </Typography>
 
                         <Typography

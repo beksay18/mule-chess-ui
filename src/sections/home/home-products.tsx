@@ -35,7 +35,7 @@ export default function HomeProducts() {
                             xs: 'repeat(1, 1fr)',
                             sm: 'repeat(2, 1fr)',
                             md: 'repeat(3, 1fr)',
-                            lg: 'repeat(4, 1fr)',
+                            lg: 'repeat(2, 1fr)',
                         },
                         gap: 3,
                     }}
@@ -57,7 +57,7 @@ export default function HomeProducts() {
                                 },
                             }}
                         >
-                            {/* Sticker Image */}
+
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -71,8 +71,8 @@ export default function HomeProducts() {
                                     src={`${baseURL}${productType.imageUrl}`}
                                     alt={productType.name}
                                     sx={{
-                                        width: 140,
-                                        maxHeight: 140,
+                                        width: 120,
+                                        maxHeight: 120,
                                         objectFit: 'contain',
                                         borderRadius: 2,
                                         transition: 'transform 0.3s ease',
