@@ -7,6 +7,7 @@ import CustomProductTitle from './custom-product-title';
 import { useRouter } from '../../../../routes/hooks';
 import Container from '@mui/material/Container';
 import Paper from '@mui/material/Paper';
+import ProductListSidebar from "./product-list-sidebar";
 
 export default function CustomProducts() {
     const router = useRouter();
@@ -35,76 +36,22 @@ export default function CustomProducts() {
         <>
             <CustomProductTitle />
             <Container sx={{ mt: 5, pb: 10 }}>
-                {customProducts.length === 0 ? (
-                    <Box textAlign="center" mt={4}>
-                        No Products Found
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    {/* Main block (80%) */}
+                    <Box sx={{ flex: '0 0 85%' }}>
+                        <Paper sx={{ p: 3 }}>
+                            Main 80% block
+                        </Paper>
                     </Box>
-                ) : (
-                    <Box
-                        sx={{
-                            display: 'grid',
-                            gridTemplateColumns: {
-                                xs: 'repeat(1, 1fr)',
-                                sm: 'repeat(2, 1fr)',
-                                md: 'repeat(3, 1fr)',
-                                lg: 'repeat(4, 1fr)',
-                            },
-                            gap: 4,
-                        }}
-                    >
-                        {customProducts.map((product) => (
-                            <Box
-                                key={product.id}
-                                onClick={() => handleProductClick(product.id)}
-                                sx={{
-                                    p: 1,
-                                    cursor: 'pointer',
-                                    transition: '0.3s',
-                                    textAlign: 'center',
-                                    '&:hover': {
-                                        backgroundColor: '#f0f0f0',
-                                    },
-                                }}
-                            >
-                                <Box
-                                    sx={{
-                                        width: '100%',
-                                        height: 200,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        overflow: 'hidden',
-                                    }}
-                                >
-                                    {product.imageUrl ? (
-                                        <Box
-                                            component="img"
-                                            src={`${baseImageUrl}${product.imageUrl}`}
-                                            alt={product.name}
-                                            sx={{
-                                                maxWidth: '100%',
-                                                maxHeight: '100%',
-                                                objectFit: 'contain',
-                                                transition: 'transform 0.3s',
-                                            }}
-                                        />
-                                    ) : (
-                                        <Box
-                                            sx={{
-                                                width: '100%',
-                                                height: '100%',
-                                                backgroundColor: '#f0f0f0',
-                                            }}
-                                        />
-                                    )}
-                                </Box>
-                                <Box sx={{ fontWeight: 500}}>
-                                    {product.name}
-                                </Box>
-                            </Box>
-                        ))}
+
+                    <Box sx={{ flex: '0 0 15%' }}>
+                        <ProductListSidebar
+                            products={customProducts}
+                            onProductClick={handleProductClick}
+                            baseImageUrl={baseImageUrl}
+                        />
                     </Box>
-                )}
+                </Box>
             </Container>
         </>
     );

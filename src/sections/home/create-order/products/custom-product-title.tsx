@@ -14,7 +14,6 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
     alignItems: 'center',
     flexShrink: 0,
     backdropFilter: 'blur(24px)',
-    padding: '15px 12px',
 }));
 
 export default function CustomProductTitle() {
@@ -36,7 +35,7 @@ export default function CustomProductTitle() {
                 <StyledToolbar variant="dense">
                     <Typography
                         component="span"
-                        variant="h2"
+                        variant="h3"
                         sx={(theme) => ({
                             fontSize: 'inherit',
                             color: '#4f7277',
