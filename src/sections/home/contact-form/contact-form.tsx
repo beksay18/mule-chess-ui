@@ -119,9 +119,14 @@ export default function ContactFormSection() {
                             <Button
                                 type="submit"
                                 variant="contained"
-                                color="primary"
                                 fullWidth
                                 disabled={submitting}
+                                sx={{
+                                    backgroundColor: '#08A24B',
+                                    '&:hover': {
+                                        backgroundColor: '#06933F',
+                                    }
+                                }}
                             >
                                 {submitting ? <CircularProgress size={24}/> : 'Submit'}
                             </Button>

@@ -10,29 +10,9 @@ const StyledTypography = styled(Typography)(({ theme }) => ({
     textAlign: 'justify',
 }));
 
-const TitleTypography = styled(Typography)(({ theme }) => ({
-    fontWeight: 600,
-    position: 'relative',
-    marginBottom: theme.spacing(2),
-    '&:hover': { cursor: 'pointer' },
-    '&::before': {
-        content: '""',
-        position: 'absolute',
-        width: 0,
-        height: 2,
-        bottom: 0,
-        left: 0,
-        backgroundColor: theme.palette.primary.main,
-        transition: 'width 0.3s ease',
-    },
-    '&:hover::before': {
-        width: '100%',
-    },
-}));
-
 const StyledImage = styled('img')(({ theme }) => ({
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 300,
     borderRadius: 16,
     boxShadow: theme.shadows[3],
     objectFit: 'cover',
@@ -41,9 +21,9 @@ const StyledImage = styled('img')(({ theme }) => ({
 
 export default function AboutUs() {
     return (
-        <Container sx={{ py: 10 }}>
-            <Typography variant="h2" color="primary" gutterBottom>
-                Hello, we are CG Stickers
+        <Container sx={{ py: 5 }}>
+            <Typography variant="h3" gutterBottom>
+                About Us
             </Typography>
 
             <Box
@@ -55,19 +35,20 @@ export default function AboutUs() {
                     mt: 4,
                 }}
             >
-                <Box sx={{ flex: 1, textAlign: 'center' }}>
-                    <StyledImage src="/assets/images/product/product-14.webp" alt="About CG Stickers" />
+                <Box sx={{ flex: '0 0 30%'}}>
+                    <StyledImage src="/assets/images/sakai-sticker.png" />
                 </Box>
 
-                <Box sx={{ flex: 1 }}>
-                    <TitleTypography variant="h5">
-                        At CG Stickers, we’re obsessed with making custom sticker ordering effortless and enjoyable.
-                    </TitleTypography>
+                <Box sx={{ flex: '0 0 70%' }}>
                     <StyledTypography variant="body1">
-                        We know your time is valuable — that’s why we’ve streamlined the entire process from start to finish.
-                        Place your order in seconds and get your custom stickers in just days.
-                        Enjoy free digital proofs, artwork assistance, fast turnaround, and shipping — all on us.
-                        That’s why creators, small businesses, and sticker lovers trust CG Stickers.
+                        SAKAI is a modern platform dedicated to simplifying the way people create and order custom stickers online.
+                        Our mission is to make high-quality sticker production accessible, fast, and enjoyable — whether you are an artist, small business owner, or just someone who loves creative design.
+                        <br /><br />
+                        SAKAI was founded in Chicago in 2024 and is operated by a team passionate about blending cutting-edge web technology with beautiful print products. We’ve built a streamlined ordering experience using smart tools and AI to help customers design and preview their stickers instantly.
+                        <br /><br />
+                        We proudly serve creators, entrepreneurs, and communities across the U.S. and beyond, and we’re continuously growing thanks to the trust and love of our customers. Our platform is part of a new wave of e-commerce startups focused on creativity, customization, and exceptional user experience.
+                        <br /><br />
+                        We’re also backed by incredible mentors and advisors, and we are currently exploring partnerships with accelerator programs to expand our reach and impact. At SAKAI, our obsession is helping your ideas stick — literally.
                     </StyledTypography>
                 </Box>
             </Box>

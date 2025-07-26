@@ -28,7 +28,7 @@ export default function ReturnsTitle() {
                         variant="h2"
                         sx={(theme) => ({
                             fontSize: 'inherit',
-                            color: 'white',
+                            color: '#4f7277',
                         })}
                     >
                         Returns

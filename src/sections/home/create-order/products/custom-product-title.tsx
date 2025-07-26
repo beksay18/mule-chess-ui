@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {getProductTypeById, ProductType} from "../../../../api/productType";
 import {Rating} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -17,7 +18,7 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
 }));
 
 export default function CustomProductTitle() {
-    const { typeId } = useParams();
+    const {typeId} = useParams();
     const [productType, setProductType] = useState<ProductType | null>(null);
 
     useEffect(() => {
@@ -27,30 +28,74 @@ export default function CustomProductTitle() {
     }, [typeId]);
 
     return (
-        <Box sx={{
-            background: '#f4f4f4',
-            py: 2
-        }}>
+        <Box sx={{background: '#f4f4f4', py: 2}}>
             <Container>
-                <StyledToolbar variant="dense">
-                    <Typography
-                        component="span"
-                        variant="h3"
-                        sx={(theme) => ({
-                            fontSize: 'inherit',
-                            color: '#4f7277',
-                        })}
-                    >
-                        Custom {productType?.name}
-                    </Typography>
-                    <Rating
-                        name="text-feedback"
-                        value={3.5}
-                        readOnly
-                        precision={0.5}
-                        sx={{ ml: 4 }}
-                    />
-                    <Box sx={{ ml: 2, color: '#4f7277' }}>10,000 reviews</Box>
+                <StyledToolbar variant="dense" sx={{justifyContent: 'space-between'}}>
+                    <Box sx={{
+                        flexGrow: 1,
+                        px: 2,
+                        display: 'flex'
+                    }}>
+                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <Box>
+                            <Typography
+                                component="div"
+                                sx={{color: '#4f7277', fontWeight: 'bold'}}
+                            >
+                                Upload {productType?.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
+                            >
+                                High-quality custom printing made easy
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <Box sx={{
+                        flexGrow: 1,
+                        px: 2,
+                        display: 'flex'
+                    }}>
+                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <Box>
+                            <Typography
+                                component="div"
+                                sx={{color: '#4f7277', fontWeight: 'bold'}}
+                            >
+                                Upload {productType?.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
+                            >
+                                High-quality custom printing made easy
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    <Box sx={{
+                        flexGrow: 1,
+                        px: 2,
+                        display: 'flex'
+                    }}>
+                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <Box>
+                            <Typography
+                                component="div"
+                                sx={{color: '#4f7277', fontWeight: 'bold'}}
+                            >
+                                Upload {productType?.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
+                            >
+                                High-quality custom printing made easy
+                            </Typography>
+                        </Box>
+                    </Box>
                 </StyledToolbar>
             </Container>
         </Box>

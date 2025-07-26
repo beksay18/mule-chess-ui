@@ -30,8 +30,7 @@ export default function Help() {
                         <Card variant="outlined">
                             <CardContent>
                                 <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-                                    <Typography color="primary" variant="h6">{item.title}</Typography>
-
+                                    <Typography variant="h6" sx={{color: '#1d7a04'}}>{item.title}</Typography>
                                 </Stack>
 
                                 {item.faqs.map((faq) => (
@@ -43,12 +42,12 @@ export default function Help() {
                                                 alignItems: 'center',
                                                 width: '100%'
                                             }}>
-                                                <Typography variant="subtitle1">Q: {faq.question}</Typography>
+                                                <Typography variant="subtitle1">{faq.question}</Typography>
                                             </Box>
                                         </AccordionSummary>
                                         <AccordionDetails>
                                             <Typography variant="body2" color="text.secondary">
-                                                A: {faq.answer}
+                                                {faq.answer}
                                             </Typography>
                                         </AccordionDetails>
                                     </Accordion>

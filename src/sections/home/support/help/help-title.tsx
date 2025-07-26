@@ -14,7 +14,6 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
     justifyContent: 'center',
     textAlign: 'center',
     backdropFilter: 'blur(24px)',
-    padding: theme.spacing(2.5, 3.75),
     flexWrap: 'wrap',
     gap: theme.spacing(25),
 }));
@@ -28,7 +27,7 @@ export default function HelpTitle() {
 
     return (
         <Box sx={{
-            background: '#04498e',
+            background: '#f4f4f4',
             py: 2
         }}>
             <Container>
@@ -38,7 +37,7 @@ export default function HelpTitle() {
                         variant="h2"
                         sx={(theme) => ({
                             fontSize: 'inherit',
-                            color: 'white',
+                            color: '#4f7277'
                         })}
                     >
                         HELP
@@ -53,7 +52,7 @@ export default function HelpTitle() {
                             fontSize: '1rem',
                             borderRadius: 2,
                             backgroundColor: 'white',
-                            color: '#1976d2',
+                            color: '#08A24B',
                             textTransform: 'none',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                             transition: 'all 0.3s ease',

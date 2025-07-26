@@ -49,7 +49,7 @@ export default function Returns() {
 
     return (
         <Container sx={{py: 5}}>
-            <Typography variant="h2" color="primary" gutterBottom>
+            <Typography variant="h2" gutterBottom sx={{color: '#4f7277'}}>
                 Returns
             </Typography>
             <Grid container spacing={8} columns={12} sx={{my: 4}}>

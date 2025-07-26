@@ -11,14 +11,13 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
     alignItems: 'center',
     flexShrink: 0,
     backdropFilter: 'blur(24px)',
-    padding: '15px 12px',
 }));
 
 export default function ContactUsTitle() {
 
     return (
         <Box sx={{
-            background: '#04498e',
+            background: '#f4f4f4',
             py: 2
         }}>
             <Container>
@@ -28,7 +27,7 @@ export default function ContactUsTitle() {
                         variant="h2"
                         sx={(theme) => ({
                             fontSize: 'inherit',
-                            color: 'white',
+                            color: '#4f7277'
                         })}
                     >
                         Contact Us
