@@ -22,6 +22,10 @@ export default function CustomProducts() {
     const [processedImage, setProcessedImage] = React.useState<string | null>(null);
     const [imageShape, setImageShape] =
         React.useState<'square' | 'rounded' | 'circle' | 'rectangle' | 'oval'>('rounded');
+    const [roundedRadius, setRoundedRadius] = React.useState(10);
+    const [ovalRadius, setOvalRadius] = React.useState(50);
+    const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
+    const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
 
     useEffect(() => {
         if (typeId) {
@@ -131,11 +135,13 @@ export default function CustomProducts() {
                                             p: 1,
                                             m: 3,
                                             borderRadius:
-                                                imageShape === 'circle' || imageShape === 'oval'
+                                                imageShape === 'circle'
                                                     ? '50%'
-                                                    : imageShape === 'rounded'
-                                                        ? 5
-                                                        : 0,
+                                                    : imageShape === 'oval'
+                                                        ? `${ovalRadius}% / 50%`
+                                                        : imageShape === 'rounded'
+                                                            ? `${roundedRadius}%`
+                                                            : 0,
                                             border: '2px solid #ccc',
                                             display: 'block',
                                             mx: 'auto',
@@ -232,7 +238,23 @@ export default function CustomProducts() {
                     </Box>
                     <Box sx={{flex: '0 0 45%'}}>
                         <Paper sx={{p: 3}}>
-                            <Box display="flex" gap={1} mb={2} flexWrap="wrap">
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    color: '#4f7277',
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline',
+                                    fontWeight: 500
+                                }}
+                                component="a"
+                                href="/help/selecting-stickers"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                Need help selecting stickers?
+                            </Typography>
+
+                            <Box display="flex" gap={1} mb={2} mt={2} flexWrap="wrap">
                                 {customProducts.map((product) => {
                                     const lowerName = product.name.toLowerCase();
                                     const showSuffix = !lowerName.includes("sticker") && !lowerName.includes("sheet");
@@ -240,18 +262,22 @@ export default function CustomProducts() {
                                     return (
                                         <Box
                                             key={product.id}
-                                            onClick={() => handleShapeChangeFromProduct(product.name)}
+                                            onClick={() => {
+                                                setSelectedProductId(product.id);
+                                                setSelectedProductName(product.name);
+                                                handleShapeChangeFromProduct(product.name);
+                                            }}
                                             component="button"
                                             sx={{
                                                 padding: '8px 12px',
-                                                backgroundColor: '#f0f0f0',
-                                                border: '1px solid #ccc',
+                                                backgroundColor: selectedProductId === product.id ? '#d0f0e8' : '#f0f0f0',
+                                                border: selectedProductId === product.id ? '2px solid #08A24B' : '1px solid #ccc',
                                                 borderRadius: '4px',
                                                 cursor: 'pointer',
                                                 fontWeight: 500,
                                                 transition: 'background-color 0.3s',
                                                 '&:hover': {
-                                                    backgroundColor: '#e0e0e0',
+                                                    backgroundColor: selectedProductId === product.id ? '#bce9db' : '#e0e0e0',
                                                 }
                                             }}
                                         >
@@ -260,6 +286,45 @@ export default function CustomProducts() {
                                     );
                                 })}
                             </Box>
+
+                            {selectedFiles.length > 0 && selectedProductName?.toLowerCase().includes('rounded') && (
+                                <Box sx={{ mb: 3, mt: 3 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                        Rounded Border Radius ({roundedRadius}%)
+                                    </Typography>
+                                    <Box sx={{ px: 2 }}>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={50}
+                                            step={1}
+                                            value={roundedRadius}
+                                            onChange={(e) => setRoundedRadius(Number(e.target.value))}
+                                            style={{ width: '100%'}}
+                                        />
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {selectedFiles.length > 0 && selectedProductName?.toLowerCase().includes('oval') && (
+                                <Box sx={{ mb: 3, mt: 3 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                        Oval Border Radius ({ovalRadius}%)
+                                    </Typography>
+                                    <Box sx={{ px: 2 }}>
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={50}
+                                            step={1}
+                                            value={ovalRadius}
+                                            onChange={(e) => setOvalRadius(Number(e.target.value))}
+                                            style={{ width: '100%' }}
+                                        />
+                                    </Box>
+                                </Box>
+                            )}
+
                             <Box
                                 component="button"
                                 sx={{
@@ -269,7 +334,7 @@ export default function CustomProducts() {
                                     borderRadius: '8px',
                                     px: 3,
                                     py: 1.5,
-                                    mt: 40,
+                                    mt: 5,
                                     cursor: 'pointer',
                                     fontSize: '16px',
                                     fontWeight: 600,
