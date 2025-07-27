@@ -63,4 +63,7 @@ export const ENDPOINTS = {
         DELETE_FAQ: (faqId: number) => `/cg-stickers/api/faq/${faqId}`,
         DELETE_TITLE: (titleId: number) => `/cg-stickers/api/faq/delete-title/${titleId}`,
     },
+    IMAGE_BACKGROUND: {
+        REMOVE: "/cg-stickers/api/background/remove",
+    },
 }

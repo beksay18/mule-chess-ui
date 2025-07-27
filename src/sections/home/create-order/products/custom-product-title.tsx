@@ -7,8 +7,9 @@ import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {getProductTypeById, ProductType} from "../../../../api/productType";
-import {Rating} from "@mui/material";
+import FilterIcon from '@mui/icons-material/Filter';
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import SelectAllIcon from '@mui/icons-material/SelectAll';
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -58,13 +59,13 @@ export default function CustomProductTitle() {
                         px: 2,
                         display: 'flex'
                     }}>
-                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <FilterIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
                         <Box>
                             <Typography
                                 component="div"
                                 sx={{color: '#4f7277', fontWeight: 'bold'}}
                             >
-                                Upload {productType?.name}
+                                Change Background
                             </Typography>
                             <Typography
                                 variant="subtitle2"
@@ -80,13 +81,13 @@ export default function CustomProductTitle() {
                         px: 2,
                         display: 'flex'
                     }}>
-                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
                         <Box>
                             <Typography
                                 component="div"
                                 sx={{color: '#4f7277', fontWeight: 'bold'}}
                             >
-                                Upload {productType?.name}
+                                Select Stickers
                             </Typography>
                             <Typography
                                 variant="subtitle2"
