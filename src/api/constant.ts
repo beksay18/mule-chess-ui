@@ -65,5 +65,6 @@ export const ENDPOINTS = {
     },
     IMAGE_BACKGROUND: {
         REMOVE: "/cg-stickers/api/background/remove",
+        BACKGROUND_COLOR: "/cg-stickers/api/background/background-color",
     },
 }

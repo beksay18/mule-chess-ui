@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import Typography from "@mui/material/Typography";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextField from "@mui/material/TextField";
-import {removeImageBackground} from "../../../../api/imageBackground";
+import {blobToBase64, removeImageBackground, replaceImageBgColor} from "../../../../api/imageBackground";
 import {useEffect, useState} from "react";
 import {getActiveProducts, Product} from "../../../../api/product";
 
@@ -18,20 +18,42 @@ export default function CustomProducts() {
     const [customProducts, setCustomProducts] = useState<Product[]>([]);
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
-    const [loading, setLoading] = React.useState(false);
+    const [loadingRemoveBackground, setLoadingRemoveBackground] = React.useState(false);
+    const [loadingReplaceBackgroundColor, setLoadingReplaceBackgroundColor] = React.useState(false);
     const [processedImage, setProcessedImage] = React.useState<string | null>(null);
     const [imageShape, setImageShape] =
-        React.useState<'square' | 'rounded' | 'circle' | 'rectangle' | 'oval'>('rounded');
+        React.useState<'square' | 'rounded' | 'circle' | 'rectangle' | 'oval'>('rectangle');
     const [roundedRadius, setRoundedRadius] = React.useState(10);
     const [ovalRadius, setOvalRadius] = React.useState(50);
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
+    const [selectedColor, setSelectedColor] = useState("#ffffff");
 
     useEffect(() => {
         if (typeId) {
             loadProductsByType(Number(typeId));
         }
     }, [typeId]);
+
+    useEffect(() => {
+        const cachedDataUrl = localStorage.getItem("cachedImage");
+        const cachedFileName = localStorage.getItem("cachedImageName");
+
+        if (cachedDataUrl) {
+            const mimeType = cachedDataUrl.split(",")[0].match(/:(.*?);/)?.[1] || "image/png";
+            const byteString = atob(cachedDataUrl.split(',')[1]);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            const blob = new Blob([ab], { type: mimeType });
+            const file = new File([blob], cachedFileName || "cached-image.png", { type: mimeType });
+
+            setSelectedFiles([file]);
+            setProcessedImage(cachedDataUrl);
+        }
+    }, []);
 
     const loadProductsByType = async (id: number) => {
         const data = await getActiveProducts(id);
@@ -46,26 +68,62 @@ export default function CustomProducts() {
         if (event.target.files && event.target.files[0]) {
             const newFile = event.target.files[0];
             setSelectedFiles([newFile]);
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                localStorage.setItem("cachedImage", reader.result as string);
+                localStorage.setItem("cachedImageName", newFile.name);
+                setProcessedImage(reader.result as string);
+            };
+            reader.readAsDataURL(newFile);
+
             event.target.value = '';
         }
     };
 
-    const handleRemoveFile = (index: number) => {
-        setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
+    const handleRemoveFile = () => {
+        setSelectedFiles([]);
+        setProcessedImage(null);
+        localStorage.removeItem("cachedImage");
+        localStorage.removeItem("cachedImageName");
     };
 
     const handleRemoveBackground = async () => {
         if (!selectedFiles[0]) return;
 
         try {
-            setLoading(true);
+            setLoadingRemoveBackground(true);
             const blob = await removeImageBackground(selectedFiles[0]);
-            const imageUrl = URL.createObjectURL(blob);
-            setProcessedImage(imageUrl);
+            const base64 = await blobToBase64(blob);
+
+            setProcessedImage(base64);
+            localStorage.setItem("cachedImage", base64);
         } catch (err) {
             console.error("Failed to remove background:", err);
         } finally {
-            setLoading(false);
+            setLoadingRemoveBackground(false);
+        }
+    };
+
+    const handleReplaceBackgroundColor = async () => {
+        if (!selectedFiles[0]) return;
+
+        try {
+            setLoadingReplaceBackgroundColor(true);
+            const base64 = await replaceImageBgColor(
+                selectedFiles[0],
+                selectedColor,
+                imageShape,
+                roundedRadius,
+                ovalRadius
+            );
+
+            setProcessedImage(base64);
+            localStorage.setItem("cachedImage", base64);
+        } catch (err) {
+            console.error("Failed to replace background:", err);
+        } finally {
+            setLoadingReplaceBackgroundColor(false);
         }
     };
 
@@ -131,7 +189,7 @@ export default function CustomProducts() {
                                                 imageShape === 'square' ? '1 / 1' :
                                                     imageShape === 'rectangle' ? '4 / 3' :
                                                         'auto',
-                                            objectFit: 'cover',
+                                            objectFit: 'contain',
                                             p: 1,
                                             m: 3,
                                             borderRadius:
@@ -169,7 +227,7 @@ export default function CustomProducts() {
                                     <Box
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleRemoveFile(0);
+                                            handleRemoveFile();
                                         }}
                                         sx={{
                                             position: 'absolute',
@@ -195,25 +253,34 @@ export default function CustomProducts() {
                             </Box>
                             <Box sx={{width: '100%', maxWidth: 700}}>
                                 {selectedFiles.length > 0 && (
-                                    <>
-                                        <Box mb={2}>
-                                            <button
-                                                onClick={handleRemoveBackground}
-                                                disabled={loading}
-                                                style={{
-                                                    padding: '8px 16px',
-                                                    backgroundColor: '#1976d2',
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 500,
-                                                }}
-                                            >
-                                                {loading ? 'Processing...' : 'Remove Background'}
-                                            </button>
+                                    <Box
+                                        mb={2}
+                                        display="flex"
+                                        flexWrap="wrap"
+                                        gap={2}
+                                        justifyContent="flex-start"
+                                    >
+                                        <Box
+                                            component="button"
+                                            onClick={handleRemoveBackground}
+                                            disabled={loadingRemoveBackground}
+                                            sx={{
+                                                padding: '8px 16px',
+                                                backgroundColor: '#3ea2b0',
+                                                '&:hover': {
+                                                    backgroundColor: '#2e7983',
+                                                },
+                                                color: '#fff',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: 500,
+                                                minWidth: 180,
+                                            }}
+                                        >
+                                            {loadingRemoveBackground ? 'Processing...' : 'Remove Background'}
                                         </Box>
-                                    </>
+                                    </Box>
                                 )}
                             </Box>
                             <Box sx={{width: '100%', maxWidth: 700}}>
@@ -288,11 +355,11 @@ export default function CustomProducts() {
                             </Box>
 
                             {selectedFiles.length > 0 && selectedProductName?.toLowerCase().includes('rounded') && (
-                                <Box sx={{ mb: 3, mt: 3 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                <Box sx={{mb: 3, mt: 3}}>
+                                    <Typography variant="subtitle2" sx={{fontWeight: 600, mb: 1}}>
                                         Rounded Border Radius ({roundedRadius}%)
                                     </Typography>
-                                    <Box sx={{ px: 2 }}>
+                                    <Box sx={{px: 2}}>
                                         <input
                                             type="range"
                                             min={0}
@@ -300,18 +367,18 @@ export default function CustomProducts() {
                                             step={1}
                                             value={roundedRadius}
                                             onChange={(e) => setRoundedRadius(Number(e.target.value))}
-                                            style={{ width: '100%'}}
+                                            style={{width: '100%'}}
                                         />
                                     </Box>
                                 </Box>
                             )}
 
                             {selectedFiles.length > 0 && selectedProductName?.toLowerCase().includes('oval') && (
-                                <Box sx={{ mb: 3, mt: 3 }}>
-                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                                <Box sx={{mb: 3, mt: 3}}>
+                                    <Typography variant="subtitle2" sx={{fontWeight: 600, mb: 1}}>
                                         Oval Border Radius ({ovalRadius}%)
                                     </Typography>
-                                    <Box sx={{ px: 2 }}>
+                                    <Box sx={{px: 2}}>
                                         <input
                                             type="range"
                                             min={0}
@@ -319,8 +386,51 @@ export default function CustomProducts() {
                                             step={1}
                                             value={ovalRadius}
                                             onChange={(e) => setOvalRadius(Number(e.target.value))}
-                                            style={{ width: '100%' }}
+                                            style={{width: '100%'}}
                                         />
+                                    </Box>
+                                </Box>
+                            )}
+
+                            {selectedFiles.length > 0 && (
+                                <Box mb={2} mt={4}>
+                                    <Typography variant="subtitle2" sx={{fontWeight: 600, mb: 1}}>
+                                        Select Background Color
+                                    </Typography>
+
+                                    <Box display="flex" alignItems="center" gap={2}>
+                                        <input
+                                            type="color"
+                                            value={selectedColor}
+                                            onChange={(e) => setSelectedColor(e.target.value)}
+                                            style={{
+                                                width: 40,
+                                                height: 40,
+                                                padding: 0,
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
+                                        />
+                                        <Box
+                                            component="button"
+                                            onClick={handleReplaceBackgroundColor}
+                                            disabled={loadingReplaceBackgroundColor}
+                                            sx={{
+                                                padding: '8px 16px',
+                                                backgroundColor: '#3ea2b0',
+                                                '&:hover': {
+                                                    backgroundColor: '#2e7983',
+                                                },
+                                                color: '#fff',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: 500,
+                                                minWidth: 180,
+                                            }}
+                                        >
+                                            {loadingReplaceBackgroundColor ? 'Processing...' : 'Replace Background Color'}
+                                        </Box>
                                     </Box>
                                 </Box>
                             )}
