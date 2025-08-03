@@ -8,7 +8,7 @@ import Paper from '@mui/material/Paper';
 import Typography from "@mui/material/Typography";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextField from "@mui/material/TextField";
-import {blobToBase64, removeImageBackground, replaceImageBgColor} from "../../../../api/imageBackground";
+import {blobToBase64, ImageShape, removeImageBackground, replaceImageBgColor} from "../../../../api/imageBackground";
 import {useEffect, useState} from "react";
 import {getActiveProducts, Product} from "../../../../api/product";
 
@@ -22,7 +22,7 @@ export default function CustomProducts() {
     const [loadingReplaceBackgroundColor, setLoadingReplaceBackgroundColor] = React.useState(false);
     const [processedImage, setProcessedImage] = React.useState<string | null>(null);
     const [imageShape, setImageShape] =
-        React.useState<'square' | 'rounded' | 'circle' | 'rectangle' | 'oval'>('rectangle');
+        React.useState<ImageShape>('rectangle');
     const [roundedRadius, setRoundedRadius] = React.useState(10);
     const [ovalRadius, setOvalRadius] = React.useState(50);
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
@@ -108,6 +108,33 @@ export default function CustomProducts() {
     const handleReplaceBackgroundColor = async () => {
         if (!selectedFiles[0]) return;
 
+        let canvasWidth: number | undefined;
+        let canvasHeight: number | undefined;
+
+        switch (imageShape) {
+            case 'rectangle':
+                canvasWidth = 1150;
+                canvasHeight = 700;
+                break;
+            case 'oval':
+                canvasWidth = 900;
+                canvasHeight = 600;
+                break;
+            case 'circle':
+                canvasWidth = 800;
+                canvasHeight = 800;
+                break;
+            case 'rounded':
+                canvasWidth = 1150;
+                canvasHeight = 700;
+                break;
+            case 'square':
+            default:
+                canvasWidth = 700;
+                canvasHeight = 700;
+                break;
+        }
+
         try {
             setLoadingReplaceBackgroundColor(true);
             const base64 = await replaceImageBgColor(
@@ -115,7 +142,9 @@ export default function CustomProducts() {
                 selectedColor,
                 imageShape,
                 roundedRadius,
-                ovalRadius
+                ovalRadius,
+                canvasWidth,
+                canvasHeight
             );
 
             setProcessedImage(base64);
@@ -127,20 +156,72 @@ export default function CustomProducts() {
         }
     };
 
-    const handleShapeChangeFromProduct = (productName: string) => {
+    const handleShapeChangeFromProduct = async (productName: string) => {
         const lower = productName.toLowerCase();
+        let newShape: ImageShape = 'rectangle';;
+
         if (lower.includes('circle')) {
-            setImageShape('circle');
+            newShape = 'circle';
         } else if (lower.includes('square')) {
-            setImageShape('square');
+            newShape = 'square';
         } else if (lower.includes('rounded')) {
-            setImageShape('rounded');
+            newShape = 'rounded';
         } else if (lower.includes('rectangle')) {
-            setImageShape('rectangle');
+            newShape = 'rectangle';
         } else if (lower.includes('oval')) {
-            setImageShape('oval');
+            newShape = 'oval';
         } else {
-            setImageShape('rounded');
+            newShape = 'rounded';
+        }
+
+        setImageShape(newShape);
+
+        if (selectedFiles[0] && processedImage) {
+            let canvasWidth: number | undefined;
+            let canvasHeight: number | undefined;
+
+            switch (newShape) {
+                case 'rectangle':
+                    canvasWidth = 1150;
+                    canvasHeight = 700;
+                    break;
+                case 'oval':
+                    canvasWidth = 900;
+                    canvasHeight = 600;
+                    break;
+                case 'circle':
+                    canvasWidth = 800;
+                    canvasHeight = 800;
+                    break;
+                case 'rounded':
+                    canvasWidth = 1150;
+                    canvasHeight = 700;
+                    break;
+                case 'square':
+                default:
+                    canvasWidth = 700;
+                    canvasHeight = 700;
+                    break;
+            }
+
+            try {
+                setLoadingReplaceBackgroundColor(true);
+                const updatedBase64 = await replaceImageBgColor(
+                    selectedFiles[0],
+                    selectedColor,
+                    newShape,
+                    roundedRadius,
+                    ovalRadius,
+                    canvasWidth,
+                    canvasHeight
+                );
+                setProcessedImage(updatedBase64);
+                localStorage.setItem("cachedImage", updatedBase64);
+            } catch (error) {
+                console.error("Failed to update shape background:", error);
+            } finally {
+                setLoadingReplaceBackgroundColor(false);
+            }
         }
     };
 

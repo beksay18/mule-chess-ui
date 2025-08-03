@@ -1,6 +1,8 @@
 import { axios } from "../http";
 import {ENDPOINTS} from "../constant";
 
+export type ImageShape = 'square' | 'rounded' | 'circle' | 'rectangle' | 'oval';
+
 export const removeImageBackground = async (file: File): Promise<Blob> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -18,20 +20,41 @@ export const removeImageBackground = async (file: File): Promise<Blob> => {
 export function replaceImageBgColor(
     file: File,
     color: string,
-    shape: 'square' | 'rounded' | 'circle' | 'rectangle' | 'oval',
+    shape: ImageShape,
     roundedRadius = 10,
-    ovalRadius = 50
+    ovalRadius = 50,
+    canvasWidth?: number,
+    canvasHeight?: number
 ): Promise<string> {
     return new Promise((resolve, reject) => {
         const img = new Image();
 
         img.onload = () => {
-            const canvasWidth = 700;
-            const canvasHeight = 700;
+            let finalWidth = 700;
+            let finalHeight = 700;
+
+            if (shape === 'rectangle') {
+                finalWidth = canvasWidth ?? 1000;
+                finalHeight = canvasHeight ?? 700;
+            } else if (shape === 'oval') {
+                finalWidth = canvasWidth ?? 900;
+                finalHeight = canvasHeight ?? 600;
+            } else if (shape === 'circle') {
+                const size = canvasWidth ?? 700;
+                finalWidth = size;
+                finalHeight = size;
+            } else if (shape === 'rounded') {
+                finalWidth = canvasWidth ?? 800;
+                finalHeight = canvasHeight ?? 700;
+            } else {
+                const size = canvasWidth ?? 700;
+                finalWidth = size;
+                finalHeight = size;
+            }
 
             const canvas = document.createElement("canvas");
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
+            canvas.width = finalWidth;
+            canvas.height = finalHeight;
 
             const ctx = canvas.getContext("2d");
             if (!ctx) return reject("No canvas context");
@@ -40,50 +63,50 @@ export function replaceImageBgColor(
 
             ctx.save();
             if (shape === 'circle') {
-                const size = Math.min(canvasWidth, canvasHeight);
+                const size = Math.min(finalWidth, finalHeight);
                 ctx.beginPath();
-                ctx.arc(canvasWidth / 2, canvasHeight / 2, size / 2, 0, Math.PI * 2);
+                ctx.arc(finalWidth / 2, finalHeight / 2, size / 2, 0, Math.PI * 2);
                 ctx.clip();
             } else if (shape === 'oval') {
                 ctx.beginPath();
                 ctx.ellipse(
-                    canvasWidth / 2,
-                    canvasHeight / 2,
-                    canvasWidth * (ovalRadius / 100),
-                    canvasHeight / 2,
+                    finalWidth / 2,
+                    finalHeight / 2,
+                    finalWidth * (ovalRadius / 100),
+                    finalHeight / 2,
                     0,
                     0,
                     Math.PI * 2
                 );
                 ctx.clip();
             } else if (shape === 'rounded') {
-                const r = (roundedRadius / 100) * Math.min(canvasWidth, canvasHeight) / 2;
+                const r = (roundedRadius / 100) * Math.min(finalWidth, finalHeight) / 2;
                 ctx.beginPath();
                 ctx.moveTo(r, 0);
-                ctx.lineTo(canvasWidth - r, 0);
-                ctx.quadraticCurveTo(canvasWidth, 0, canvasWidth, r);
-                ctx.lineTo(canvasWidth, canvasHeight - r);
-                ctx.quadraticCurveTo(canvasWidth, canvasHeight, canvasWidth - r, canvasHeight);
-                ctx.lineTo(r, canvasHeight);
-                ctx.quadraticCurveTo(0, canvasHeight, 0, canvasHeight - r);
+                ctx.lineTo(finalWidth - r, 0);
+                ctx.quadraticCurveTo(finalWidth, 0, finalWidth, r);
+                ctx.lineTo(finalWidth, finalHeight - r);
+                ctx.quadraticCurveTo(finalWidth, finalHeight, finalWidth - r, finalHeight);
+                ctx.lineTo(r, finalHeight);
+                ctx.quadraticCurveTo(0, finalHeight, 0, finalHeight - r);
                 ctx.lineTo(0, r);
                 ctx.quadraticCurveTo(0, 0, r, 0);
                 ctx.clip();
             }
 
-            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+            ctx.fillRect(0, 0, finalWidth, finalHeight);
 
             const aspectRatio = img.width / img.height;
-            let drawWidth = canvasWidth;
+            let drawWidth = finalWidth;
             let drawHeight = drawWidth / aspectRatio;
 
-            if (drawHeight > canvasHeight) {
-                drawHeight = canvasHeight;
+            if (drawHeight > finalHeight) {
+                drawHeight = finalHeight;
                 drawWidth = drawHeight * aspectRatio;
             }
 
-            const x = (canvasWidth - drawWidth) / 2;
-            const y = (canvasHeight - drawHeight) / 2;
+            const x = (finalWidth - drawWidth) / 2;
+            const y = (finalHeight - drawHeight) / 2;
 
             ctx.drawImage(img, x, y, drawWidth, drawHeight);
             ctx.restore();
