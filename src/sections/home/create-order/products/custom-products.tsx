@@ -268,7 +268,6 @@ export default function CustomProducts() {
                                             maxHeight: 400,
                                             aspectRatio:
                                                 imageShape === 'square' ? '1 / 1' :
-                                                    imageShape === 'rectangle' ? '4 / 3' :
                                                         'auto',
                                             objectFit: 'contain',
                                             p: 1,
@@ -281,7 +280,8 @@ export default function CustomProducts() {
                                                         : imageShape === 'rounded'
                                                             ? `${roundedRadius}%`
                                                             : 0,
-                                            border: '2px solid #ccc',
+                                            border: '1px dashed #ccc',
+                                            outlineOffset: '4px',
                                             display: 'block',
                                             mx: 'auto',
                                         }}
