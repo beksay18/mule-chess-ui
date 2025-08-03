@@ -21,8 +21,8 @@ export function replaceImageBgColor(
     file: File,
     color: string,
     shape: ImageShape,
-    roundedRadius = 10,
-    ovalRadius = 50,
+    roundedRadius: number,
+    ovalRadius: number,
     canvasWidth?: number,
     canvasHeight?: number
 ): Promise<string> {
@@ -66,31 +66,6 @@ export function replaceImageBgColor(
                 const size = Math.min(finalWidth, finalHeight);
                 ctx.beginPath();
                 ctx.arc(finalWidth / 2, finalHeight / 2, size / 2, 0, Math.PI * 2);
-                ctx.clip();
-            } else if (shape === 'oval') {
-                ctx.beginPath();
-                ctx.ellipse(
-                    finalWidth / 2,
-                    finalHeight / 2,
-                    finalWidth * (ovalRadius / 100),
-                    finalHeight / 2,
-                    0,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.clip();
-            } else if (shape === 'rounded') {
-                const r = (roundedRadius / 100) * Math.min(finalWidth, finalHeight) / 2;
-                ctx.beginPath();
-                ctx.moveTo(r, 0);
-                ctx.lineTo(finalWidth - r, 0);
-                ctx.quadraticCurveTo(finalWidth, 0, finalWidth, r);
-                ctx.lineTo(finalWidth, finalHeight - r);
-                ctx.quadraticCurveTo(finalWidth, finalHeight, finalWidth - r, finalHeight);
-                ctx.lineTo(r, finalHeight);
-                ctx.quadraticCurveTo(0, finalHeight, 0, finalHeight - r);
-                ctx.lineTo(0, r);
-                ctx.quadraticCurveTo(0, 0, r, 0);
                 ctx.clip();
             }
 

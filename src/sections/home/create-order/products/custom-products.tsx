@@ -463,7 +463,7 @@ export default function CustomProducts() {
                                         <input
                                             type="range"
                                             min={0}
-                                            max={50}
+                                            max={100}
                                             step={1}
                                             value={ovalRadius}
                                             onChange={(e) => setOvalRadius(Number(e.target.value))}
