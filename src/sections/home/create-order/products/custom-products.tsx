@@ -38,6 +38,15 @@ export default function CustomProducts() {
     useEffect(() => {
         const cachedDataUrl = localStorage.getItem("cachedImage");
         const cachedFileName = localStorage.getItem("cachedImageName");
+        const cachedShape = localStorage.getItem("cachedImageShape") as ImageShape;
+        const cachedColor = localStorage.getItem("cachedImageColor");
+        const cachedRounded = localStorage.getItem("cachedRoundedRadius");
+        const cachedOval = localStorage.getItem("cachedOvalRadius");
+
+        if (cachedRounded) setRoundedRadius(Number(cachedRounded));
+        if (cachedOval) setOvalRadius(Number(cachedOval));
+        if (cachedShape) setImageShape(cachedShape);
+        if (cachedColor) setSelectedColor(cachedColor);
 
         if (cachedDataUrl) {
             const mimeType = cachedDataUrl.split(",")[0].match(/:(.*?);/)?.[1] || "image/png";
@@ -51,9 +60,44 @@ export default function CustomProducts() {
             const file = new File([blob], cachedFileName || "cached-image.png", { type: mimeType });
 
             setSelectedFiles([file]);
-            setProcessedImage(cachedDataUrl);
+            setTimeout(() => {
+                handleReplaceBackgroundColorFromCache(file, cachedColor || "#ffffff", cachedShape, Number(cachedRounded), Number(cachedOval));
+            }, 0);
         }
     }, []);
+
+    const handleReplaceBackgroundColorFromCache = async (
+        file: File,
+        color: string,
+        shape: ImageShape,
+        rounded: number,
+        oval: number
+    ) => {
+        const shapeDimensions = {
+            rectangle: [1150, 700],
+            oval: [900, 600],
+            circle: [800, 800],
+            rounded: [1150, 700],
+            square: [700, 700],
+        };
+        const [canvasWidth, canvasHeight] = shapeDimensions[shape] || [700, 700];
+
+        try {
+            const base64 = await replaceImageBgColor(
+                file,
+                color,
+                shape,
+                rounded,
+                oval,
+                canvasWidth,
+                canvasHeight
+            );
+            setProcessedImage(base64);
+            localStorage.setItem("cachedImage", base64);
+        } catch (e) {
+            console.error("Restore failed:", e);
+        }
+    };
 
     const loadProductsByType = async (id: number) => {
         const data = await getActiveProducts(id);
@@ -98,6 +142,7 @@ export default function CustomProducts() {
 
             setProcessedImage(base64);
             localStorage.setItem("cachedImage", base64);
+            localStorage.setItem("cachedOriginalImage", base64);
         } catch (err) {
             console.error("Failed to remove background:", err);
         } finally {
@@ -149,6 +194,10 @@ export default function CustomProducts() {
 
             setProcessedImage(base64);
             localStorage.setItem("cachedImage", base64);
+            localStorage.setItem("cachedImageShape", imageShape);
+            localStorage.setItem("cachedImageColor", selectedColor);
+            localStorage.setItem("cachedRoundedRadius", String(roundedRadius));
+            localStorage.setItem("cachedOvalRadius", String(ovalRadius));
         } catch (err) {
             console.error("Failed to replace background:", err);
         } finally {
@@ -265,7 +314,7 @@ export default function CustomProducts() {
                                             width: imageShape === 'square' ? '100%' : '100%',
                                             height: imageShape === 'square' ? 'auto' : '100%',
                                             maxWidth: imageShape === 'square' || imageShape === 'circle' ? 400 : '100%',
-                                            maxHeight: 400,
+                                            maxHeight: 800,
                                             aspectRatio:
                                                 imageShape === 'square' ? '1 / 1' :
                                                         'auto',
