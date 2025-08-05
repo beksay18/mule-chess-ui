@@ -80,6 +80,7 @@ export default function CustomProducts() {
             rounded: [1150, 700],
             square: [700, 700],
             'die-cut': [1150, 700],
+            'kiss-cut': [1150, 700],
         };
         const [canvasWidth, canvasHeight] = shapeDimensions[shape] || [700, 700];
 
@@ -219,6 +220,8 @@ export default function CustomProducts() {
         } else if (lower.includes('rounded')) {
             newShape = 'rounded';
         } else if (lower.includes('rectangle')) {
+            newShape = 'rectangle';
+        } else if (lower.includes('kiss cut')) {
             newShape = 'rectangle';
         } else if (lower.includes('oval')) {
             newShape = 'oval';
@@ -528,7 +531,7 @@ export default function CustomProducts() {
                                 </Box>
                             )}
 
-                            {selectedFiles.length > 0 && (
+                            {selectedFiles.length > 0 && imageShape !== 'die-cut' &&  (
                                 <Box mb={2} mt={4}>
                                     <Typography variant="subtitle2" sx={{fontWeight: 600, mb: 1}}>
                                         Select Background Color
