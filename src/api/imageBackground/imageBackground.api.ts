@@ -1,7 +1,7 @@
 import { axios } from "../http";
 import {ENDPOINTS} from "../constant";
 
-export type ImageShape = 'square' | 'rounded' | 'circle' | 'rectangle' | 'oval';
+export type ImageShape = 'square' | 'rounded' | 'circle' | 'rectangle' | 'oval' | 'die-cut';
 
 export const removeImageBackground = async (file: File): Promise<Blob> => {
     const formData = new FormData();

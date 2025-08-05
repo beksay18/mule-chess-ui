@@ -79,6 +79,7 @@ export default function CustomProducts() {
             circle: [800, 800],
             rounded: [1150, 700],
             square: [700, 700],
+            'die-cut': [1150, 700],
         };
         const [canvasWidth, canvasHeight] = shapeDimensions[shape] || [700, 700];
 
@@ -180,11 +181,13 @@ export default function CustomProducts() {
                 break;
         }
 
+        const finalColor = imageShape === 'die-cut' ? '#ffffff' : selectedColor;
+
         try {
             setLoadingReplaceBackgroundColor(true);
             const base64 = await replaceImageBgColor(
                 selectedFiles[0],
-                selectedColor,
+                finalColor,
                 imageShape,
                 roundedRadius,
                 ovalRadius,
@@ -195,7 +198,7 @@ export default function CustomProducts() {
             setProcessedImage(base64);
             localStorage.setItem("cachedImage", base64);
             localStorage.setItem("cachedImageShape", imageShape);
-            localStorage.setItem("cachedImageColor", selectedColor);
+            localStorage.setItem("cachedImageColor", finalColor);
             localStorage.setItem("cachedRoundedRadius", String(roundedRadius));
             localStorage.setItem("cachedOvalRadius", String(ovalRadius));
         } catch (err) {
@@ -219,6 +222,9 @@ export default function CustomProducts() {
             newShape = 'rectangle';
         } else if (lower.includes('oval')) {
             newShape = 'oval';
+        } else if (lower.includes('die cut')) {
+            newShape = 'die-cut';
+            setSelectedColor('#ffffff');
         } else {
             newShape = 'rounded';
         }
@@ -252,12 +258,12 @@ export default function CustomProducts() {
                     canvasHeight = 700;
                     break;
             }
-
+            const colorToUse = newShape === 'die-cut' ? '#ffffff' : selectedColor;
             try {
                 setLoadingReplaceBackgroundColor(true);
                 const updatedBase64 = await replaceImageBgColor(
                     selectedFiles[0],
-                    selectedColor,
+                    colorToUse,
                     newShape,
                     roundedRadius,
                     ovalRadius,
@@ -329,7 +335,7 @@ export default function CustomProducts() {
                                                         : imageShape === 'rounded'
                                                             ? `${roundedRadius}%`
                                                             : 0,
-                                            border: '1px dashed #ccc',
+                                            border: imageShape === 'die-cut' ? 'none' : '1px dashed #ccc',
                                             outlineOffset: '4px',
                                             display: 'block',
                                             mx: 'auto',
