@@ -8,9 +8,10 @@ import Paper from '@mui/material/Paper';
 import Typography from "@mui/material/Typography";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import TextField from "@mui/material/TextField";
-import {blobToBase64, ImageShape, removeImageBackground, replaceImageBgColor} from "../../../../api/imageBackground";
+import {blobToBase64, ImageShape, removeImageBackground, replaceImageBgColor} from "../../../../api/backgrounds";
 import {useEffect, useState} from "react";
 import {getActiveProducts, Product} from "../../../../api/product";
+import Button from "@mui/material/Button";
 
 export default function CustomProducts() {
     const router = useRouter();
@@ -29,6 +30,7 @@ export default function CustomProducts() {
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState("#ffffff");
     const [isKissCutBackground, setIsKissCutBackground] = useState(false);
+    const [textPosition, setTextPosition] = useState({ x: 50, y: 100 });
 
     useEffect(() => {
         if (typeId) {
@@ -284,6 +286,59 @@ export default function CustomProducts() {
                 setLoadingReplaceBackgroundColor(false);
             }
         }
+    };
+
+    const handleAddTextToImage = (newTextPosition: { x: number, y: number }) => {
+        if (!selectedFiles[0] && !processedImage) return;
+
+        const img = new Image();
+        const imageSource = processedImage ? processedImage : URL.createObjectURL(selectedFiles[0]);
+
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            ctx.drawImage(img, 0, 0);
+
+            ctx.font = 'bold 64px Arial';
+            ctx.fillStyle = 'rgba(0, 0, 255, 0.9)';
+
+            ctx.fillText('Custom Text', newTextPosition.x, newTextPosition.y);
+
+            const base64Image = canvas.toDataURL('image/png');
+            setProcessedImage(base64Image);
+            localStorage.setItem("cachedImage", base64Image);
+        };
+        img.src = imageSource;
+    };
+
+    const moveText = (direction: string) => {
+        setTextPosition(prevPosition => {
+            const newPosition = { ...prevPosition };
+
+            switch (direction) {
+                case 'up':
+                    newPosition.y -= 10;
+                    break;
+                case 'down':
+                    newPosition.y += 10;
+                    break;
+                case 'left':
+                    newPosition.x -= 10;
+                    break;
+                case 'right':
+                    newPosition.x += 10;
+                    break;
+                default:
+                    break;
+            }
+            handleAddTextToImage(newPosition);
+            return newPosition;
+        });
     };
 
 
@@ -576,6 +631,75 @@ export default function CustomProducts() {
                                     </Box>
                                 </Box>
                             )}
+
+                            {selectedFiles.length > 0 && (
+                                <Box
+                                    component="button"
+                                    onClick={() => handleAddTextToImage(textPosition)}
+                                    sx={{
+                                        padding: '8px 16px',
+                                        backgroundColor: '#3ea2b0',
+                                        '&:hover': {
+                                            backgroundColor: '#2e7983',
+                                        },
+                                        color: '#fff',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        fontWeight: 500,
+                                        minWidth: 180,
+                                    }}
+                                >
+                                    Add Text to Image
+                                </Box>
+                            )}
+
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    marginTop: 2,
+                                }}
+                            >
+                                <Box>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => moveText('up')}
+                                        sx={{backgroundColor: 'grey'}}
+                                    >
+                                        Up
+                                    </Button>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => moveText('left')}
+                                        sx={{backgroundColor: 'grey'}}
+                                    >
+                                        Left
+                                    </Button>
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => moveText('right')}
+                                        sx={{backgroundColor: 'grey'}}
+                                    >
+                                        Right
+                                    </Button>
+                                </Box>
+
+                                <Box>
+                                    <Button
+                                        variant="contained"
+                                        sx={{backgroundColor: 'grey'}}
+                                        onClick={() => moveText('down')}
+                                    >
+                                        Down
+                                    </Button>
+                                </Box>
+                            </Box>
 
                             <Box
                                 component="button"
