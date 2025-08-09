@@ -6,6 +6,9 @@ export const createProductType = (payload: ProductTypeRequest): Promise<ProductT
         const formData = new FormData();
         formData.append("name", payload.name);
         formData.append("isActive", String(payload.isActive));
+        if (payload.position !== undefined && payload.position !== null) {
+            formData.append("position", String(payload.position));
+        }
         if (payload.image) {
                 formData.append("image", payload.image);
         }
@@ -40,6 +43,9 @@ export const updateProductType = (
         const formData = new FormData();
         formData.append("name", payload.name);
         formData.append("isActive", String(payload.isActive));
+        if (payload.position !== undefined && payload.position !== null) {
+            formData.append("position", String(payload.position));
+        }
         if (payload.image) {
                 formData.append("image", payload.image);
         }

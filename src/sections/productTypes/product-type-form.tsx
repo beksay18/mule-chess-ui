@@ -21,13 +21,14 @@ export default function ProductTypeForm() {
     const navigate = useNavigate();
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const [image, setImage] = useState<File | undefined>(undefined);
-
+    const [position, setPosition] = useState<number | ''>('');
 
     useEffect(() => {
         if (id) {
             getProductTypeById(Number(id)).then((data) => {
                 setName(data.name);
                 setIsActive(data.isActive);
+                setPosition(data.position ?? '');
             });
         }
     }, [id]);
@@ -35,16 +36,22 @@ export default function ProductTypeForm() {
     const handleSubmit = async () => {
         setSubmitAttempted(true);
 
-        if (!name.trim()) {
-            return;
-        }
+        if (!name.trim()) return;
 
         try {
+            const payload = {
+                name,
+                isActive,
+                image: image ?? undefined,
+                position: position === '' ? undefined : Number(position),
+            };
+
             if (id) {
-                await updateProductType(Number(id), { name, isActive, image: image ?? undefined });
+                await updateProductType(Number(id), payload);
             } else {
-                await createProductType({ name, isActive, image: image ?? undefined });
+                await createProductType(payload);
             }
+
             navigate('/products-types');
         } catch (error) {
             console.error('Failed to save product type:', error);
@@ -68,6 +75,18 @@ export default function ProductTypeForm() {
                             required
                             error={submitAttempted && !name.trim()}
                             helperText={submitAttempted && !name.trim() ? 'Name is required' : ''}
+                        />
+
+                        <TextField
+                            label="Position"
+                            type="number"
+                            value={position}
+                            onChange={(e) => {
+                                const v = e.target.value;
+                                setPosition(v === '' ? '' : Number(v));
+                            }}
+                            fullWidth
+                            inputProps={{ min: 0 }}
                         />
 
                         <TextField

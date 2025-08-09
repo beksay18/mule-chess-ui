@@ -28,11 +28,11 @@ function mapToProductTypeItem(
         status: productType.isActive ? 'active' : 'inactive',
         coverUrl: productType.imageUrl || '',
         color: getRandomColor(),
+        position: productType.position != null ? Number(productType.position) : undefined,
         onEdit,
         onDelete,
     };
 }
-
 
 export function ProductTypesView() {
     const router = useRouter();

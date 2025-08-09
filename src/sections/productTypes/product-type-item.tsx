@@ -13,6 +13,7 @@ export type ProductItemProps = {
     status: string;
     coverUrl?: string;
     color?: string;
+    position?: number;
     onEdit?: (id: number) => void;
     onDelete?: (id: number) => void;
 };
@@ -106,6 +107,19 @@ export function ProductTypeItem({ product }: { product: ProductItemProps }) {
                         }}
                     >
                         {product.status}
+                    </Label>
+                    <Label
+                        variant="soft"
+                        color="error"
+                        sx={{
+                            textTransform: 'capitalize',
+                            fontSize: 12,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 1.5,
+                        }}
+                    >
+                        {product.position}
                     </Label>
                     <Box>
                         <IconButton onClick={() => product.onEdit?.(product.id)} size="small">
