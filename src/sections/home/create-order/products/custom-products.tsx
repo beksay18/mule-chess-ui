@@ -28,6 +28,7 @@ export default function CustomProducts() {
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState("#ffffff");
+    const [isKissCutBackground, setIsKissCutBackground] = useState(false);
 
     useEffect(() => {
         if (typeId) {
@@ -223,6 +224,8 @@ export default function CustomProducts() {
             newShape = 'rectangle';
         } else if (lower.includes('kiss cut')) {
             newShape = 'rectangle';
+            setIsKissCutBackground(true);
+            setSelectedColor('#ffffff');
         } else if (lower.includes('oval')) {
             newShape = 'oval';
         } else if (lower.includes('die cut')) {
@@ -531,7 +534,7 @@ export default function CustomProducts() {
                                 </Box>
                             )}
 
-                            {selectedFiles.length > 0 && imageShape !== 'die-cut' &&  (
+                            {selectedFiles.length > 0 && imageShape !== 'die-cut' && !isKissCutBackground &&  (
                                 <Box mb={2} mt={4}>
                                     <Typography variant="subtitle2" sx={{fontWeight: 600, mb: 1}}>
                                         Select Background Color
