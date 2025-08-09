@@ -229,7 +229,7 @@ export default function CustomProducts() {
             newShape = 'die-cut';
             setSelectedColor('#ffffff');
         } else {
-            newShape = 'rounded';
+            newShape = 'rectangle';
         }
 
         setImageShape(newShape);
@@ -337,8 +337,8 @@ export default function CustomProducts() {
                                                         ? `${ovalRadius}% / 50%`
                                                         : imageShape === 'rounded'
                                                             ? `${roundedRadius}%`
-                                                            : 0,
-                                            border: imageShape === 'die-cut' ? 'none' : '1px dashed #ccc',
+                                                            : '0px',
+                                            border: imageShape === 'die-cut' ? 'none' : '2px dashed #ccc',
                                             outlineOffset: '4px',
                                             display: 'block',
                                             mx: 'auto',
