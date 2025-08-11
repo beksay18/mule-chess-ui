@@ -26,8 +26,7 @@ export default function CustomProducts() {
     const [loadingRemoveBackground, setLoadingRemoveBackground] = React.useState(false);
     const [loadingReplaceBackgroundColor, setLoadingReplaceBackgroundColor] = React.useState(false);
     const [processedImage, setProcessedImage] = React.useState<string | null>(null);
-    const [imageShape, setImageShape] =
-        React.useState<ImageShape>('rectangle');
+    const [imageShape, setImageShape] = React.useState<ImageShape>('rectangle');
     const [roundedRadius, setRoundedRadius] = React.useState(10);
     const [ovalRadius, setOvalRadius] = React.useState(50);
     const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
@@ -36,9 +35,8 @@ export default function CustomProducts() {
     const [isKissCutBackground, setIsKissCutBackground] = useState(false);
     const [textPosition, setTextPosition] = React.useState({ x: 50, y: 50 });
     const [textContent, setTextContent] = React.useState("Custom Text");
-    const [textStyle, setTextStyle] = React.useState({ fontSize: 24, color: "#ffffff", fontWeight: "bold" });
-    const canvasRef = React.useRef<HTMLCanvasElement>(null);
-    const [isTextAdded, setIsTextAdded] = useState(false);
+    const [textStyle, setTextStyle] = React.useState({ fontSize: 24, color: "#ffffff", fontWeight: "normal" });
+    const [activeTextIndex, setActiveTextIndex] = useState<number | null>(null);
     const [originalImage, setOriginalImage] = React.useState<string | null>(null);
     const [savedTexts, setSavedTexts] = useState<Array<{
         content: string;
@@ -306,15 +304,7 @@ export default function CustomProducts() {
         }
     };
 
-    const handleAddText = () => {
-        if (!isTextAdded) {
-            setIsTextAdded(true);
-        }
-        handleAddTextToImage(textPosition);
-    };
-
-
-    const handleAddTextToImage = (position: { x: number, y: number }) => {
+    const renderImageWithTexts = React.useCallback(() => {
         if (!originalImage) return;
 
         const img = new Image();
@@ -327,10 +317,10 @@ export default function CustomProducts() {
 
             canvas.width = img.width;
             canvas.height = img.height;
-
             ctx.drawImage(img, 0, 0);
 
-            savedTexts.forEach(text => {
+            // Render all saved texts
+            savedTexts.forEach((text, index) => {
                 ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
                 ctx.fillStyle = text.style.color;
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
@@ -345,17 +335,24 @@ export default function CustomProducts() {
                 ctx.shadowColor = 'transparent';
             });
 
-            if (isTextAdded) {
-                ctx.font = `${textStyle.fontWeight} ${textStyle.fontSize}px Arial`;
-                ctx.fillStyle = textStyle.color;
+            // Render active text if being edited
+            if (activeTextIndex !== null) {
+                const text = {
+                    content: textContent,
+                    position: textPosition,
+                    style: textStyle
+                };
+
+                ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
+                ctx.fillStyle = text.style.color;
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
                 ctx.shadowBlur = 5;
                 ctx.shadowOffsetX = 2;
                 ctx.shadowOffsetY = 2;
 
-                const x = (position.x / 100) * canvas.width;
-                const y = (position.y / 100) * canvas.height;
-                ctx.fillText(textContent, x, y);
+                const x = (text.position.x / 100) * canvas.width;
+                const y = (text.position.y / 100) * canvas.height;
+                ctx.fillText(text.content, x, y);
 
                 ctx.shadowColor = 'transparent';
             }
@@ -364,6 +361,65 @@ export default function CustomProducts() {
             setProcessedImage(base64Image);
             localStorage.setItem("cachedImage", base64Image);
         };
+    }, [originalImage, savedTexts, activeTextIndex, textContent, textPosition, textStyle]);
+
+    useEffect(() => {
+        renderImageWithTexts();
+    }, [renderImageWithTexts]);
+
+    const handleAddText = () => {
+        if (activeTextIndex === null) {
+            // Adding a new text
+            setActiveTextIndex(savedTexts.length);
+            setTextContent("Custom Text");
+            setTextPosition({ x: 50, y: 50 });
+            setTextStyle({ fontSize: 24, color: "#ffffff", fontWeight: "normal" });
+        } else {
+            // Updating existing text
+            renderImageWithTexts();
+        }
+    };
+
+    const handleSaveText = () => {
+        if (activeTextIndex === null) return;
+
+        const newText = {
+            content: textContent,
+            position: { ...textPosition },
+            style: { ...textStyle }
+        };
+
+        if (activeTextIndex === savedTexts.length) {
+            // Adding new text
+            setSavedTexts([...savedTexts, newText]);
+        } else {
+            // Updating existing text
+            const updatedTexts = [...savedTexts];
+            updatedTexts[activeTextIndex] = newText;
+            setSavedTexts(updatedTexts);
+        }
+
+        // Reset for new text
+        setActiveTextIndex(null);
+    };
+
+    const handleEditText = (index: number) => {
+        const text = savedTexts[index];
+        setTextContent(text.content);
+        setTextPosition(text.position);
+        setTextStyle(text.style);
+        setActiveTextIndex(index);
+    };
+
+    const handleRemoveText = (index: number) => {
+        const newTexts = savedTexts.filter((_, i) => i !== index);
+        setSavedTexts(newTexts);
+
+        if (activeTextIndex === index) {
+            setActiveTextIndex(null);
+        } else if (activeTextIndex !== null && activeTextIndex > index) {
+            setActiveTextIndex(activeTextIndex - 1);
+        }
     };
 
     const moveText = (direction: string) => {
@@ -386,110 +442,10 @@ export default function CustomProducts() {
                 default:
                     break;
             }
-            // Always update the image when moving text
-            handleAddTextToImage(newPos);
             return newPos;
         });
     };
 
-    useEffect(() => {
-        if (!processedImage) return;
-        const canvas = canvasRef.current;
-        const ctx = canvas?.getContext('2d');
-        const img = new Image();
-        img.src = processedImage;
-
-        img.onload = () => {
-            if (canvas && ctx) {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0);
-
-                savedTexts.forEach(text => {
-                    ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
-                    ctx.fillStyle = text.style.color;
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-
-                    const x = (text.position.x / 100) * canvas.width;
-                    const y = (text.position.y / 100) * canvas.height;
-                    ctx.fillText(text.content, x, y);
-
-                    ctx.shadowColor = 'transparent';
-                });
-
-                if (isTextAdded) {
-                    ctx.font = `${textStyle.fontWeight} ${textStyle.fontSize}px Arial`;
-                    ctx.fillStyle = textStyle.color;
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-
-                    const x = (textPosition.x / 100) * canvas.width;
-                    const y = (textPosition.y / 100) * canvas.height;
-                    ctx.fillText(textContent, x, y);
-
-                    ctx.shadowColor = 'transparent';
-                }
-            }
-        };
-    }, [processedImage, textContent, textPosition, textStyle, savedTexts, isTextAdded]);
-
-    const handleSaveText = () => {
-        const newSavedTexts = [
-            ...savedTexts,
-            {
-                content: textContent,
-                position: { ...textPosition },
-                style: { ...textStyle }
-            }
-        ];
-        setSavedTexts(newSavedTexts);
-
-        // Reset for new text
-        setTextContent("New Text");
-        setTextPosition({ x: 50, y: 50 });
-        setIsTextAdded(false);
-
-        // Update image with all texts
-        if (originalImage) {
-            const img = new Image();
-            img.src = originalImage;
-
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return;
-
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-
-                newSavedTexts.forEach(text => {
-                    ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
-                    ctx.fillStyle = text.style.color;
-                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-                    ctx.shadowBlur = 5;
-                    ctx.shadowOffsetX = 2;
-                    ctx.shadowOffsetY = 2;
-
-                    const x = (text.position.x / 100) * canvas.width;
-                    const y = (text.position.y / 100) * canvas.height;
-                    ctx.fillText(text.content, x, y);
-
-                    ctx.shadowColor = 'transparent';
-                });
-
-                const base64Image = canvas.toDataURL('image/png');
-                setProcessedImage(base64Image);
-                localStorage.setItem("cachedImage", base64Image);
-            };
-        }
-    };
 
     return (
         <>
@@ -787,6 +743,47 @@ export default function CustomProducts() {
                                         Text Customization
                                     </Typography>
 
+                                    {/* Saved Texts List */}
+                                    {savedTexts.length > 0 && (
+                                        <Box sx={{ mb: 3 }}>
+                                            <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
+                                                Saved Texts:
+                                            </Typography>
+                                            {savedTexts.map((text, index) => (
+                                                <Box
+                                                    key={index}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        mb: 1,
+                                                        p: 1,
+                                                        backgroundColor: activeTextIndex === index ? '#f0f0f0' : 'transparent',
+                                                        borderRadius: 1
+                                                    }}
+                                                >
+                                                    <Typography sx={{ flexGrow: 1 }}>
+                                                        &quot;{text.content}&quot; at ({text.position.x}, {text.position.y})
+                                                    </Typography>
+                                                    <Button
+                                                        size="small"
+                                                        onClick={() => handleEditText(index)}
+                                                        sx={{ mr: 1 }}
+                                                    >
+                                                        Edit
+                                                    </Button>
+                                                    <Button
+                                                        size="small"
+                                                        color="error"
+                                                        onClick={() => handleRemoveText(index)}
+                                                    >
+                                                        Remove
+                                                    </Button>
+                                                </Box>
+                                            ))}
+                                        </Box>
+                                    )}
+
+                                    {/* Text Editing Controls */}
                                     <TextField
                                         fullWidth
                                         label="Text Content"
@@ -800,95 +797,55 @@ export default function CustomProducts() {
                                             label="Font Size"
                                             type="number"
                                             value={textStyle.fontSize}
-                                            onChange={(e) => setTextStyle({...textStyle, fontSize: parseInt(e.target.value) || 24})}
+                                            onChange={(e) => setTextStyle({
+                                                ...textStyle,
+                                                fontSize: parseInt(e.target.value) || 24
+                                            })}
                                             sx={{ width: 100 }}
                                         />
 
-                                        <input
-                                            type="color"
-                                            value={textStyle.color}
-                                            onChange={(e) => setTextStyle({...textStyle, color: e.target.value})}
-                                            style={{
-                                                width: 40,
-                                                height: 40,
-                                                padding: 0,
-                                                border: 'none',
-                                                cursor: 'pointer'
-                                            }}
-                                        />
-                                    </Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Typography sx={{ mr: 1 }}>Color:</Typography>
+                                            <input
+                                                type="color"
+                                                value={textStyle.color}
+                                                onChange={(e) => setTextStyle({
+                                                    ...textStyle,
+                                                    color: e.target.value
+                                                })}
+                                                style={{
+                                                    width: 40,
+                                                    height: 40,
+                                                    padding: 0,
+                                                    border: 'none',
+                                                    cursor: 'pointer'
+                                                }}
+                                            />
+                                        </Box>
 
-                                    <Box display="flex" gap={2} sx={{ mb: 2 }}>
-                                        <Box
-                                            component="button"
-                                            onClick={handleAddText}
-                                            sx={{
-                                                padding: '8px 16px',
-                                                backgroundColor: '#3ea2b0',
-                                                '&:hover': { backgroundColor: '#2e7983' },
-                                                color: '#fff',
-                                                border: 'none',
-                                                borderRadius: '4px',
-                                                cursor: 'pointer',
-                                                fontWeight: 500,
-                                                minWidth: 180,
+                                        <TextField
+                                            select
+                                            label="Font Weight"
+                                            value={textStyle.fontWeight}
+                                            onChange={(e) => setTextStyle({
+                                                ...textStyle,
+                                                fontWeight: e.target.value
+                                            })}
+                                            sx={{ width: 120 }}
+                                            SelectProps={{
+                                                native: true,
                                             }}
                                         >
-                                            {isTextAdded ? 'Update Text' : 'Add Text to Image'}
-                                        </Box>
-                                        {isTextAdded && (
-                                            <Box
-                                                component="button"
-                                                onClick={handleSaveText}
-                                                sx={{
-                                                    padding: '8px 16px',
-                                                    backgroundColor: '#4CAF50',
-                                                    '&:hover': { backgroundColor: '#3e8e41' },
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 500,
-                                                    minWidth: 180,
-                                                }}
-                                            >
-                                                Save Text
-                                            </Box>
-                                        )}
-
-                                        {savedTexts.length > 0 && (
-                                            <Box
-                                                component="button"
-                                                onClick={() => {
-                                                    setSavedTexts([]);
-                                                    if (originalImage) {
-                                                        setProcessedImage(originalImage);
-                                                        localStorage.setItem("cachedImage", originalImage);
-                                                    }
-                                                }}
-                                                sx={{
-                                                    padding: '8px 16px',
-                                                    backgroundColor: '#f44336',
-                                                    '&:hover': { backgroundColor: '#d32f2f' },
-                                                    color: '#fff',
-                                                    border: 'none',
-                                                    borderRadius: '4px',
-                                                    cursor: 'pointer',
-                                                    fontWeight: 500,
-                                                    minWidth: 180,
-                                                    mt: 2
-                                                }}
-                                            >
-                                                Clear Text
-                                            </Box>
-                                        )}
+                                            <option value="normal">Normal</option>
+                                            <option value="bold">Bold</option>
+                                        </TextField>
                                     </Box>
 
                                     <Typography variant="body2" sx={{ mb: 1 }}>
                                         Text Position: X: {textPosition.x}, Y: {textPosition.y}
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, mb: 3 }}>
                                         <Button variant="contained" onClick={() => moveText("up")} size="small">
                                             <NorthIcon />
                                         </Button>
@@ -905,6 +862,46 @@ export default function CustomProducts() {
                                         <Button variant="contained" onClick={() => moveText("down")} size="small">
                                             <SouthIcon />
                                         </Button>
+                                    </Box>
+
+                                    <Box display="flex" gap={2}>
+                                        <Button
+                                            variant="contained"
+                                            onClick={handleAddText}
+                                            color={activeTextIndex === null ? "primary" : "secondary"}
+                                            sx={{ minWidth: 180 }}
+                                        >
+                                            {activeTextIndex === null ? 'Add New Text' : 'Update Text'}
+                                        </Button>
+
+                                        {activeTextIndex !== null && (
+                                            <Button
+                                                variant="contained"
+                                                onClick={handleSaveText}
+                                                color="success"
+                                                sx={{ minWidth: 180 }}
+                                            >
+                                                {activeTextIndex === savedTexts.length ? 'Save Text' : 'Update Saved Text'}
+                                            </Button>
+                                        )}
+
+                                        {savedTexts.length > 0 && (
+                                            <Button
+                                                variant="contained"
+                                                onClick={() => {
+                                                    setSavedTexts([]);
+                                                    setActiveTextIndex(null);
+                                                    if (originalImage) {
+                                                        setProcessedImage(originalImage);
+                                                        localStorage.setItem("cachedImage", originalImage);
+                                                    }
+                                                }}
+                                                color="error"
+                                                sx={{ minWidth: 180 }}
+                                            >
+                                                Clear All Text
+                                            </Button>
+                                        )}
                                     </Box>
                                 </Box>
                             )}
