@@ -12,6 +12,10 @@ import {blobToBase64, ImageShape, removeImageBackground, replaceImageBgColor} fr
 import {useEffect, useState} from "react";
 import {getActiveProducts, Product} from "../../../../api/product";
 import Button from "@mui/material/Button";
+import NorthIcon from '@mui/icons-material/North';
+import WestIcon from '@mui/icons-material/West';
+import EastIcon from '@mui/icons-material/East';
+import SouthIcon from '@mui/icons-material/South';
 
 export default function CustomProducts() {
     const router = useRouter();
@@ -30,7 +34,17 @@ export default function CustomProducts() {
     const [selectedProductName, setSelectedProductName] = useState<string | null>(null);
     const [selectedColor, setSelectedColor] = useState("#ffffff");
     const [isKissCutBackground, setIsKissCutBackground] = useState(false);
-    const [textPosition, setTextPosition] = useState({ x: 50, y: 100 });
+    const [textPosition, setTextPosition] = React.useState({ x: 50, y: 50 });
+    const [textContent, setTextContent] = React.useState("Custom Text");
+    const [textStyle, setTextStyle] = React.useState({ fontSize: 24, color: "#ffffff", fontWeight: "bold" });
+    const canvasRef = React.useRef<HTMLCanvasElement>(null);
+    const [isTextAdded, setIsTextAdded] = useState(false);
+    const [originalImage, setOriginalImage] = React.useState<string | null>(null);
+    const [savedTexts, setSavedTexts] = useState<Array<{
+        content: string;
+        position: { x: number; y: number };
+        style: { fontSize: number; color: string; fontWeight: string };
+    }>>([]);
 
     useEffect(() => {
         if (typeId) {
@@ -63,6 +77,7 @@ export default function CustomProducts() {
             const file = new File([blob], cachedFileName || "cached-image.png", { type: mimeType });
 
             setSelectedFiles([file]);
+            setOriginalImage(cachedDataUrl);
             setTimeout(() => {
                 handleReplaceBackgroundColorFromCache(file, cachedColor || "#ffffff", cachedShape, Number(cachedRounded), Number(cachedOval));
             }, 0);
@@ -120,9 +135,11 @@ export default function CustomProducts() {
 
             const reader = new FileReader();
             reader.onload = () => {
-                localStorage.setItem("cachedImage", reader.result as string);
+                const imageData = reader.result as string;
+                localStorage.setItem("cachedImage", imageData);
                 localStorage.setItem("cachedImageName", newFile.name);
-                setProcessedImage(reader.result as string);
+                setProcessedImage(imageData);
+                setOriginalImage(imageData);
             };
             reader.readAsDataURL(newFile);
 
@@ -146,6 +163,7 @@ export default function CustomProducts() {
             const base64 = await blobToBase64(blob);
 
             setProcessedImage(base64);
+            setOriginalImage(base64);
             localStorage.setItem("cachedImage", base64);
             localStorage.setItem("cachedOriginalImage", base64);
         } catch (err) {
@@ -288,11 +306,19 @@ export default function CustomProducts() {
         }
     };
 
-    const handleAddTextToImage = (newTextPosition: { x: number, y: number }) => {
-        if (!selectedFiles[0] && !processedImage) return;
+    const handleAddText = () => {
+        if (!isTextAdded) {
+            setIsTextAdded(true);
+        }
+        handleAddTextToImage(textPosition);
+    };
+
+
+    const handleAddTextToImage = (position: { x: number, y: number }) => {
+        if (!originalImage) return;
 
         const img = new Image();
-        const imageSource = processedImage ? processedImage : URL.createObjectURL(selectedFiles[0]);
+        img.src = originalImage;
 
         img.onload = () => {
             const canvas = document.createElement('canvas');
@@ -304,43 +330,166 @@ export default function CustomProducts() {
 
             ctx.drawImage(img, 0, 0);
 
-            ctx.font = 'bold 64px Arial';
-            ctx.fillStyle = 'rgba(0, 0, 255, 0.9)';
+            savedTexts.forEach(text => {
+                ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
+                ctx.fillStyle = text.style.color;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
 
-            ctx.fillText('Custom Text', newTextPosition.x, newTextPosition.y);
+                const x = (text.position.x / 100) * canvas.width;
+                const y = (text.position.y / 100) * canvas.height;
+                ctx.fillText(text.content, x, y);
+
+                ctx.shadowColor = 'transparent';
+            });
+
+            if (isTextAdded) {
+                ctx.font = `${textStyle.fontWeight} ${textStyle.fontSize}px Arial`;
+                ctx.fillStyle = textStyle.color;
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                const x = (position.x / 100) * canvas.width;
+                const y = (position.y / 100) * canvas.height;
+                ctx.fillText(textContent, x, y);
+
+                ctx.shadowColor = 'transparent';
+            }
 
             const base64Image = canvas.toDataURL('image/png');
             setProcessedImage(base64Image);
             localStorage.setItem("cachedImage", base64Image);
         };
-        img.src = imageSource;
     };
 
     const moveText = (direction: string) => {
-        setTextPosition(prevPosition => {
-            const newPosition = { ...prevPosition };
-
+        const step = 2;
+        setTextPosition(prev => {
+            const newPos = { ...prev };
             switch (direction) {
-                case 'up':
-                    newPosition.y -= 10;
+                case "up":
+                    newPos.y = Math.max(0, prev.y - step);
                     break;
-                case 'down':
-                    newPosition.y += 10;
+                case "down":
+                    newPos.y = Math.min(100, prev.y + step);
                     break;
-                case 'left':
-                    newPosition.x -= 10;
+                case "left":
+                    newPos.x = Math.max(0, prev.x - step);
                     break;
-                case 'right':
-                    newPosition.x += 10;
+                case "right":
+                    newPos.x = Math.min(100, prev.x + step);
                     break;
                 default:
                     break;
             }
-            handleAddTextToImage(newPosition);
-            return newPosition;
+            // Always update the image when moving text
+            handleAddTextToImage(newPos);
+            return newPos;
         });
     };
 
+    useEffect(() => {
+        if (!processedImage) return;
+        const canvas = canvasRef.current;
+        const ctx = canvas?.getContext('2d');
+        const img = new Image();
+        img.src = processedImage;
+
+        img.onload = () => {
+            if (canvas && ctx) {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+
+                savedTexts.forEach(text => {
+                    ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
+                    ctx.fillStyle = text.style.color;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    const x = (text.position.x / 100) * canvas.width;
+                    const y = (text.position.y / 100) * canvas.height;
+                    ctx.fillText(text.content, x, y);
+
+                    ctx.shadowColor = 'transparent';
+                });
+
+                if (isTextAdded) {
+                    ctx.font = `${textStyle.fontWeight} ${textStyle.fontSize}px Arial`;
+                    ctx.fillStyle = textStyle.color;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    const x = (textPosition.x / 100) * canvas.width;
+                    const y = (textPosition.y / 100) * canvas.height;
+                    ctx.fillText(textContent, x, y);
+
+                    ctx.shadowColor = 'transparent';
+                }
+            }
+        };
+    }, [processedImage, textContent, textPosition, textStyle, savedTexts, isTextAdded]);
+
+    const handleSaveText = () => {
+        const newSavedTexts = [
+            ...savedTexts,
+            {
+                content: textContent,
+                position: { ...textPosition },
+                style: { ...textStyle }
+            }
+        ];
+        setSavedTexts(newSavedTexts);
+
+        // Reset for new text
+        setTextContent("New Text");
+        setTextPosition({ x: 50, y: 50 });
+        setIsTextAdded(false);
+
+        // Update image with all texts
+        if (originalImage) {
+            const img = new Image();
+            img.src = originalImage;
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                newSavedTexts.forEach(text => {
+                    ctx.font = `${text.style.fontWeight} ${text.style.fontSize}px Arial`;
+                    ctx.fillStyle = text.style.color;
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                    ctx.shadowBlur = 5;
+                    ctx.shadowOffsetX = 2;
+                    ctx.shadowOffsetY = 2;
+
+                    const x = (text.position.x / 100) * canvas.width;
+                    const y = (text.position.y / 100) * canvas.height;
+                    ctx.fillText(text.content, x, y);
+
+                    ctx.shadowColor = 'transparent';
+                });
+
+                const base64Image = canvas.toDataURL('image/png');
+                setProcessedImage(base64Image);
+                localStorage.setItem("cachedImage", base64Image);
+            };
+        }
+    };
 
     return (
         <>
@@ -633,73 +782,132 @@ export default function CustomProducts() {
                             )}
 
                             {selectedFiles.length > 0 && (
-                                <Box
-                                    component="button"
-                                    onClick={() => handleAddTextToImage(textPosition)}
-                                    sx={{
-                                        padding: '8px 16px',
-                                        backgroundColor: '#3ea2b0',
-                                        '&:hover': {
-                                            backgroundColor: '#2e7983',
-                                        },
-                                        color: '#fff',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        fontWeight: 500,
-                                        minWidth: 180,
-                                    }}
-                                >
-                                    Add Text to Image
+                                <Box sx={{ mb: 3, mt: 3 }}>
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 2 }}>
+                                        Text Customization
+                                    </Typography>
+
+                                    <TextField
+                                        fullWidth
+                                        label="Text Content"
+                                        value={textContent}
+                                        onChange={(e) => setTextContent(e.target.value)}
+                                        sx={{ mb: 2 }}
+                                    />
+
+                                    <Box display="flex" gap={2} sx={{ mb: 2 }}>
+                                        <TextField
+                                            label="Font Size"
+                                            type="number"
+                                            value={textStyle.fontSize}
+                                            onChange={(e) => setTextStyle({...textStyle, fontSize: parseInt(e.target.value) || 24})}
+                                            sx={{ width: 100 }}
+                                        />
+
+                                        <input
+                                            type="color"
+                                            value={textStyle.color}
+                                            onChange={(e) => setTextStyle({...textStyle, color: e.target.value})}
+                                            style={{
+                                                width: 40,
+                                                height: 40,
+                                                padding: 0,
+                                                border: 'none',
+                                                cursor: 'pointer'
+                                            }}
+                                        />
+                                    </Box>
+
+                                    <Box display="flex" gap={2} sx={{ mb: 2 }}>
+                                        <Box
+                                            component="button"
+                                            onClick={handleAddText}
+                                            sx={{
+                                                padding: '8px 16px',
+                                                backgroundColor: '#3ea2b0',
+                                                '&:hover': { backgroundColor: '#2e7983' },
+                                                color: '#fff',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                fontWeight: 500,
+                                                minWidth: 180,
+                                            }}
+                                        >
+                                            {isTextAdded ? 'Update Text' : 'Add Text to Image'}
+                                        </Box>
+                                        {isTextAdded && (
+                                            <Box
+                                                component="button"
+                                                onClick={handleSaveText}
+                                                sx={{
+                                                    padding: '8px 16px',
+                                                    backgroundColor: '#4CAF50',
+                                                    '&:hover': { backgroundColor: '#3e8e41' },
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 500,
+                                                    minWidth: 180,
+                                                }}
+                                            >
+                                                Save Text
+                                            </Box>
+                                        )}
+
+                                        {savedTexts.length > 0 && (
+                                            <Box
+                                                component="button"
+                                                onClick={() => {
+                                                    setSavedTexts([]);
+                                                    if (originalImage) {
+                                                        setProcessedImage(originalImage);
+                                                        localStorage.setItem("cachedImage", originalImage);
+                                                    }
+                                                }}
+                                                sx={{
+                                                    padding: '8px 16px',
+                                                    backgroundColor: '#f44336',
+                                                    '&:hover': { backgroundColor: '#d32f2f' },
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer',
+                                                    fontWeight: 500,
+                                                    minWidth: 180,
+                                                    mt: 2
+                                                }}
+                                            >
+                                                Clear Text
+                                            </Box>
+                                        )}
+                                    </Box>
+
+                                    <Typography variant="body2" sx={{ mb: 1 }}>
+                                        Text Position: X: {textPosition.x}, Y: {textPosition.y}
+                                    </Typography>
+
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                        <Button variant="contained" onClick={() => moveText("up")} size="small">
+                                            <NorthIcon />
+                                        </Button>
+
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Button variant="contained" onClick={() => moveText("left")} size="small">
+                                                <WestIcon />
+                                            </Button>
+                                            <Button variant="contained" onClick={() => moveText("right")} size="small">
+                                                <EastIcon />
+                                            </Button>
+                                        </Box>
+
+                                        <Button variant="contained" onClick={() => moveText("down")} size="small">
+                                            <SouthIcon />
+                                        </Button>
+                                    </Box>
                                 </Box>
                             )}
-
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    gap: 2,
-                                    marginTop: 2,
-                                }}
-                            >
-                                <Box>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => moveText('up')}
-                                        sx={{backgroundColor: 'grey'}}
-                                    >
-                                        Up
-                                    </Button>
-                                </Box>
-
-                                <Box sx={{ display: 'flex', gap: 2 }}>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => moveText('left')}
-                                        sx={{backgroundColor: 'grey'}}
-                                    >
-                                        Left
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        onClick={() => moveText('right')}
-                                        sx={{backgroundColor: 'grey'}}
-                                    >
-                                        Right
-                                    </Button>
-                                </Box>
-
-                                <Box>
-                                    <Button
-                                        variant="contained"
-                                        sx={{backgroundColor: 'grey'}}
-                                        onClick={() => moveText('down')}
-                                    >
-                                        Down
-                                    </Button>
-                                </Box>
-                            </Box>
 
                             <Box
                                 component="button"
