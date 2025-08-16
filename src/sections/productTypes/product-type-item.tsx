@@ -6,6 +6,7 @@ import { Label } from 'src/components/label';
 import IconButton from "@mui/material/IconButton";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import {useRouter} from "../../routes/hooks";
 
 export type ProductItemProps = {
     id: number;
@@ -19,12 +20,18 @@ export type ProductItemProps = {
 };
 
 export function ProductTypeItem({ product }: { product: ProductItemProps }) {
+    const router = useRouter();
     const IMAGE_HEIGHT = 200;
     const isDev = import.meta.env.MODE === 'development';
     const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
 
+    const handleCardClick = () => {
+        router.push(`/products/${product.id}`);
+    };
+
     const renderImage = product.coverUrl ? (
         <Box
+            onClick={handleCardClick}
             sx={{
                 width: '100%',
                 height: IMAGE_HEIGHT,
@@ -50,6 +57,7 @@ export function ProductTypeItem({ product }: { product: ProductItemProps }) {
         </Box>
     ) : (
         <Box
+            onClick={handleCardClick}
             sx={{
                 width: '100%',
                 height: IMAGE_HEIGHT,

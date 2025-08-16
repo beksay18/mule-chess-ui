@@ -9,15 +9,10 @@ import {
     Stack,
     Button,
     FormControlLabel,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     Checkbox,
     IconButton, SelectChangeEvent,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import {Iconify} from 'src/components/iconify';
 import {DashboardContent} from '../../layouts/dashboard';
 import {
     createProduct,
@@ -26,40 +21,36 @@ import {
     ProductRequest,
     updateProduct,
 } from '../../api/product';
-import {getAllProductTypes, ProductType} from '../../api/productType';
 
 export default function ProductForm() {
-    const {id} = useParams();
+    type RouteParams = { id?: string; productTypeId?: string; typeId?: string };
+    const params = useParams<RouteParams>();
     const navigate = useNavigate();
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const routeProductTypeIdStr = params.productTypeId ?? params.typeId ?? null;
+    const routeProductTypeId = routeProductTypeIdStr ? Number(routeProductTypeIdStr) : null;
 
     const [formData, setFormData] = useState<ProductRequest>({
         name: '',
         description: '',
         price: null,
         isActive: true,
-        productTypeId: null,
+        productTypeId: routeProductTypeId,
         dimensions: [],
         discounts: [],
         maxHeight: 0,
         maxWidth: 0,
         maxQuantity: 0,
     });
-    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+
     const [loading, setLoading] = useState(false);
     const [image, setImage] = useState<File | undefined>(undefined);
     const [backgroundImage, setBackgroundImage] = useState<File | undefined>(undefined);
     const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
 
     useEffect(() => {
-        loadProductTypes();
-        if (id) loadProduct(Number(id));
-    }, [id]);
-
-    const loadProductTypes = async () => {
-        const types = await getAllProductTypes();
-        setProductTypes(types);
-    };
+        if (params.id) loadProduct(Number(params.id));
+    }, [params.id]);
 
     const loadProduct = async (productId: number) => {
         const data = await getProductById(productId);
@@ -68,7 +59,7 @@ export default function ProductForm() {
             description: data.description,
             price: data.price,
             isActive: data.isActive,
-            productTypeId: data.productType.id,
+            productTypeId: routeProductTypeId,
             dimensions: data.dimensions || [],
             discounts: data.discounts || [],
             maxHeight: data.maxHeight,
@@ -179,7 +170,6 @@ export default function ProductForm() {
             !formData.name.trim() ||
             !formData.description.trim() ||
             formData.price === null ||
-            formData.productTypeId === null ||
             formData.maxHeight === null || formData.maxHeight <= 0 ||
             formData.maxWidth === null || formData.maxWidth <= 0 ||
             formData.maxQuantity === null || formData.maxQuantity <= 0
@@ -197,14 +187,14 @@ export default function ProductForm() {
                 (discount) => discount.quantity > 0
             );
 
-            const updatedFormData = {...formData, dimensions: filteredDimensions, discounts: filteredDiscounts};
+            const payload = { ...formData, dimensions: filteredDimensions, discounts: filteredDiscounts };
 
-            if (id) {
-                await updateProduct(Number(id), {...updatedFormData, image, backgroundImage});
+            if (params.id) {
+                await updateProduct(Number(params.id), { ...payload, image, backgroundImage });
             } else {
-                await createProduct({...updatedFormData, image, backgroundImage});
+                await createProduct({ ...payload, image, backgroundImage });
             }
-            navigate('/products');
+            navigate(`/products/${formData.productTypeId}`);
         } catch (err) {
             console.error('Failed to submit', err);
         } finally {
@@ -216,33 +206,12 @@ export default function ProductForm() {
         <DashboardContent maxWidth="xl">
             <Stack>
                 <Typography variant="h4" sx={{mb: 3}}>
-                    {id ? 'Edit Product' : 'Create Product'}
+                    {params.id ? 'Edit Product' : 'Create Product'}
                 </Typography>
 
                 <Card sx={{p: 3}}>
                     <Stack spacing={3}>
                         <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-                            <FormControl fullWidth>
-                                <InputLabel id="product-type-label">Product Type</InputLabel>
-                                <Select
-                                    labelId="product-type-label"
-                                    name="productTypeId"
-                                    value={formData.productTypeId ?? ''}
-                                    label="Product Type"
-                                    onChange={(e) => handleSelectChange(e)}
-                                >
-                                    <MenuItem value="" disabled>Select a Product Type</MenuItem>
-                                    {productTypes.map((type) => (
-                                        <MenuItem key={type.id} value={type.id}>
-                                            {type.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                                {submitAttempted && !formData.productTypeId && (
-                                    <Typography variant="caption" color="error">Product type is required</Typography>
-                                )}
-                            </FormControl>
-
                             <TextField
                                 label="Product Name"
                                 name="name"
@@ -493,7 +462,7 @@ export default function ProductForm() {
                                 onClick={handleSubmit}
                                 disabled={!formData.name.trim()}
                             >
-                                {id ? 'Update' : 'Create'}
+                                {params.id ? 'Update' : 'Create'}
                             </Button>
                         </Stack>
                     </Stack>

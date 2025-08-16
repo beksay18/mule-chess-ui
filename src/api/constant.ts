@@ -15,7 +15,7 @@ export const ENDPOINTS = {
         GET_ACTIVE_PRODUCT_TYPES: "/cg-stickers/api/product-types/public",
     },
     PRODUCT: {
-        GET_ALL_PRODUCTS: "/cg-stickers/api/products",
+        GET_PRODUCTS_BY_TYPE: (id: number | string) => `/cg-stickers/api/products/type/${id}`,
         GET_PRODUCT_BY_ID: (id: number | string) => `/cg-stickers/api/products/${id}`,
         CREATE_PRODUCT: "/cg-stickers/api/products",
         UPDATE_PRODUCT: (id: number | string) => `/cg-stickers/api/products/${id}`,
@@ -62,9 +62,5 @@ export const ENDPOINTS = {
         UPDATE_FAQ_UNDER_TITLE: (faqId: number) => `/cg-stickers/api/faq/faq/${faqId}`,
         DELETE_FAQ: (faqId: number) => `/cg-stickers/api/faq/${faqId}`,
         DELETE_TITLE: (titleId: number) => `/cg-stickers/api/faq/delete-title/${titleId}`,
-    },
-    IMAGE_BACKGROUND: {
-        REMOVE: "/cg-stickers/api/background/remove",
-        BACKGROUND_COLOR: "/cg-stickers/api/background/background-color",
     },
 }

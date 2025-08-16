@@ -7,7 +7,9 @@ import Box from "@mui/material/Box";
 import {useEffect, useState} from "react";
 import { useRouter} from 'src/routes/hooks';
 import { ProductItem, ProductItemProps } from '../product-item';
-import {deleteProduct, getAllProducts, Product} from "../../../api/product";
+import {deleteProduct, getProductByProductTypeId, Product} from "../../../api/product";
+import {useParams} from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // ----------------------------------------------------------------------
 
@@ -27,7 +29,7 @@ function mapToProductItem(
         name: product.name,
         description: product.description,
         price: product.price,
-        productType: product.productType.name,
+        productType: product.productType.name || 'Unknown',
         status: product.isActive ? 'active' : 'inactive',
         coverUrl: product.imageUrl || '',
         color: getRandomColor(),
@@ -39,27 +41,42 @@ function mapToProductItem(
 
 export function ProductView() {
     const router = useRouter();
+    const { typeId } = useParams();
     const [products, setProducts] = useState<Product[]>([]);
+    const [productTypeName, setProductTypeName] = useState<string>('Product');
 
     useEffect(() => {
-        loadProducts();
-    }, []);
+        if (typeId) {
+            loadProductsByType(Number(typeId));
+        }
+    }, [typeId]);
 
-    const loadProducts = async () => {
-        const data = await getAllProducts();
-        console.log("Loaded products:", data);
-        setProducts(data);
+    const loadProductsByType = async (id: number) => {
+        try {
+            const data = await getProductByProductTypeId(id);
+            const productsArray = Array.isArray(data) ? data : data ? [data] : [];
+            setProducts(productsArray);
+
+            if (productsArray.length > 0 && productsArray[0].productType?.name) {
+                setProductTypeName(productsArray[0].productType.name);
+            }
+        } catch (error) {
+            console.error('Error loading products:', error);
+            setProducts([]);
+        }
     };
 
     const handleEdit = (id: number) => {
-        router.push(`/products/product-form/${id}`);
+        router.push(`/products/${typeId}/product-form/${id}`);
     };
 
     const handleDelete = async (id: number) => {
         if (window.confirm('Are you sure you want to delete this product?')) {
             try {
                 await deleteProduct(id);
-                loadProducts();
+                if (typeId) {
+                    loadProductsByType(Number(typeId));
+                }
             } catch (err) {
                 console.error(err);
             }
@@ -76,12 +93,20 @@ export function ProductView() {
                 }}
             >
                 <Button
+                    startIcon={<ArrowBackIcon/>}
+                    onClick={() => router.back()}
+                    variant="outlined"
+                    sx={{textTransform: 'none', mr: 2}}
+                >
+                    Back
+                </Button>
+                <Button
                     variant="contained"
                     color="inherit"
                     startIcon={<Iconify icon="mingcute:add-line" />}
                     onClick={() => router.push('product-form')}
                 >
-                    New Product
+                    New {productTypeName}
                 </Button>
             </Box>
 

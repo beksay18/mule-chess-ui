@@ -32,9 +32,9 @@ export const createProduct = (payload: ProductRequest): Promise<Product> => {
             .then(({ data }) => data);
 };
 
-export const getAllProducts = (): Promise<Product[]> =>
+export const getProductByProductTypeId = (id: number): Promise<Product> =>
     axios
-        .getWithRetries<Product[]>(ENDPOINTS.PRODUCT.GET_ALL_PRODUCTS)
+        .getWithRetries<Product>(ENDPOINTS.PRODUCT.GET_PRODUCTS_BY_TYPE(id))
         .then(({ data }) => data);
 
 export const getActiveProducts = (id: number): Promise<Product[]> =>

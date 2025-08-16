@@ -101,7 +101,7 @@ export const routesSection: RouteObject[] = [
                 ],
             },
             {
-                path: 'products',
+                path: 'products/:typeId',
                 element: (
                     <RoleGuard allowedRoles={['ROLE_ADMIN']}>
                         <Outlet/>
