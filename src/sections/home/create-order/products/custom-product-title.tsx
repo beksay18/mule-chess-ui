@@ -29,53 +29,9 @@ export default function CustomProductTitle() {
     }, [typeId]);
 
     return (
-        <Box sx={{background: '#f4f4f4', py: 2}}>
+        <Box sx={{background: '#f4f4f4', py: 3}}>
             <Container>
                 <StyledToolbar variant="dense" sx={{justifyContent: 'space-between'}}>
-                    <Box sx={{
-                        flexGrow: 1,
-                        px: 2,
-                        display: 'flex'
-                    }}>
-                        <CloudUploadIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
-                        <Box>
-                            <Typography
-                                component="div"
-                                sx={{color: '#4f7277', fontWeight: 'bold'}}
-                            >
-                                Upload {productType?.name}
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
-                            >
-                                High-quality custom printing made easy
-                            </Typography>
-                        </Box>
-                    </Box>
-
-                    <Box sx={{
-                        flexGrow: 1,
-                        px: 2,
-                        display: 'flex'
-                    }}>
-                        <FilterIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
-                        <Box>
-                            <Typography
-                                component="div"
-                                sx={{color: '#4f7277', fontWeight: 'bold'}}
-                            >
-                                Change Background
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
-                            >
-                                High-quality custom printing made easy
-                            </Typography>
-                        </Box>
-                    </Box>
-
                     <Box sx={{
                         flexGrow: 1,
                         px: 2,
@@ -87,7 +43,49 @@ export default function CustomProductTitle() {
                                 component="div"
                                 sx={{color: '#4f7277', fontWeight: 'bold'}}
                             >
-                                Select Stickers
+                               Custom {productType?.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
+                            >
+                                High-quality custom printing made easy
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={{
+                        flexGrow: 1,
+                        px: 2,
+                        display: 'flex'
+                    }}>
+                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <Box>
+                            <Typography
+                                component="div"
+                                sx={{color: '#4f7277', fontWeight: 'bold'}}
+                            >
+                                Custom {productType?.name}
+                            </Typography>
+                            <Typography
+                                variant="subtitle2"
+                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
+                            >
+                                High-quality custom printing made easy
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={{
+                        flexGrow: 1,
+                        px: 2,
+                        display: 'flex'
+                    }}>
+                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
+                        <Box>
+                            <Typography
+                                component="div"
+                                sx={{color: '#4f7277', fontWeight: 'bold'}}
+                            >
+                                Custom {productType?.name}
                             </Typography>
                             <Typography
                                 variant="subtitle2"
