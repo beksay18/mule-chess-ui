@@ -640,7 +640,7 @@ export default function CustomProducts() {
                                             sx={{
                                                 padding: '8px 12px',
                                                 backgroundColor: selectedProductId === product.id ? '#d0f0e8' : '#f0f0f0',
-                                                border: selectedProductId === product.id ? '2px solid #08A24B' : '1px solid #ccc',
+                                                border: selectedProductId === product.id ? '2px solid #175195' : '1px solid #ccc',
                                                 borderRadius: '4px',
                                                 cursor: 'pointer',
                                                 fontWeight: 500,

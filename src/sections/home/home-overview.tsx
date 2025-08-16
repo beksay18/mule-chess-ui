@@ -16,7 +16,7 @@ export default function HomeOverview() {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const headerImage = '/assets/images/hello.png';
+    const headerImage = '/assets/images/home-products/home-car.png';
 
     useEffect(() => {
         const loadTypes = async () => {
@@ -62,10 +62,7 @@ export default function HomeOverview() {
                                 gap: 1,
                             }}
                         >
-                            Create custom stickers, labels with
-                            <span style={{color: '#08A24B', whiteSpace: 'nowrap'}}>
-                                AI
-                            </span>
+                            Create custom stickers, labels and more
                         </Typography>
 
                         <Typography
@@ -87,7 +84,7 @@ export default function HomeOverview() {
                                     fontWeight: 'bold',
                                     fontSize: '1rem',
                                     borderRadius: 2,
-                                    backgroundColor: '#08A24B',
+                                    backgroundColor: '#175195',
                                     color: '#ffffff',
                                     textTransform: 'none',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',

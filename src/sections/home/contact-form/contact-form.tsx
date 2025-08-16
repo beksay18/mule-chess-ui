@@ -122,7 +122,7 @@ export default function ContactFormSection() {
                                 fullWidth
                                 disabled={submitting}
                                 sx={{
-                                    backgroundColor: '#08A24B',
+                                    backgroundColor: '#175195',
                                     '&:hover': {
                                         backgroundColor: '#06933F',
                                     }

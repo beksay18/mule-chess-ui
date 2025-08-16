@@ -36,15 +36,15 @@ export default function AboutUs() {
                 }}
             >
                 <Box sx={{ flex: '0 0 30%'}}>
-                    <StyledImage src="/assets/images/sakai-sticker.png" />
+                    <StyledImage src="/assets/images/home-products/home-car.png" />
                 </Box>
 
                 <Box sx={{ flex: '0 0 70%' }}>
                     <StyledTypography variant="body1">
-                        SAKAI is a modern platform dedicated to simplifying the way people create and order custom stickers online.
+                        Complete Graphics is a modern platform dedicated to simplifying the way people create and order custom stickers online.
                         Our mission is to make high-quality sticker production accessible, fast, and enjoyable — whether you are an artist, small business owner, or just someone who loves creative design.
                         <br /><br />
-                        SAKAI was founded in Chicago in 2024 and is operated by a team passionate about blending cutting-edge web technology with beautiful print products. We’ve built a streamlined ordering experience using smart tools and AI to help customers design and preview their stickers instantly.
+                        Complete Graphics was founded in Chicago in 2024 and is operated by a team passionate about blending cutting-edge web technology with beautiful print products. We’ve built a streamlined ordering experience using smart tools and AI to help customers design and preview their stickers instantly.
                         <br /><br />
                         We proudly serve creators, entrepreneurs, and communities across the U.S. and beyond, and we’re continuously growing thanks to the trust and love of our customers. Our platform is part of a new wave of e-commerce startups focused on creativity, customization, and exceptional user experience.
                         <br /><br />

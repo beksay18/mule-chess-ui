@@ -103,3 +103,19 @@ export const blobToBase64 = (blob: Blob): Promise<string> =>
         reader.readAsDataURL(blob);
     });
 
+export interface TextItem {
+    content: string;
+    position: { x: number; y: number };
+    style: {
+        fontSize: number;
+        color: string;
+        fontWeight: string;
+    };
+}
+
+export interface ImageProcessingOptions {
+    color: string;
+    shape: ImageShape;
+    roundedRadius: number;
+    ovalRadius: number;
+}

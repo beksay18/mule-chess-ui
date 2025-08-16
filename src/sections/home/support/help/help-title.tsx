@@ -52,7 +52,7 @@ export default function HelpTitle() {
                             fontSize: '1rem',
                             borderRadius: 2,
                             backgroundColor: 'white',
-                            color: '#08A24B',
+                            color: '#175195',
                             textTransform: 'none',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                             transition: 'all 0.3s ease',

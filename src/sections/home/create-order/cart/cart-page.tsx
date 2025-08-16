@@ -263,7 +263,7 @@ export default function CartPage() {
                                 height: 60,
                                 fontSize: '1.2rem',
                                 fontWeight: 'bold',
-                                backgroundColor: '#08A24B',
+                                backgroundColor: '#175195',
                                 color: '#ffffff',
                                 '&:hover': {
                                     backgroundColor: '#06853D',

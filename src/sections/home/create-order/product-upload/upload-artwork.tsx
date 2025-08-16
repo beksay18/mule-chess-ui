@@ -153,7 +153,7 @@ export default function UploadArtwork() {
                         size="large"
                         onClick={handleAddToCart}
                         sx={{
-                            fontWeight: 'bold', textTransform: 'none', px: 4, backgroundColor: '#08A24B',
+                            fontWeight: 'bold', textTransform: 'none', px: 4, backgroundColor: '#175195',
                             color: '#ffffff',
                             '&:hover': {
                                 backgroundColor: '#06853D',

@@ -43,6 +43,7 @@ export default function Header() {
     const [open, setOpen] = React.useState(false);
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
     const [productTypes, setProductTypes] = useState<ProductType[]>([]);
+    const logoImage = '/assets/images/logo.webp';
 
     useEffect(() => {
         loadProductTypes();
@@ -91,7 +92,7 @@ export default function Header() {
             id="hero"
             sx={{
                 width: '100%',
-                background: 'linear-gradient(90deg, #08A24B 0%, #08A24B 100%)',
+                background: 'linear-gradient(90deg, #175195 0%, #175195 100%)',
                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
             }}
         >
@@ -109,21 +110,14 @@ export default function Header() {
                         }}
                     >
                         <Box
-                            component="span"
+                            component="img"
+                            src={logoImage}
+                            alt="CG Stickers"
                             sx={{
-                                fontWeight: 800,
-                                fontSize: '2rem',
-                                fontFamily: `'Sora', sans-serif`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                letterSpacing: '0.15em',
-                                textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
-                                textTransform: 'uppercase',
-                                backgroundColor: '#ffffff',
+                                height: 50,
+                                width: 'auto',
                             }}
-                        >
-                            SAKAI
-                        </Box>
+                        />
                     </Box>
                     <Box sx={{display: {xs: 'none', md: 'flex'}, gap: 2, ml: 2}}>
                         <Button
