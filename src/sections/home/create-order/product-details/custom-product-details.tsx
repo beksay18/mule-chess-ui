@@ -100,17 +100,7 @@ export default function CustomProductDetails() {
     };
 
     return (
-        <Box
-            sx={{
-                backgroundImage: customProduct?.backgroundImageUrl
-                    ? `url(${baseImageUrl}${customProduct.backgroundImageUrl})`
-                    : undefined,
-                backgroundSize: 'contain',
-                backgroundPosition: 'top 250px left 25%',
-                backgroundRepeat: 'no-repeat',
-                borderRadius: 2,
-            }}
-        >
+        <Box>
             <Container
                 sx={{py: {xs: 4, sm: 8}}}>
                 <Box sx={{display: 'flex', flexDirection: {xs: 'column', md: 'row'}, gap: 4}}>
@@ -125,6 +115,20 @@ export default function CustomProductDetails() {
                         <Typography variant="body2" sx={{mt: 2, color: 'text.secondary'}}>
                             {customProduct?.description}
                         </Typography>
+                        <Box
+                            sx={{
+                                mt: 4,
+                                backgroundImage: customProduct?.backgroundImageUrl
+                                    ? `url(${baseImageUrl}${customProduct.backgroundImageUrl})`
+                                    : undefined,
+                                backgroundSize: 'contain',
+                                backgroundPosition: 'center',
+                                backgroundRepeat: 'no-repeat',
+                                borderRadius: 2,
+                                height: 300,
+                                display: {xs: 'none', md: 'block'}
+                            }}
+                        />
                     </Box>
 
                     <Box flex={3} display="flex" flexDirection="column" gap={2} sx={{

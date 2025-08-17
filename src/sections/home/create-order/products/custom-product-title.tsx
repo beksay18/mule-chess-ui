@@ -7,9 +7,7 @@ import Typography from "@mui/material/Typography";
 import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {getProductTypeById, ProductType} from "../../../../api/productType";
-import FilterIcon from '@mui/icons-material/Filter';
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import SelectAllIcon from '@mui/icons-material/SelectAll';
+import {Rating} from "@mui/material";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -31,70 +29,25 @@ export default function CustomProductTitle() {
     return (
         <Box sx={{background: '#f4f4f4', py: 3}}>
             <Container>
-                <StyledToolbar variant="dense" sx={{justifyContent: 'space-between'}}>
-                    <Box sx={{
-                        flexGrow: 1,
-                        px: 2,
-                        display: 'flex'
-                    }}>
-                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
-                        <Box>
-                            <Typography
-                                component="div"
-                                sx={{color: '#4f7277', fontWeight: 'bold'}}
-                            >
-                               Custom {productType?.name}
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
-                            >
-                                High-quality custom printing made easy
-                            </Typography>
-                        </Box>
-                    </Box>
-                    <Box sx={{
-                        flexGrow: 1,
-                        px: 2,
-                        display: 'flex'
-                    }}>
-                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
-                        <Box>
-                            <Typography
-                                component="div"
-                                sx={{color: '#4f7277', fontWeight: 'bold'}}
-                            >
-                                Custom {productType?.name}
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
-                            >
-                                High-quality custom printing made easy
-                            </Typography>
-                        </Box>
-                    </Box>
-                    <Box sx={{
-                        flexGrow: 1,
-                        px: 2,
-                        display: 'flex'
-                    }}>
-                        <SelectAllIcon sx={{color: '#4f7277', fontSize: 40, mr: 2}}/>
-                        <Box>
-                            <Typography
-                                component="div"
-                                sx={{color: '#4f7277', fontWeight: 'bold'}}
-                            >
-                                Custom {productType?.name}
-                            </Typography>
-                            <Typography
-                                variant="subtitle2"
-                                sx={{color: '#888', fontStyle: 'italic', mt: 0.5, fontSize: 11}}
-                            >
-                                High-quality custom printing made easy
-                            </Typography>
-                        </Box>
-                    </Box>
+                <StyledToolbar variant="dense">
+                    <Typography
+                        component="span"
+                        variant="h3"
+                        sx={(theme) => ({
+                            fontSize: 'inherit',
+                            color: '#4f7277',
+                        })}
+                    >
+                        Custom {productType?.name}
+                    </Typography>
+                    <Rating
+                        name="text-feedback"
+                        value={3.5}
+                        readOnly
+                        precision={0.5}
+                        sx={{ ml: 4 }}
+                    />
+                    <Box sx={{ ml: 2, color: '#4f7277' }}>10,000 reviews</Box>
                 </StyledToolbar>
             </Container>
         </Box>
