@@ -17,7 +17,7 @@ export default function ContactUsTitle() {
 
     return (
         <Box sx={{
-            background: '#f4f4f4',
+            background: '#DAE6F2',
             py: 2
         }}>
             <Container>

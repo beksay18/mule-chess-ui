@@ -27,7 +27,7 @@ export default function CustomProductTitle() {
     }, [typeId]);
 
     return (
-        <Box sx={{background: '#f4f4f4', py: 3}}>
+        <Box sx={{background: '#DAE6F2', py: 3}}>
             <Container>
                 <StyledToolbar variant="dense">
                     <Typography
