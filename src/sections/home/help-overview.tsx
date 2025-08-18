@@ -16,7 +16,16 @@ const StyledToolbar = styled(Toolbar)(({ theme }) => ({
     backdropFilter: 'blur(24px)',
     padding: theme.spacing(2.5, 3.75),
     flexWrap: 'wrap',
-    gap: theme.spacing(25),
+    gap: theme.spacing(2),
+    [theme.breakpoints.up('sm')]: {
+        gap: theme.spacing(4),
+    },
+    [theme.breakpoints.up('md')]: {
+        gap: theme.spacing(10),
+    },
+    [theme.breakpoints.up('lg')]: {
+        gap: theme.spacing(25),
+    },
 }));
 
 export default function HelpOverview() {

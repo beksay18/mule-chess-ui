@@ -71,7 +71,7 @@ export default function HomeProducts() {
                                     src={`${baseURL}${productType.imageUrl}`}
                                     alt={productType.name}
                                     sx={{
-                                        width: 120,
+                                        width: 200,
                                         maxHeight: 120,
                                         objectFit: 'contain',
                                         borderRadius: 2,
