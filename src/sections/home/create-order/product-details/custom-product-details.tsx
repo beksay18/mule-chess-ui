@@ -18,6 +18,7 @@ import {LaminationSelector} from './lamination-selector';
 import {LoadingButton} from '@mui/lab';
 import ProductReviews from "./product-review";
 import {getCurrentUser} from "../../../../api";
+import {getProductReviewSummary} from "../../../../api/reviews";
 
 export default function CustomProductDetails() {
     const router = useRouter();
@@ -25,6 +26,8 @@ export default function CustomProductDetails() {
     const currentUser = getCurrentUser();
     const [customProduct, setCustomProduct] = useState<Product | null>(null);
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [avgRating, setAvgRating] = useState<number>(0);
+    const [totalReviewer, setTotalReviewers] = useState<number>(0);
     const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
     const [dimension, setDimension] = useState<{
@@ -50,6 +53,10 @@ export default function CustomProductDetails() {
     useEffect(() => {
         if (productId) {
             getProductById(Number(productId)).then(setCustomProduct);
+            getProductReviewSummary(Number(productId)).then((summary) => {
+                setAvgRating(summary.averageRating ?? 0);
+                setTotalReviewers(summary.totalReviews ?? 0);
+            });
         }
     }, [productId]);
 
@@ -110,9 +117,9 @@ export default function CustomProductDetails() {
                     <Box flex={5}>
                         <Typography variant="h4">{customProduct?.name}</Typography>
                         <Box display="flex" alignItems="center" mt={1}>
-                            <Rating value={3.5} precision={0.5} readOnly/>
+                            <Rating value={Math.min(5, Math.max(0, avgRating || 0))} precision={0.5} readOnly />
                             <Typography variant="body2" sx={{ml: 1}}>
-                                (5,450 reviews)
+                                ({totalReviewer} {totalReviewer === 1 ? "review" : "reviews"})
                             </Typography>
                         </Box>
                         <Typography variant="body2" sx={{mt: 2, color: 'text.secondary'}}>

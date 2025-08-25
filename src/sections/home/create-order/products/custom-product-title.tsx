@@ -8,6 +8,7 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {getProductTypeById, ProductType} from "../../../../api/productType";
 import {Rating} from "@mui/material";
+import {getProductTypeReviewSummary} from "../../../../api/reviews";
 
 const StyledToolbar = styled(Toolbar)(({theme}) => ({
     display: 'flex',
@@ -19,10 +20,16 @@ const StyledToolbar = styled(Toolbar)(({theme}) => ({
 export default function CustomProductTitle() {
     const {typeId} = useParams();
     const [productType, setProductType] = useState<ProductType | null>(null);
+    const [avgRating, setAvgRating] = useState<number>(0);
+    const [totalReviewer, setTotalReviewers] = useState<number>(0);
 
     useEffect(() => {
         if (typeId) {
             getProductTypeById(Number(typeId)).then(setProductType);
+            getProductTypeReviewSummary(Number(typeId)).then((summary) => {
+                setAvgRating(summary.averageRating ?? 0);
+                setTotalReviewers(summary.totalReviews ?? 0);
+            });
         }
     }, [typeId]);
 
@@ -40,14 +47,8 @@ export default function CustomProductTitle() {
                     >
                         Custom {productType?.name}
                     </Typography>
-                    <Rating
-                        name="text-feedback"
-                        value={3.5}
-                        readOnly
-                        precision={0.5}
-                        sx={{ ml: 4 }}
-                    />
-                    <Box sx={{ ml: 2, color: '#4f7277' }}>10,000 reviews</Box>
+                    <Rating name="text-feedback" value={Math.min(5, Math.max(0, avgRating || 0))} precision={0.5} sx={{ ml: 4 }} readOnly />
+                    <Box sx={{ ml: 2, color: '#4f7277' }}>({totalReviewer} {totalReviewer === 1 ? "review" : "reviews"})</Box>
                 </StyledToolbar>
             </Container>
         </Box>

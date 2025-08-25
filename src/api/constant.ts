@@ -41,6 +41,7 @@ export const ENDPOINTS = {
         PRODUCT_REVIEW: "/cg-stickers/api/review/product-reviews",
         CREATE_REVIEW: "/cg-stickers/api/review/create-review",
         PRODUCT_REVIEW_SUMMARY: "/cg-stickers/api/review/summary",
+        PRODUCT_TYPE_REVIEW_SUMMARY: "/cg-stickers/api/review/summary/type",
     },
     PROFILE: {
         CHANGE_PASSWORD: (userId: number | string) => `/cg-stickers/api/profile/change-password/${userId}`,

@@ -25,3 +25,8 @@ export type ProductReviewSummary = {
     totalReviews: number;
     wouldOrderAgainPct: number;
 };
+
+export type ProductTypeReviewSummary = {
+    averageRating: number;
+    totalReviews: number;
+};
