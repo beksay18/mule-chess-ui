@@ -5,13 +5,16 @@ import {ProductReviewResponsePage, ProductReviewSummary, ReviewRequest} from "./
 export const createReview = (payload: ReviewRequest): Promise<void> =>
     axios.post(ENDPOINTS.REVIEWS.CREATE_REVIEW, payload).then(() => {});
 
-export const getProductReviews = ({page, size, filter}: {
+export const getProductReviews = ({page, size, productId, filter}: {
     page: number;
     size: number;
+    productId?: number;
     filter?: string;
 }): Promise<ProductReviewResponsePage> =>
     axios.getWithRetries<ProductReviewResponsePage>(
-        `${ENDPOINTS.REVIEWS.PRODUCT_REVIEW}?page=${page}&size=${size}${filter ? `&filter=${encodeURIComponent(filter)}` : ''}`
+        `${ENDPOINTS.REVIEWS.PRODUCT_REVIEW}?page=${page}&size=${size}` +
+        `${filter ? `&filter=${encodeURIComponent(filter)}` : ''}` +
+        `${productId ? `&productId=${productId}` : ''}`
     ).then(({data}) => data);
 
 export const getProductReviewSummary = (productId: number): Promise<ProductReviewSummary> =>

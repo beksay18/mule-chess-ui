@@ -40,7 +40,7 @@ export const ENDPOINTS = {
     REVIEWS: {
         PRODUCT_REVIEW: "/cg-stickers/api/review/product-reviews",
         CREATE_REVIEW: "/cg-stickers/api/review/create-review",
-        PRODUCT_REVIEW_SUMMARY: "/api/reviews/summary",
+        PRODUCT_REVIEW_SUMMARY: "/cg-stickers/api/review/summary",
     },
     PROFILE: {
         CHANGE_PASSWORD: (userId: number | string) => `/cg-stickers/api/profile/change-password/${userId}`,

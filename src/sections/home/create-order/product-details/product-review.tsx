@@ -1,10 +1,15 @@
-// components/reviews/ProductReviews.tsx
 import { useEffect, useMemo, useState } from "react";
 import {
     Box, Button, Divider, Rating, Stack, TextField, Typography, CircularProgress, Pagination
 } from "@mui/material";
 import dayjs from "dayjs";
-import {createReview, getProductReviews, getProductReviewSummary, ProductReviewContent} from "../../../../api/reviews";
+import { useSearchParams } from "react-router-dom";
+import {
+    createReview,
+    getProductReviews,
+    getProductReviewSummary,
+    ProductReviewContent,
+} from "../../../../api/reviews";
 
 type Props = {
     productId: number;
@@ -12,17 +17,15 @@ type Props = {
     currentUserId: number;
 };
 
-const labels: Record<number, string> = {
-    1: "Terrible",
-    2: "Bad",
-    3: "Okay",
-    4: "Great",
-    5: "Perfect",
-};
+const labels: Record<number, string> = { 1:"Terrible",2:"Bad",3:"Okay",4:"Great",5:"Perfect" };
 
 export default function ProductReviews({ productId, productName, currentUserId }: Props) {
-    const [page, setPage] = useState(1);
-    const [size, setSize] = useState(10);
+    const isLoggedIn = Number.isFinite(currentUserId) && (currentUserId as number) > 0;
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const page = Math.max(0, parseInt(searchParams.get("rpage") || "0", 10));   // 0-based for API
+    const size = Math.max(1, parseInt(searchParams.get("rsize") || "10", 10));
+
     const [totalPages, setTotalPages] = useState(1);
     const [rows, setRows] = useState<ProductReviewContent[]>([]);
     const [loading, setLoading] = useState(true);
@@ -43,28 +46,32 @@ export default function ProductReviews({ productId, productName, currentUserId }
     );
 
     useEffect(() => {
+        if (!Number.isFinite(productId)) return () => {};
         let cancelled = false;
         (async () => {
             try {
                 setLoading(true);
-                const data = await getProductReviews({
-                    page: page - 1,
-                    size,
-                    filter: `productId==${productId}`,
-                });
+                const data = await getProductReviews({ page, size, productId });
                 if (cancelled) return;
+                const maxPage = Math.max(0, (data.totalPages ?? 1) - 1);
+                if (page > maxPage) {
+                    const next = new URLSearchParams(searchParams);
+                    next.set("rpage", String(maxPage));
+                    setSearchParams(next, { replace: true });
+                    return;
+                }
+
                 setRows(data.content || []);
                 setTotalPages(data.totalPages || 1);
             } finally {
                 if (!cancelled) setLoading(false);
             }
         })();
-        return () => {
-            cancelled = true;
-        };
-    }, [page, size, productId]);
+        return () => { cancelled = true; };
+    }, [page, size, productId,]);
 
     useEffect(() => {
+        if (!Number.isFinite(productId)) return () => {};
         let cancelled = false;
         (async () => {
             try {
@@ -76,18 +83,14 @@ export default function ProductReviews({ productId, productName, currentUserId }
                 setAgainPct(s.wouldOrderAgainPct ?? 0);
             } catch {
                 if (!cancelled) {
-                    setAvg(0);
-                    setTotal(0);
-                    setAgainPct(0);
+                    setAvg(0); setTotal(0); setAgainPct(0);
                 }
                 console.warn("Failed to load review summary");
             } finally {
                 if (!cancelled) setSummaryLoading(false);
             }
         })();
-        return () => {
-            cancelled = true;
-        };
+        return () => { cancelled = true; };
     }, [productId]);
 
     async function onSave() {
@@ -102,12 +105,18 @@ export default function ProductReviews({ productId, productName, currentUserId }
                 userId: currentUserId,
                 isActive: true,
             });
+
             setTitle("");
             setDesc("");
             setRating(5);
-            setPage(1);
+
+            const next = new URLSearchParams(searchParams);
+            next.set("rpage", "0");
+            next.set("rsize", String(size));
+            setSearchParams(next, { replace: true });
+
             const [list, s] = await Promise.all([
-                getProductReviews({ page: 0, size, filter: `productId==${productId}` }),
+                getProductReviews({ page: 0, size, productId }),
                 getProductReviewSummary(productId),
             ]);
             setRows(list.content || []);
@@ -120,6 +129,13 @@ export default function ProductReviews({ productId, productName, currentUserId }
         }
     }
 
+    const handlePageChange = (_: unknown, p1Based: number) => {
+        const next = new URLSearchParams(searchParams);
+        next.set("rpage", String(p1Based - 1)); // convert to 0-based
+        next.set("rsize", String(size));
+        setSearchParams(next);
+    };
+
     return (
         <Stack spacing={3}>
             <Box sx={{ display: "flex", alignItems: "baseline", gap: 2 }}>
@@ -128,69 +144,36 @@ export default function ProductReviews({ productId, productName, currentUserId }
                 </Typography>
             </Box>
 
-            <Stack
-                direction={{ xs: "column", sm: "row" }}
-                spacing={4}
-                sx={{ alignItems: { xs: "flex-start", sm: "center" } }}
-            >
-                <SummaryItem
-                    loading={summaryLoading}
-                    headline={avg ? `${avg.toFixed(2)} / 5` : "—"}
-                    sub="Average rating"
-                />
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={4} sx={{ alignItems: { xs: "flex-start", sm: "center" } }}>
+                <SummaryItem loading={summaryLoading} headline={avg ? `${avg.toFixed(2)} / 5` : "—"} sub="Average rating" />
                 <SummaryItem loading={summaryLoading} headline={`${total}`} sub="Total reviews" />
-                <SummaryItem
-                    loading={summaryLoading}
-                    headline={againPct ? `${againPct}%` : "—"}
-                    sub="Would order again"
-                />
+                <SummaryItem loading={summaryLoading} headline={againPct ? `${againPct}%` : "—"} sub="Would order again" />
             </Stack>
 
             <Divider />
 
-            <Box sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
-                <Stack spacing={2}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <Typography variant="h6">How would you rate this product?</Typography>
-                        <Rating
-                            value={rating}
-                            onChange={(_, v) => setRating(v)}
-                            onChangeActive={(_, v) => setHover(v ?? -1)}
-                        />
-                        <Typography color="text.secondary">{ratingLabel}</Typography>
+            {isLoggedIn && (
+                <Box sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                    <Stack spacing={2}>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Typography variant="h6">How would you rate this product?</Typography>
+                            <Rating value={rating} onChange={(_, v) => setRating(v)} onChangeActive={(_, v) => setHover(v ?? -1)} />
+                            <Typography color="text.secondary">{ratingLabel}</Typography>
+                        </Stack>
+
+                        <TextField label="Title (optional)" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+                        <TextField label="Review *" value={desc} onChange={(e) => setDesc(e.target.value)} fullWidth multiline minRows={4} required />
+
+                        <Box>
+                            <Button variant="contained" onClick={onSave} disabled={saving || !rating || !desc.trim()}>
+                                {saving ? "Saving…" : "Save Review"}
+                            </Button>
+                        </Box>
                     </Stack>
+                </Box>
+            )}
 
-                    <TextField
-                        label="Title (optional)"
-                        placeholder="What is the title of your review?"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        fullWidth
-                    />
-                    <TextField
-                        label="Review *"
-                        placeholder="Tell us what you think of this product…"
-                        value={desc}
-                        onChange={(e) => setDesc(e.target.value)}
-                        fullWidth
-                        multiline
-                        minRows={4}
-                        required
-                    />
 
-                    <Box>
-                        <Button
-                            variant="contained"
-                            onClick={onSave}
-                            disabled={saving || !rating || !desc.trim()}
-                        >
-                            {saving ? "Saving…" : "Save Review"}
-                        </Button>
-                    </Box>
-                </Stack>
-            </Box>
-
-            {/* List */}
             <Stack spacing={2}>
                 {loading ? (
                     <Box sx={{ py: 6, display: "flex", justifyContent: "center" }}>
@@ -217,11 +200,12 @@ export default function ProductReviews({ productId, productName, currentUserId }
                                 </Typography>
                             </Box>
                         ))}
+
                         <Box sx={{ display: "flex", justifyContent: "center", py: 2 }}>
                             <Pagination
-                                count={totalPages}
-                                page={page}
-                                onChange={(_, p) => setPage(p)}
+                                count={totalPages}        // from server
+                                page={page + 1}           // UI is 1-based
+                                onChange={handlePageChange}
                                 shape="rounded"
                             />
                         </Box>
@@ -232,20 +216,10 @@ export default function ProductReviews({ productId, productName, currentUserId }
     );
 }
 
-function SummaryItem({
-                         loading,
-                         headline,
-                         sub,
-                     }: {
-    loading: boolean;
-    headline: string;
-    sub: string;
-}) {
+function SummaryItem({ loading, headline, sub }: { loading: boolean; headline: string; sub: string }) {
     return (
         <Stack spacing={0.5}>
-            <Typography variant="h3" fontWeight={800}>
-                {loading ? "…" : headline}
-            </Typography>
+            <Typography variant="h3" fontWeight={800}>{loading ? "…" : headline}</Typography>
             <Typography color="text.secondary">{sub}</Typography>
         </Stack>
     );
