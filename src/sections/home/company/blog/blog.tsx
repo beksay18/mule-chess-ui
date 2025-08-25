@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Container, Typography, Box} from '@mui/material';
 import {Masonry} from '@mui/lab';
 import {PostItem} from "./post-item";
+import BlogTitle from "./blog-title";
 
 export type IPostItem = {
     id: string;
@@ -69,27 +70,22 @@ export default function Blog() {
     ];
 
     return (
-        <Container sx={{py: 5}}>
-            <Typography variant="h2" gutterBottom
-                        sx={(theme) => ({
-                            fontSize: 'inherit',
-                            color: '#4f7277'
-                        })}>
-                Blog
-            </Typography>
-
-            <Box mt={5}>
-                <Masonry columns={{xs: 1, md: 3}} spacing={3}>
-                    {posts.map((post) => (
-                        <PostItem
-                            key={post.id}
-                            post={post}
-                            latestPost={false}
-                            latestPostLarge={false}
-                        />
-                    ))}
-                </Masonry>
-            </Box>
-        </Container>
+        <>
+            <BlogTitle/>
+            <Container sx={{py: 5}}>
+                <Box>
+                    <Masonry columns={{xs: 1, md: 3}} spacing={3}>
+                        {posts.map((post) => (
+                            <PostItem
+                                key={post.id}
+                                post={post}
+                                latestPost={false}
+                                latestPostLarge={false}
+                            />
+                        ))}
+                    </Masonry>
+                </Box>
+            </Container>
+        </>
     );
 }

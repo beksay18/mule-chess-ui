@@ -16,10 +16,13 @@ import {DimensionSelector} from './dimension-selector';
 import {QuantitySelector} from './quantity-selector';
 import {LaminationSelector} from './lamination-selector';
 import {LoadingButton} from '@mui/lab';
+import ProductReviews from "./product-review";
+import {getCurrentUser} from "../../../../api";
 
 export default function CustomProductDetails() {
     const router = useRouter();
     const {productId} = useParams();
+    const currentUser = getCurrentUser();
     const [customProduct, setCustomProduct] = useState<Product | null>(null);
     const [submitAttempted, setSubmitAttempted] = useState(false);
     const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
@@ -190,6 +193,18 @@ export default function CustomProductDetails() {
                         </Card>
                     </Box>
                 </Box>
+                {customProduct && (
+                    <Box
+                        component="section" mt={2}>
+                        <Container>
+                            <ProductReviews
+                                productId={customProduct.id}
+                                productName={customProduct.name}
+                                currentUserId={Number(currentUser?.userId)}
+                            />
+                        </Container>
+                    </Box>
+                )}
             </Container>
         </Box>
     );

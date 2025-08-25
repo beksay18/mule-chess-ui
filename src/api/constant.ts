@@ -37,6 +37,11 @@ export const ENDPOINTS = {
     USER: {
         GET_ALL_USERS: "/cg-stickers/api/user/all-users",
     },
+    REVIEWS: {
+        PRODUCT_REVIEW: "/cg-stickers/api/review/product-reviews",
+        CREATE_REVIEW: "/cg-stickers/api/review/create-review",
+        PRODUCT_REVIEW_SUMMARY: "/api/reviews/summary",
+    },
     PROFILE: {
         CHANGE_PASSWORD: (userId: number | string) => `/cg-stickers/api/profile/change-password/${userId}`,
         UPDATE_PERSONAL_INFO: (userId: number | string) => `/cg-stickers/api/profile/edit-personal-info/${userId}`,
