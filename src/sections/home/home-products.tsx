@@ -1,9 +1,7 @@
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
 import { getActiveProducts, Product } from '../../api/product';
@@ -133,9 +131,6 @@ export default function HomeProducts() {
                                     '& .product-image': {
                                         transform: 'scale(1.05)',
                                     },
-                                    '& .product-overlay': {
-                                        opacity: 1,
-                                    },
                                     '& .product-name-label': {
                                         transform: 'rotate(0deg)',
                                     },
@@ -191,36 +186,6 @@ export default function HomeProducts() {
                                         }}
                                     />
                                 )}
-
-                                <Box
-                                    className="product-overlay"
-                                    sx={{
-                                        position: 'absolute',
-                                        inset: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        bgcolor: alpha(BRAND_BLUE, 0.85),
-                                        opacity: 0,
-                                        transition: 'opacity 0.3s ease',
-                                    }}
-                                >
-                                    <Button
-                                        variant="contained"
-                                        endIcon={<ArrowForwardIcon />}
-                                        sx={{
-                                            bgcolor: '#fff',
-                                            color: BRAND_BLUE,
-                                            fontWeight: 700,
-                                            textTransform: 'none',
-                                            borderRadius: 2,
-                                            px: 3,
-                                            '&:hover': { bgcolor: theme.palette.grey[100] },
-                                        }}
-                                    >
-                                        Customize
-                                    </Button>
-                                </Box>
                             </Box>
 
                             <Box
@@ -243,10 +208,8 @@ export default function HomeProducts() {
                                         fontSize: '0.9375rem',
                                         letterSpacing: '-0.01em',
                                         color: BRAND_BLUE,
-                                        bgcolor: '#ffffff',
                                         border: `2px dashed ${alpha(BRAND_BLUE, 0.28)}`,
                                         borderRadius: 2,
-                                        boxShadow: `2px 2px 0 ${alpha(BRAND_BLUE, 0.08)}`,
                                         transform: `rotate(${index % 2 === 0 ? -2 : 2}deg)`,
                                         transition: 'transform 0.3s ease',
                                         textAlign: 'center',
