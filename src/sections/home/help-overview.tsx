@@ -1,86 +1,105 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import {useRouter} from "../../routes/hooks";
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { alpha } from '@mui/material/styles';
+import { useRouter } from '../../routes/hooks';
 
-const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    backdropFilter: 'blur(24px)',
-    padding: theme.spacing(2.5, 3.75),
-    flexWrap: 'wrap',
-    gap: theme.spacing(2),
-    [theme.breakpoints.up('sm')]: {
-        gap: theme.spacing(4),
-    },
-    [theme.breakpoints.up('md')]: {
-        gap: theme.spacing(10),
-    },
-    [theme.breakpoints.up('lg')]: {
-        gap: theme.spacing(25),
-    },
-}));
+const BRAND_BLUE = '#175195';
+const BRAND_BLUE_LIGHT = '#2d8fd5';
 
 export default function HelpOverview() {
     const router = useRouter();
 
-    const handleContactUsClick = () => {
-        router.push(`/contact-us`);
-    };
-
     return (
-        <Box
-            sx={{
-                background: 'linear-gradient(90deg, #175195 0%, #175195 100%)',
-                py: 4,
-            }}
-        >
-            <Container>
-                <StyledToolbar variant="dense">
-                    <Typography
-                        component="h1"
-                        variant="h4"
-                        sx={{
-                            color: 'white',
-                            fontWeight: 600,
-                            whiteSpace: 'nowrap',
-                            fontSize: { xs: '1.5rem', sm: '2rem' },
-                        }}
+        <Box sx={{ bgcolor: '#ffffff', py: { xs: 4, md: 6 } }}>
+            <Container maxWidth="lg">
+                <Box
+                    sx={{
+                        borderRadius: 4,
+                        px: { xs: 3, sm: 5, md: 6 },
+                        py: { xs: 4, sm: 5 },
+                        background: `linear-gradient(135deg, ${BRAND_BLUE} 0%, ${BRAND_BLUE_LIGHT} 100%)`,
+                        boxShadow: `0 16px 40px ${alpha(BRAND_BLUE, 0.22)}`,
+                    }}
+                >
+                    <Stack
+                        direction={{ xs: 'column', md: 'row' }}
+                        alignItems={{ xs: 'center', md: 'center' }}
+                        justifyContent="space-between"
+                        spacing={{ xs: 3, md: 4 }}
                     >
-                        Have any questions for us?
-                    </Typography>
+                        <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                            <Typography
+                                component="h2"
+                                sx={{
+                                    color: '#ffffff',
+                                    fontWeight: 800,
+                                    fontSize: { xs: '1.5rem', sm: '1.875rem', md: '2rem' },
+                                    letterSpacing: '-0.02em',
+                                    lineHeight: 1.2,
+                                }}
+                            >
+                                Have questions? We&apos;re here to help!
+                            </Typography>
 
-                    <Button
-                        sx={{
-                            mt: { xs: 2, sm: 0 },
-                            px: 4,
-                            py: 1.5,
-                            fontWeight: 'bold',
-                            fontSize: '1rem',
-                            borderRadius: 2,
-                            backgroundColor: 'white',
-                            color: '#175195',
-                            textTransform: 'none',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            transition: 'all 0.3s ease',
-                            '&:hover': {
-                                backgroundColor: '#f0f0f0',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                transform: 'scale(1.05)',
-                            },
-                        }}
-                        onClick={() => handleContactUsClick()}
-                    >
-                        Contact Us
-                    </Button>
-                </StyledToolbar>
+                            <Typography
+                                sx={{
+                                    color: alpha('#ffffff', 0.9),
+                                    fontSize: { xs: '0.95rem', sm: '1.05rem' },
+                                    lineHeight: 1.65,
+                                    maxWidth: 480,
+                                }}
+                            >
+                                Send us a message and our team will get back to you as soon as possible.
+                            </Typography>
+                        </Stack>
+
+                        <Button
+                            variant="contained"
+                            size="large"
+                            endIcon={
+                                <ArrowForwardIcon
+                                    sx={{
+                                        fontSize: 20,
+                                        transition: 'transform 0.25s ease',
+                                    }}
+                                />
+                            }
+                            onClick={() => router.push('/contact-us')}
+                            sx={{
+                                flexShrink: 0,
+                                minWidth: { xs: '100%', sm: 220 },
+                                px: 4,
+                                py: 1.75,
+                                fontWeight: 800,
+                                fontSize: '1.0625rem',
+                                letterSpacing: '0.01em',
+                                borderRadius: 50,
+                                bgcolor: '#ffffff',
+                                color: BRAND_BLUE,
+                                textTransform: 'none',
+                                boxShadow: `0 6px 20px ${alpha('#000000', 0.18)}`,
+                                transition: 'all 0.25s ease',
+                                '& .MuiButton-endIcon': {
+                                    ml: 1,
+                                },
+                                '&:hover': {
+                                    bgcolor: '#ffffff',
+                                    transform: 'translateY(-3px)',
+                                    boxShadow: `0 12px 28px ${alpha('#000000', 0.22)}`,
+                                    '& .MuiButton-endIcon': {
+                                        transform: 'translateX(4px)',
+                                    },
+                                },
+                            }}
+                        >
+                            Contact Us
+                        </Button>
+                    </Stack>
+                </Box>
             </Container>
         </Box>
     );

@@ -1,156 +1,186 @@
-import * as React from 'react';
+import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import IconButton from '@mui/material/IconButton';
-import InputLabel from '@mui/material/InputLabel';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import YouTubeIcon from '@mui/icons-material/YouTube';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import {useEffect, useState} from "react";
-import {getActiveProductTypes, ProductType} from "../../api/productType";
-import {useRouter} from "../../routes/hooks";
 
-function Copyright() {
-    return (
-        <Typography variant="body2" sx={{ color: 'text.secondary', mt: 1 }}>
-            {'Copyright © '}
-            <Link color="text.secondary" href="#">
-                SAKAI
-            </Link>
-            &nbsp;
-            {new Date().getFullYear()}
-        </Typography>
-    );
-}
+const BRAND_BLUE = '#175195';
+const FOOTER_DARK = '#0c1f35';
+const FOOTER_DARKER = '#081628';
+
+const linkSx = {
+    color: alpha('#ffffff', 0.65),
+    fontSize: '0.875rem',
+    textDecoration: 'none',
+    cursor: 'pointer',
+    transition: 'color 0.2s ease',
+    '&:hover': {
+        color: '#ffffff',
+    },
+};
+
+const sectionTitleSx = {
+    color: '#ffffff',
+    fontWeight: 700,
+    fontSize: '0.8125rem',
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    mb: 0.5,
+};
 
 export default function Footer() {
-    const [productTypes, setProductTypes] = useState<ProductType[]>([]);
-    const router = useRouter();
-
-    useEffect(() => {
-        loadProductTypes();
-    }, []);
-
-    const loadProductTypes = async () => {
-        const data = await getActiveProductTypes();
-        setProductTypes(data);
-    };
+    const logoImage = '/assets/images/home-products/cg-sticker-house.png';
 
     return (
-        <Container
+        <Box
+            component="footer"
             sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: { xs: 4, sm: 8 },
-                py: { xs: 8, sm: 10 },
-                textAlign: { sm: 'center', md: 'left' },
+                bgcolor: FOOTER_DARK,
+                backgroundImage: `linear-gradient(180deg, ${FOOTER_DARK} 0%, ${FOOTER_DARKER} 100%)`,
+                borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
             }}
         >
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: { xs: 'column', sm: 'row' },
-                    width: '100%',
-                    justifyContent: 'space-between',
-                }}
-            >
+            <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>
                 <Box
                     sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 4,
-                        minWidth: { xs: '100%', sm: '60%' },
+                        display: 'grid',
+                        gridTemplateColumns: {
+                            xs: '1fr',
+                            sm: '1fr 1fr',
+                            md: '2fr 1fr 1fr',
+                        },
+                        gap: { xs: 4, md: 6 },
                     }}
                 >
-                    <Box sx={{ width: { xs: '100%', sm: '60%' } }}>
-                        <Stack direction="row" spacing={1}>
-                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
-                                <InstagramIcon fontSize="large" />
-                            </IconButton>
-                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
-                                <YouTubeIcon fontSize="large" />
-                            </IconButton>
-                            <IconButton href="#" size="large" sx={{ color: 'text.secondary', '&:hover': { color: 'text.primary' } }}>
-                                <FacebookIcon fontSize="large" />
-                            </IconButton>
+                    <Stack spacing={2.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                        <Stack spacing={1.5} sx={{ alignItems: { xs: 'center', md: 'flex-start' } }}>
+                            <Box
+                                component="a"
+                                href="/"
+                                sx={{
+                                    display: 'inline-flex',
+                                    textDecoration: 'none',
+                                    transition: 'opacity 0.2s ease',
+                                    '&:hover': { opacity: 0.88 },
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src={logoImage}
+                                    alt="CG Stickers"
+                                    sx={{
+                                        height: { xs: 44, md: 52 },
+                                        width: 'auto',
+                                        maxWidth: { xs: 200, md: 240 },
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                    }}
+                                />
+                            </Box>
+
+                            <Box sx={{ maxWidth: 300, textAlign: { xs: 'center', md: 'left' } }}>
+                                <Typography
+                                    sx={{
+                                        color: alpha('#ffffff', 0.85),
+                                        fontSize: '0.9375rem',
+                                        fontWeight: 600,
+                                        lineHeight: 1.65,
+                                        mb: 0.75,
+                                    }}
+                                >
+                                    Design online and we&apos;ll handle the rest.
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        color: alpha('#ffffff', 0.5),
+                                        fontSize: '0.875rem',
+                                        lineHeight: 1.7,
+                                    }}
+                                >
+                                    Custom stickers printed with care.
+                                </Typography>
+                            </Box>
                         </Stack>
-                        <Typography variant="body2" gutterBottom color="text.secondary" sx={{ fontWeight: 600, mt: 2 }}>
-                            © {new Date().getFullYear()} Complete Graphics. All rights reserved.&nbsp;
-                            <Link href="/privacy" underline="hover" color="text.secondary" sx={{ ml: 1 }}>
-                                Privacy
-                            </Link>
-                            <Typography component="span" sx={{ mx: 0.5 }} variant="caption">·</Typography>
-                            <Link href="/terms" underline="hover" color="text.secondary">
-                                Terms
-                            </Link>
-                        </Typography>
-                    </Box>
-                </Box>
-                <Box
-                    sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                        flexDirection: 'column',
-                        gap: 1,
-                    }}
-                >
-                    <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                        Product
-                    </Typography>
-                    {productTypes.map((type) => (
-                        <Link
-                            key={type.id}
-                            color="text.secondary"
-                            variant="body2"
-                            underline="hover"
-                            onClick={() => {
-                                router.push(`/custom-products/${type.id}`);
-                            }}
+
+                        <Stack
+                            direction="row"
+                            spacing={0.5}
+                            sx={{ justifyContent: { xs: 'center', md: 'flex-start' } }}
                         >
-                            {type.name}
+                            {[InstagramIcon, YouTubeIcon, FacebookIcon].map((Icon, index) => (
+                                <IconButton
+                                    key={index}
+                                    href="#"
+                                    aria-label="Social link"
+                                    sx={{
+                                        color: alpha('#ffffff', 0.55),
+                                        '&:hover': {
+                                            color: '#ffffff',
+                                            bgcolor: alpha(BRAND_BLUE, 0.35),
+                                        },
+                                    }}
+                                >
+                                    <Icon />
+                                </IconButton>
+                            ))}
+                        </Stack>
+                    </Stack>
+
+                    <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', sm: 'flex-start' } }}>
+                        <Typography sx={sectionTitleSx}>Company</Typography>
+                        <Link href="/about-us" sx={linkSx}>
+                            About us
                         </Link>
-                    ))}
+                        <Link href="/blog" sx={linkSx}>
+                            Blog
+                        </Link>
+                        <Link href="/contact-us" sx={linkSx}>
+                            Contact us
+                        </Link>
+                    </Stack>
+
+                    <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', sm: 'flex-start' } }}>
+                        <Typography sx={sectionTitleSx}>Support</Typography>
+                        <Link href="/help" sx={linkSx}>
+                            Help
+                        </Link>
+                        <Link href="/returns" sx={linkSx}>
+                            Returns
+                        </Link>
+                    </Stack>
                 </Box>
+
                 <Box
                     sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                        flexDirection: 'column',
-                        gap: 1,
+                        mt: { xs: 5, md: 6 },
+                        pt: 3,
+                        borderTop: `1px solid ${alpha('#ffffff', 0.1)}`,
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        gap: 1.5,
+                        textAlign: { xs: 'center', sm: 'left' },
                     }}
                 >
-                    <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                        Company
+                    <Typography sx={{ color: alpha('#ffffff', 0.5), fontSize: '0.8125rem' }}>
+                        © {new Date().getFullYear()} Complete Graphics. All rights reserved.
                     </Typography>
-                    <Link color="text.secondary" variant="body2" href="/about-us">
-                        About us
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="/blog">
-                        Blog
-                    </Link>
+                    <Stack direction="row" spacing={2}>
+                        <Link href="/privacy" sx={{ ...linkSx, fontSize: '0.8125rem' }}>
+                            Privacy
+                        </Link>
+                        <Link href="/terms" sx={{ ...linkSx, fontSize: '0.8125rem' }}>
+                            Terms
+                        </Link>
+                    </Stack>
                 </Box>
-                <Box
-                    sx={{
-                        display: { xs: 'none', sm: 'flex' },
-                        flexDirection: 'column',
-                        gap: 1,
-                    }}
-                >
-                    <Typography variant="body2" sx={{ fontWeight: 'medium' }}>
-                        Support
-                    </Typography>
-                    <Link color="text.secondary" variant="body2" href="/help">
-                        Help
-                    </Link>
-                    <Link color="text.secondary" variant="body2" href="/returns">
-                        Returns
-                    </Link>
-                </Box>
-            </Box>
-        </Container>
+            </Container>
+        </Box>
     );
 }
