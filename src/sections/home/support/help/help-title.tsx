@@ -1,72 +1,88 @@
-import * as React from 'react';
-import {styled} from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import {useRouter} from "../../../../routes/hooks";
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { alpha, useTheme } from '@mui/material/styles';
+import { useRouter } from '../../../../routes/hooks';
 
-const StyledToolbar = styled(Toolbar)(({theme}) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    textAlign: 'center',
-    backdropFilter: 'blur(24px)',
-    flexWrap: 'wrap',
-    gap: theme.spacing(25),
-}));
+const BRAND_BLUE = '#175195';
+
+const stickerChipSx = {
+    position: 'relative' as const,
+    display: 'inline-block',
+    px: { xs: 2, md: 2.5 },
+    py: { xs: 0.5, md: 0.75 },
+    mx: 0.5,
+    fontWeight: 800,
+    color: BRAND_BLUE,
+    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
+    borderRadius: 2.5,
+    transform: 'rotate(-3deg)',
+};
 
 export default function HelpTitle() {
+    const theme = useTheme();
     const router = useRouter();
 
-    const handleContactUsClick = () => {
-        router.push(`/contact-us`);
-    };
-
     return (
-        <Box sx={{
-            background: '#DAE6F2',
-            py: 2
-        }}>
-            <Container>
-                <StyledToolbar variant="dense">
-                    <Typography
-                        component="span"
-                        variant="h2"
-                        sx={(theme) => ({
-                            fontSize: 'inherit',
-                            color: '#4f7277'
-                        })}
-                    >
-                        HELP
-                    </Typography>
+        <Box sx={{ bgcolor: '#ffffff', pt: { xs: 5, md: 8 }, pb: { xs: 3, md: 4 } }}>
+            <Container maxWidth="md">
+                <Stack spacing={3} alignItems="center" sx={{ textAlign: 'center' }}>
+                    <Box component="h1" sx={{ m: 0, maxWidth: 520 }}>
+                        <Typography
+                            component="span"
+                            sx={{
+                                display: 'block',
+                                fontWeight: 800,
+                                letterSpacing: '-0.03em',
+                                fontSize: { xs: '2rem', md: '2.5rem' },
+                                lineHeight: 1.15,
+                                color: theme.palette.grey[900],
+                                mb: 1.5,
+                            }}
+                        >
+                            How can we{' '}
+                            <Box component="span" sx={stickerChipSx}>
+                                help?
+                            </Box>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: 'text.secondary',
+                                fontSize: { xs: '1rem', md: '1.0625rem' },
+                                lineHeight: 1.65,
+                            }}
+                        >
+                            Browse answers below or reach out — we&apos;re happy to assist with
+                            orders, artwork, and shipping.
+                        </Typography>
+                    </Box>
 
                     <Button
+                        variant="contained"
+                        size="large"
+                        endIcon={<ArrowForwardIcon />}
+                        onClick={() => router.push('/contact-us')}
                         sx={{
-                            mt: { xs: 2, sm: 0 },
                             px: 4,
                             py: 1.5,
-                            fontWeight: 'bold',
+                            fontWeight: 700,
                             fontSize: '1rem',
-                            borderRadius: 2,
-                            backgroundColor: 'white',
-                            color: '#175195',
+                            borderRadius: 50,
+                            bgcolor: BRAND_BLUE,
                             textTransform: 'none',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            transition: 'all 0.3s ease',
+                            boxShadow: `0 8px 24px ${alpha(BRAND_BLUE, 0.25)}`,
                             '&:hover': {
-                                backgroundColor: '#f0f0f0',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.25)',
-                                transform: 'scale(1.05)',
+                                bgcolor: '#124578',
+                                transform: 'translateY(-2px)',
                             },
                         }}
-                        onClick={() => handleContactUsClick()}
                     >
                         Email support
                     </Button>
-                </StyledToolbar>
+                </Stack>
             </Container>
         </Box>
     );

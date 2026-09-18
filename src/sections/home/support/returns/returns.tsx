@@ -1,129 +1,220 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Button from '@mui/material/Button';
+import Container from '@mui/material/Container';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import {styled} from '@mui/material/styles';
-import Container from "@mui/material/Container";
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
+import ShieldOutlinedIcon from '@mui/icons-material/ShieldOutlined';
+import VerifiedOutlinedIcon from '@mui/icons-material/VerifiedOutlined';
+import { alpha, useTheme } from '@mui/material/styles';
+import { useRouter } from '../../../../routes/hooks';
 
-const StyledTypography = styled(Typography)(({theme}) => ({
-    display: 'block',
-    color: theme.palette.text.secondary,
-    lineHeight: 1.75,
-    fontSize: theme.typography.body1.fontSize,
-    whiteSpace: 'pre-line',
-    textAlign: 'justify',
-}));
+const BRAND_BLUE = '#175195';
 
-const TitleTypography = styled(Typography)(({theme}) => ({
-    position: 'relative',
-    textDecoration: 'none',
-    '&:hover': {cursor: 'pointer'},
-    '& .arrow': {
-        visibility: 'hidden',
-        position: 'absolute',
-        right: 0,
-        top: '50%',
-        transform: 'translateY(-50%)',
+const stickerChipSx = {
+    position: 'relative' as const,
+    display: 'inline-block',
+    px: { xs: 2, md: 2.5 },
+    py: { xs: 0.5, md: 0.75 },
+    mx: 0.5,
+    fontWeight: 800,
+    color: BRAND_BLUE,
+    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
+    borderRadius: 2.5,
+    transform: 'rotate(-2deg)',
+};
+
+const SECTIONS = [
+    {
+        icon: ReplayOutlinedIcon,
+        title: 'Problems with your order?',
+        paragraphs: [
+            'If you have a problem with your order, please let us know within 30 days of receiving your products. We will be unable to replace or refund any orders brought to our attention after 30 days of confirmed delivery by USPS or UPS.',
+            'Every order we produce is 100% custom. We do not allow returns or refunds for reasons unrelated to quality — for example, we will not refund your order if you decide you do not want it, ordered the wrong size, or prefer a different product. If the mistake is on our end, we will fix it and make it right.',
+            'If your order has an issue due to setup, printing, laminating, or packaging, let us know. We will look into the issue and, if needed, reprint your order. Refunds will not be given for these issues — only reprints.',
+            'If you feel there was an error in print quality, we are happy to look into it. Screen colors can differ from printed output due to brightness, contrast, and color variables. If we reprint your order, we may ask for a photo or further instructions so we can get it right.',
+        ],
     },
-    '&:hover .arrow': {
-        visibility: 'visible',
-        opacity: 0.7,
+    {
+        icon: VerifiedOutlinedIcon,
+        title: 'Refunds',
+        paragraphs: [
+            'We will process your refund request within 2 business days. Once we submit a refund to your bank or credit card company, it can take up to 4 business days to see the credit on your statement. This usually depends on the policies of your bank or credit card company.',
+            'If you have not received a refund yet, contact your bank or credit card company — they should be able to answer questions about any delay.',
+        ],
     },
-    '&::before': {
-        content: '""',
-        position: 'absolute',
-        width: 0,
-        height: '1px',
-        bottom: 0,
-        left: 0,
-        backgroundColor: (theme.vars || theme).palette.text.primary,
-        opacity: 0.3,
-        transition: 'width 0.3s ease, opacity 0.3s ease',
+    {
+        icon: ShieldOutlinedIcon,
+        title: 'Our guarantee',
+        paragraphs: [
+            'We stand behind our products, our process, and our print quality. We do not assume liability for lost sales, labor costs, or other costs associated with your order if there are issues, but we will reprint your order and cover shipping when quality is at fault.',
+            'While we guarantee the quality of our prints, shipping times are not guaranteed since we use USPS and UPS.',
+            'We appreciate your business and thank you for choosing Complete Graphics Sticker House. We hope to print another order for you soon!',
+        ],
     },
-    '&:hover::before': {
-        width: '100%',
-    },
-}));
+] as const;
 
 export default function Returns() {
+    const theme = useTheme();
+    const router = useRouter();
 
     return (
-        <Container sx={{py: 5}}>
-            <Typography variant="h2" gutterBottom sx={{color: '#4f7277'}}>
-                Returns
-            </Typography>
-            <Grid container spacing={8} columns={12} sx={{my: 4}}>
-                <Grid size={{xs: 12, sm: 12}}>
+        <Box sx={{ bgcolor: '#ffffff', pb: { xs: 6, md: 8 } }}>
+            <Box sx={{ pt: { xs: 5, md: 8 }, pb: { xs: 3, md: 4 } }}>
+                <Container maxWidth="md">
+                    <Stack spacing={3} alignItems="center" sx={{ textAlign: 'center' }}>
+                        <Box component="h1" sx={{ m: 0, maxWidth: 540 }}>
+                            <Typography
+                                component="span"
+                                sx={{
+                                    display: 'block',
+                                    fontWeight: 800,
+                                    letterSpacing: '-0.03em',
+                                    fontSize: { xs: '2rem', md: '2.5rem' },
+                                    lineHeight: 1.15,
+                                    color: theme.palette.grey[900],
+                                    mb: 1.5,
+                                }}
+                            >
+                                Returns &{' '}
+                                <Box component="span" sx={stickerChipSx}>
+                                    refunds
+                                </Box>
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontSize: { xs: '1rem', md: '1.0625rem' },
+                                    lineHeight: 1.65,
+                                }}
+                            >
+                                Custom stickers are made to order. Here is how we handle order
+                                issues, reprints, and refunds.
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </Container>
+            </Box>
+
+            <Container maxWidth="md">
+                <Stack spacing={3}>
                     <Box
                         sx={{
+                            p: { xs: 2.5, md: 3 },
+                            borderRadius: 3,
                             display: 'flex',
-                            flexDirection: 'column',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
                             justifyContent: 'space-between',
-                            gap: 1,
-                            height: '100%',
+                            gap: 2,
+                            bgcolor: alpha(BRAND_BLUE, 0.04),
+                            border: `1px solid ${alpha(BRAND_BLUE, 0.12)}`,
                         }}
                     >
-                        <TitleTypography gutterBottom variant="h5" tabIndex={0}>
-                            Problems with your order?
-                        </TitleTypography>
-                        <TitleTypography gutterBottom tabIndex={0}>
-                            Email us: support@cgstickers.com
-                        </TitleTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            If you have a problem with your order, please let us know within 30 days of receiving your
-                            products. We will be unable to replace or refund any orders brought to our attention after
-                            30 days of confirmed delivery by USPS or UPS.
-                            It is important to note that every order we produce is 100% custom. We do not allow returns
-                            or refunds for reasons that is unrelated to quality. i.e.- we will not refund your order if
-                            you decide you do not want it. We will not refund or reprint your order if you ordered the
-                            wrong size or prefer a different product. We try to be fair if the mistake is on our end
-                            without a doubt we will fix it and make it right.
-                        </StyledTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            If your order has an issue due to set up, printing, laminating or packaging please let us
-                            know. We will look into the issue and if needed, reprint your order. Refunds will not be
-                            given for these issues; only reprints.
-                        </StyledTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            If you do feel that there was an error in the quality of your print job, we will be happy to
-                            look in to the issue you are having. One of the main problems we encounter is based on what
-                            you see on a screen versus what is printed out from our machines. There are many variables
-                            that can sometimes change the appearance of colors, brightness, and contrast of your images.
-                            So if we do find that we need to reprint your order, we may ask for your assistance to get
-                            the order right, and might request a photo or further instructions before reproducing your
-                            reprinted order. We just want to know how to make it right!
-                        </StyledTypography>
-                        <TitleTypography gutterBottom variant="h5" tabIndex={0}>
-                            Refunds
-                        </TitleTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            We will process your refund request within 2 business days. Once we submit a refund to your
-                            bank or credit card company, it can take up to 4 business days to see the credit on your
-                            statement. This usually has to do with the policies and procedures of your bank or credit
-                            card company.
-                        </StyledTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            If you haven’t received a refund yet, contact your bank or credit card company. They should
-                            be able to answer any questions as to the delay.
-                        </StyledTypography>
-                        <TitleTypography gutterBottom variant="h5" tabIndex={0}>
-                            Our guarantee
-                        </TitleTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            We want you to know that we stand behind our products, our process, and our print quality.
-                            Our guarantee is to stand behind this quality and service. We don’t assume liability for
-                            lost sales, labor costs, or other costs associated with your order if there are issues with
-                            your order, but we definitely have you covered on reprinting your order and the shipping
-                            costs. As we do guarantee the quality of our prints, shipping is not guaranteed to arrive on
-                            time since we use USPS and UPS.
-                        </StyledTypography>
-                        <StyledTypography variant="body2" color="text.secondary" gutterBottom>
-                            We appreciate your business, and thank you for choosing AADesigns! We hope to print another
-                            order for you soon!
-                        </StyledTypography>
+                        <Stack direction="row" spacing={2} alignItems="center">
+                            <Box
+                                sx={{
+                                    width: 44,
+                                    height: 44,
+                                    flexShrink: 0,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: 2,
+                                    bgcolor: alpha(BRAND_BLUE, 0.1),
+                                    color: BRAND_BLUE,
+                                }}
+                            >
+                                <EmailOutlinedIcon />
+                            </Box>
+                            <Box>
+                                <Typography sx={{ fontWeight: 700, color: theme.palette.grey[900] }}>
+                                    Need help with an order?
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    support@cgstickerhouse.com
+                                </Typography>
+                            </Box>
+                        </Stack>
+                        <Button
+                            variant="contained"
+                            endIcon={<ArrowForwardIcon />}
+                            onClick={() => router.push('/contact-us')}
+                            sx={{
+                                flexShrink: 0,
+                                px: 3,
+                                py: 1.25,
+                                fontWeight: 700,
+                                fontSize: '0.9375rem',
+                                borderRadius: 50,
+                                bgcolor: BRAND_BLUE,
+                                textTransform: 'none',
+                                boxShadow: `0 6px 20px ${alpha(BRAND_BLUE, 0.22)}`,
+                                '&:hover': { bgcolor: '#124578' },
+                            }}
+                        >
+                            Contact us
+                        </Button>
                     </Box>
-                </Grid>
-            </Grid>
-        </Container>
+
+                    {SECTIONS.map(({ icon: Icon, title, paragraphs }) => (
+                        <Box
+                            key={title}
+                            sx={{
+                                p: { xs: 2.5, md: 3.5 },
+                                borderRadius: 3,
+                                bgcolor: '#ffffff',
+                                border: `1px solid ${alpha(BRAND_BLUE, 0.1)}`,
+                                boxShadow: `0 4px 24px ${alpha(BRAND_BLUE, 0.05)}`,
+                            }}
+                        >
+                            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2.5 }}>
+                                <Box
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: 2,
+                                        bgcolor: alpha(BRAND_BLUE, 0.08),
+                                        color: BRAND_BLUE,
+                                    }}
+                                >
+                                    <Icon sx={{ fontSize: 22 }} />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 800,
+                                        fontSize: '1.125rem',
+                                        color: theme.palette.grey[900],
+                                        letterSpacing: '-0.01em',
+                                    }}
+                                >
+                                    {title}
+                                </Typography>
+                            </Stack>
+
+                            <Stack spacing={2}>
+                                {paragraphs.map((text) => (
+                                    <Typography
+                                        key={text.slice(0, 40)}
+                                        sx={{
+                                            color: 'text.secondary',
+                                            fontSize: '0.9375rem',
+                                            lineHeight: 1.75,
+                                        }}
+                                    >
+                                        {text}
+                                    </Typography>
+                                ))}
+                            </Stack>
+                        </Box>
+                    ))}
+                </Stack>
+            </Container>
+        </Box>
     );
 }

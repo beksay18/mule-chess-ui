@@ -140,12 +140,12 @@ export default function HomeProducts() {
                             <Box
                                 sx={{
                                     position: 'relative',
-                                    height: { xs: 200, md: 220 },
+                                    height: { xs: 220, md: 260 },
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     bgcolor: '#ffffff',
-                                    p: 3,
+                                    p: { xs: 1.5, md: 2 },
                                     overflow: 'hidden',
                                 }}
                             >
@@ -170,8 +170,8 @@ export default function HomeProducts() {
                                         src={`${baseURL}${product.imageUrl}`}
                                         alt={product.name}
                                         sx={{
-                                            maxWidth: '85%',
-                                            maxHeight: '85%',
+                                            width: '100%',
+                                            height: '100%',
                                             objectFit: 'contain',
                                             transition: 'transform 0.4s ease',
                                         }}
