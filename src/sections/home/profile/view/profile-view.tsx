@@ -1,15 +1,10 @@
-import ProfilePage from "../profile-page";
-import Header from "../../header";
-import {ProfileMenu} from "./profile-menu";
-import Footer from "../../footer";
+import ProfilePage from '../profile-page';
+import { ProfileLayout } from './profile-layout';
 
 export function ProfileView() {
-  return (
-    <>
-      <Header/>
-      <ProfileMenu/>
-      <ProfilePage/>
-      <Footer />
-    </>
-  );
+    return (
+        <ProfileLayout>
+            <ProfilePage />
+        </ProfileLayout>
+    );
 }

@@ -5,6 +5,11 @@ import {
 } from '@mui/material';
 import { updatePersonalInfo } from '../../../api/profile';
 import { ProfileRequest } from '../../../api/profile/type';
+import {
+    formatUsPhoneNumber,
+    isValidUsPhoneNumber,
+    stripPhoneDigits,
+} from '../../../utils/validator';
 
 interface Props {
     open: boolean;
@@ -19,25 +24,31 @@ export default function UpdatePhoneDialog({ open, onClose, userId, initialData }
     const [success, setSuccess] = React.useState<string | null>(null);
     const [loading, setLoading] = React.useState(false);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-    };
-
     React.useEffect(() => {
         if (open) {
-            setForm(initialData);
+            setForm({
+                ...initialData,
+                phoneNumber: formatUsPhoneNumber(initialData.phoneNumber || ''),
+            });
             setError(null);
             setSuccess(null);
         }
     }, [open, initialData]);
 
     const handleSubmit = async () => {
+        if (!isValidUsPhoneNumber(form.phoneNumber)) {
+            setError('Enter a valid 10-digit US phone number');
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setSuccess(null);
         try {
-            const res = await updatePersonalInfo(userId, form);
+            const res = await updatePersonalInfo(userId, {
+                ...form,
+                phoneNumber: stripPhoneDigits(form.phoneNumber),
+            });
             const current = JSON.parse(sessionStorage.getItem('current-user') || '{}');
 
             sessionStorage.setItem(
@@ -68,12 +79,22 @@ export default function UpdatePhoneDialog({ open, onClose, userId, initialData }
                 {success && <Alert severity="success">{success}</Alert>}
 
                 <TextField
-                    label="Phone Number"
+                    label="Phone number"
                     name="phoneNumber"
+                    type="tel"
                     value={form.phoneNumber}
-                    onChange={handleChange}
+                    onChange={(e) =>
+                        setForm((prev) => ({
+                            ...prev,
+                            phoneNumber: formatUsPhoneNumber(e.target.value),
+                        }))
+                    }
+                    placeholder="(555) 555-5555"
                     fullWidth
-                    sx={{mt: 2}}
+                    sx={{ mt: 2 }}
+                    slotProps={{
+                        htmlInput: { inputMode: 'numeric', maxLength: 14 },
+                    }}
                 />
             </DialogContent>
             <DialogActions>

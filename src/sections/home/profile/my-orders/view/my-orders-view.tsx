@@ -1,15 +1,10 @@
-import MyOrdersPage from "../my-orders-page";
-import Header from "../../../header";
-import {ProfileMenu} from "../../view/profile-menu";
-import Footer from "../../../footer";
+import MyOrdersPage from '../my-orders-page';
+import { ProfileLayout } from '../../view/profile-layout';
 
 export function MyOrdersView() {
-  return (
-    <>
-      <Header/>
-      <ProfileMenu/>
-      <MyOrdersPage/>
-      <Footer />
-    </>
-  );
+    return (
+        <ProfileLayout>
+            <MyOrdersPage />
+        </ProfileLayout>
+    );
 }

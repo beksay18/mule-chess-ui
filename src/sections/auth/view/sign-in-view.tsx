@@ -1,90 +1,160 @@
-import {Box, Typography, Divider, Card, CardContent, Button} from '@mui/material';
-import {useCallback, useState} from 'react';
-import {useRouter} from 'src/routes/hooks';
-import {signIn} from '../../../api/auth';
-import {SessionStorage} from '../../../api';
-import {SignInForm} from '../sign-in-form';
-import {SocialLoginButton} from '../social-login-button';
-import Container from "@mui/material/Container";
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import { useCallback, useState } from 'react';
+import Link from '@mui/material/Link';
+import { alpha, useTheme } from '@mui/material/styles';
+import { useRouter } from 'src/routes/hooks';
+import { signIn } from '../../../api/auth';
+import { SessionStorage } from '../../../api';
+import { SignInForm } from '../sign-in-form';
+import { SocialLoginButton } from '../social-login-button';
+
+const BRAND_BLUE = '#175195';
+
+const stickerChipSx = {
+    position: 'relative' as const,
+    display: 'inline-block',
+    px: { xs: 2, md: 2.5 },
+    py: { xs: 0.5, md: 0.75 },
+    mx: 0.5,
+    fontWeight: 800,
+    color: BRAND_BLUE,
+    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
+    borderRadius: 2.5,
+    transform: 'rotate(-3deg)',
+};
 
 export function SignInView() {
+    const theme = useTheme();
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
 
-    const handleSignIn = useCallback(async (username: string, password: string) => {
-        try {
-            const res = await signIn({username, password});
+    const handleSignIn = useCallback(
+        async (username: string, password: string) => {
+            try {
+                const res = await signIn({ username, password });
 
-            SessionStorage.setJSONValue('access-token', {'access-token': res.accessToken});
-            SessionStorage.setJSONValue('current-user', {
-                userId: res.id,
-                username: res.username,
-                role: res.role,
-                person: res.person,
-            });
+                SessionStorage.setJSONValue('access-token', { 'access-token': res.accessToken });
+                SessionStorage.setJSONValue('current-user', {
+                    userId: res.id,
+                    username: res.username,
+                    role: res.role,
+                    person: res.person,
+                });
 
-            router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
-        } catch (error: any) {
-            const message = error?.response?.data?.message || 'Sign-in failed. Please try again.';
-            setErrorMessage(message);
-            console.error('Sign-in failed:', error);
-        }
-    }, [router]);
+                router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
+            } catch (error: any) {
+                const message =
+                    error?.response?.data?.message || 'Sign-in failed. Please try again.';
+                setErrorMessage(message);
+                console.error('Sign-in failed:', error);
+            }
+        },
+        [router]
+    );
 
     return (
-        <Container id="features" sx={{py: 15}}>
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    bgcolor: 'background.default',
-                    px: 2,
-                }}
-            >
-                <Card
-                    sx={{
-                        width: '100%',
-                        maxWidth: 420,
-                        p: 3,
-                        borderRadius: 3,
-                        boxShadow: 3,
-                    }}
-                >
-                    <CardContent>
-                        <Box sx={{gap: 1.5, display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 5}}>
-                            <Typography variant="h5">Log in</Typography>
-                            <Typography variant="body2" sx={{color: 'text.secondary'}}>
-                                Don’t have an account?
-                                <Box component="span" sx={{ml: 0.5}}>
-                                    <a href="/sign-up"
-                                       style={{color: '#1976d2', textDecoration: 'none', fontWeight: 500}}>
-                                        Get started
-                                    </a>
-                                </Box>
-                            </Typography>
-                        </Box>
+        <Box
+            sx={{
+                bgcolor: '#ffffff',
+                py: { xs: 5, md: 8 },
+                minHeight: { xs: 'calc(100dvh - 64px)', md: 'calc(100dvh - 72px)' },
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+            }}
+        >
+            <Container maxWidth="sm">
+                <Stack spacing={4} alignItems="center">
+                    <Box component="h1" sx={{ m: 0, textAlign: 'center', maxWidth: 400 }}>
+                        <Typography
+                            component="span"
+                            sx={{
+                                display: 'block',
+                                fontWeight: 800,
+                                letterSpacing: '-0.03em',
+                                fontSize: { xs: '2rem', md: '2.25rem' },
+                                lineHeight: 1.15,
+                                color: theme.palette.grey[900],
+                                mb: 1,
+                            }}
+                        >
+                            Welcome{' '}
+                            <Box component="span" sx={stickerChipSx}>
+                                back
+                            </Box>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: 'text.secondary',
+                                fontSize: { xs: '0.975rem', md: '1rem' },
+                                lineHeight: 1.6,
+                            }}
+                        >
+                            Sign in to manage orders and continue designing stickers.
+                        </Typography>
+                    </Box>
 
-                        <SignInForm onSubmit={handleSignIn}/>
+                    <Box
+                        sx={{
+                            width: '100%',
+                            maxWidth: 420,
+                            p: { xs: 3, md: 3.5 },
+                            borderRadius: 3,
+                            bgcolor: '#ffffff',
+                            border: `1px solid ${alpha(BRAND_BLUE, 0.12)}`,
+                            boxShadow: `0 8px 32px ${alpha(BRAND_BLUE, 0.08)}`,
+                        }}
+                    >
+                        <SignInForm onSubmit={handleSignIn} />
 
                         {errorMessage && (
-                            <Typography variant="body2" color="error" sx={{mt: 2}}>
+                            <Typography
+                                variant="body2"
+                                color="error"
+                                textAlign="center"
+                                sx={{ mt: 2 }}
+                            >
                                 {errorMessage}
                             </Typography>
                         )}
 
-                        <Divider sx={{my: 3, '&::before, &::after': {borderTopStyle: 'dashed'}}}>
-                            <Typography variant="overline"
-                                        sx={{color: 'text.secondary', fontWeight: 'fontWeightMedium'}}>
+                        <Divider sx={{ my: 3 }}>
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    color: 'text.secondary',
+                                    fontWeight: 600,
+                                    letterSpacing: '0.06em',
+                                }}
+                            >
                                 OR
                             </Typography>
                         </Divider>
 
-                        <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                            <SocialLoginButton/>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <SocialLoginButton />
                         </Box>
-                    </CardContent>
-                </Card>
-            </Box>
-        </Container>
+
+                        <Typography
+                            variant="body2"
+                            sx={{ color: 'text.secondary', textAlign: 'center', mt: 3 }}
+                        >
+                            Don&apos;t have an account?{' '}
+                            <Link
+                                href="/sign-up"
+                                underline="hover"
+                                sx={{ fontWeight: 700, color: BRAND_BLUE }}
+                            >
+                                Create one
+                            </Link>
+                        </Typography>
+                    </Box>
+                </Stack>
+            </Container>
+        </Box>
     );
 }

@@ -1,9 +1,28 @@
 import { Box, Button, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify';
 import { useState, FormEvent } from 'react';
-import { isValidEmail } from "../../utils/validator";
+import { isValidEmail } from '../../utils/validator';
 
-export function SignInForm({ onSubmit }: { onSubmit: (username: string, password: string) => void }) {
+const BRAND_BLUE = '#175195';
+
+const fieldSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 2,
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: alpha(BRAND_BLUE, 0.4),
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: BRAND_BLUE,
+        },
+    },
+};
+
+export function SignInForm({
+    onSubmit,
+}: {
+    onSubmit: (username: string, password: string) => void;
+}) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +53,7 @@ export function SignInForm({ onSubmit }: { onSubmit: (username: string, password
         <Box
             component="form"
             onSubmit={handleSubmit}
-            sx={{ display: 'flex', alignItems: 'flex-end', flexDirection: 'column' }}
+            sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}
         >
             <TextField
                 fullWidth
@@ -42,19 +61,33 @@ export function SignInForm({ onSubmit }: { onSubmit: (username: string, password
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 onKeyDown={handleKeyDown}
-                sx={{ mb: 3 }}
+                sx={{ ...fieldSx, mb: 2.5 }}
                 slotProps={{ inputLabel: { shrink: true } }}
                 required
                 error={errors.username}
                 helperText={
-                    errors.username && (username.trim() === ''
-                        ? 'Email is required'
-                        : 'Invalid email format')
+                    errors.username &&
+                    (username.trim() === '' ? 'Email is required' : 'Invalid email format')
                 }
             />
-            <Link variant="body2" color="inherit" sx={{ mb: 1.5 }}>
-                Forgot password?
-            </Link>
+
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    mb: 1,
+                }}
+            >
+                <Link
+                    href="/contact-us"
+                    variant="body2"
+                    underline="hover"
+                    sx={{ color: BRAND_BLUE, fontWeight: 600, fontSize: '0.8125rem' }}
+                >
+                    Forgot password?
+                </Link>
+            </Box>
+
             <TextField
                 fullWidth
                 label="Password"
@@ -70,22 +103,42 @@ export function SignInForm({ onSubmit }: { onSubmit: (username: string, password
                     input: {
                         endAdornment: (
                             <InputAdornment position="end">
-                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
-                                    <Iconify icon={showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                                <IconButton
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    edge="end"
+                                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                                >
+                                    <Iconify
+                                        icon={
+                                            showPassword ? 'solar:eye-bold' : 'solar:eye-closed-bold'
+                                        }
+                                    />
                                 </IconButton>
                             </InputAdornment>
                         ),
                     },
                 }}
-                sx={{ mb: 3 }}
+                sx={{ ...fieldSx, mb: 3 }}
             />
+
             <Button
                 fullWidth
                 size="large"
-                color="inherit"
                 variant="contained"
-                onClick={handleSubmit}
                 type="submit"
+                sx={{
+                    py: 1.5,
+                    fontWeight: 700,
+                    fontSize: '1rem',
+                    borderRadius: 50,
+                    bgcolor: BRAND_BLUE,
+                    textTransform: 'none',
+                    boxShadow: `0 8px 24px ${alpha(BRAND_BLUE, 0.25)}`,
+                    '&:hover': {
+                        bgcolor: '#124578',
+                        transform: 'translateY(-1px)',
+                    },
+                }}
             >
                 Sign in
             </Button>

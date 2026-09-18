@@ -1,15 +1,10 @@
-import MyShippingAddressesPage from "../my-shipping-addresses-page";
-import Header from "../../../header";
-import {ProfileMenu} from "../../view/profile-menu";
-import Footer from "../../../footer";
+import MyShippingAddressesPage from '../my-shipping-addresses-page';
+import { ProfileLayout } from '../../view/profile-layout';
 
 export function MyShippingAddressesView() {
-  return (
-    <>
-      <Header/>
-      <ProfileMenu/>
-      <MyShippingAddressesPage/>
-      <Footer />
-    </>
-  );
+    return (
+        <ProfileLayout>
+            <MyShippingAddressesPage />
+        </ProfileLayout>
+    );
 }

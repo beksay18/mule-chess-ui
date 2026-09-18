@@ -169,7 +169,20 @@ export default function Footer() {
                     }}
                 >
                     <Typography sx={{ color: alpha('#ffffff', 0.5), fontSize: '0.8125rem' }}>
-                        © {new Date().getFullYear()} Complete Graphics. All rights reserved.
+                        © {new Date().getFullYear()}{' '}
+                        <Link
+                            href="https://www.completegraphics.us/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                                ...linkSx,
+                                fontSize: '0.8125rem',
+                                color: alpha('#ffffff', 0.65),
+                            }}
+                        >
+                            Complete Graphics
+                        </Link>
+                        . All rights reserved.
                     </Typography>
                     <Stack direction="row" spacing={2}>
                         <Link href="/privacy" sx={{ ...linkSx, fontSize: '0.8125rem' }}>
