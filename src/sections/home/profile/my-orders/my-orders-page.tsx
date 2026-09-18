@@ -12,14 +12,31 @@ import { getMyOrders, MyOrderResponsePage } from '../../../../api/order';
 
 const BRAND_BLUE = '#175195';
 
+const STATUS_FILTERS = ['All', 'NEW', 'IN_PROGRESS', 'READY_TO_SHIP', 'SHIPPED', 'CANCELLED'] as const;
+
+type StatusFilter = (typeof STATUS_FILTERS)[number];
+
 const STATUS_STYLES: Record<string, { label: string; bgcolor: string; color: string }> = {
     NEW: { label: 'New', bgcolor: alpha('#2196f3', 0.12), color: '#1565c0' },
     IN_PROGRESS: { label: 'In progress', bgcolor: alpha('#ff9800', 0.12), color: '#e65100' },
     READY_TO_SHIP: { label: 'Ready to ship', bgcolor: alpha('#9c27b0', 0.12), color: '#7b1fa2' },
     SHIPPED: { label: 'Shipped', bgcolor: alpha(BRAND_BLUE, 0.12), color: BRAND_BLUE },
-    DELIVERED: { label: 'Delivered', bgcolor: alpha('#4caf50', 0.12), color: '#2e7d32' },
     CANCELLED: { label: 'Cancelled', bgcolor: alpha('#f44336', 0.12), color: '#c62828' },
 };
+
+function getStatusFilterLabel(status: StatusFilter) {
+    if (status === 'All') {
+        return 'All';
+    }
+    return STATUS_STYLES[status]?.label ?? status;
+}
+
+function buildStatusFilter(status: StatusFilter) {
+    if (status === 'All') {
+        return undefined;
+    }
+    return `orderStatus:${status}`;
+}
 
 function getStatusStyle(status: string) {
     return (
@@ -45,15 +62,17 @@ export default function MyOrdersPage() {
     const [orders, setOrders] = useState<MyOrderResponsePage | null>(null);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [activeStatus, setActiveStatus] = useState<StatusFilter>('All');
     const pageSize = 5;
     const baseImageUrl = import.meta.env.VITE_API_BASE_IMAGE_URL;
 
-    const fetchOrders = async (currentPage: number) => {
+    const fetchOrders = async (currentPage: number, status: StatusFilter) => {
         setLoading(true);
         try {
             const result = await getMyOrders({
                 page: currentPage - 1,
                 size: pageSize,
+                filter: buildStatusFilter(status),
                 userId: user?.userId,
             });
             setOrders(result);
@@ -65,11 +84,16 @@ export default function MyOrdersPage() {
     };
 
     useEffect(() => {
-        fetchOrders(page);
-    }, [page, user?.userId]);
+        fetchOrders(page, activeStatus);
+    }, [page, activeStatus, user?.userId]);
 
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
         setPage(value);
+    };
+
+    const handleStatusChange = (status: StatusFilter) => {
+        setActiveStatus(status);
+        setPage(1);
     };
 
     return (
@@ -91,6 +115,39 @@ export default function MyOrdersPage() {
                     View your sticker orders and track their status.
                 </Typography>
             </Box>
+
+            <Stack
+                direction="row"
+                spacing={1}
+                flexWrap="wrap"
+                useFlexGap
+                sx={{ gap: 1 }}
+            >
+                {STATUS_FILTERS.map((status) => {
+                    const isActive = activeStatus === status;
+                    return (
+                        <Chip
+                            key={status}
+                            label={getStatusFilterLabel(status)}
+                            clickable
+                            onClick={() => handleStatusChange(status)}
+                            sx={{
+                                fontWeight: 600,
+                                fontSize: '0.8125rem',
+                                borderRadius: 50,
+                                bgcolor: isActive ? BRAND_BLUE : '#ffffff',
+                                color: isActive ? '#ffffff' : theme.palette.grey[700],
+                                border: `1px solid ${
+                                    isActive ? BRAND_BLUE : alpha(BRAND_BLUE, 0.2)
+                                }`,
+                                '&:hover': {
+                                    bgcolor: isActive ? '#124578' : alpha(BRAND_BLUE, 0.06),
+                                },
+                            }}
+                        />
+                    );
+                })}
+            </Stack>
 
             {loading ? (
                 <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -265,11 +322,27 @@ export default function MyOrdersPage() {
                         sx={{ fontSize: 48, color: alpha(BRAND_BLUE, 0.25), mb: 1.5 }}
                     />
                     <Typography sx={{ fontWeight: 600, color: theme.palette.grey[700], mb: 0.5 }}>
-                        No orders yet
+                        {activeStatus === 'All' ? 'No orders yet' : 'No orders with this status'}
                     </Typography>
-                    <Typography variant="body2">
-                        When you place an order, it will show up here.
+                    <Typography variant="body2" sx={{ mb: activeStatus === 'All' ? 0 : 2 }}>
+                        {activeStatus === 'All'
+                            ? 'When you place an order, it will show up here.'
+                            : `You don't have any ${getStatusFilterLabel(activeStatus).toLowerCase()} orders right now.`}
                     </Typography>
+                    {activeStatus !== 'All' && (
+                        <Chip
+                            label="View all orders"
+                            clickable
+                            onClick={() => handleStatusChange('All')}
+                            sx={{
+                                fontWeight: 600,
+                                borderRadius: 50,
+                                bgcolor: alpha(BRAND_BLUE, 0.08),
+                                color: BRAND_BLUE,
+                                '&:hover': { bgcolor: alpha(BRAND_BLUE, 0.14) },
+                            }}
+                        />
+                    )}
                 </Box>
             )}
         </Stack>

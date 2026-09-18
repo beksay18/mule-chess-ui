@@ -1,118 +1,171 @@
-import type { CardProps } from '@mui/material/Card';
-
 import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Card from '@mui/material/Card';
+import Chip from '@mui/material/Chip';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { alpha, useTheme } from '@mui/material/styles';
 import { fDate } from 'src/utils/format-time';
-import { varAlpha } from 'minimal-shared/utils';
 
-// ----------------------------------------------------------------------
+const BRAND_BLUE = '#175195';
+
+export type BlogCategory = 'Design tips' | 'Marketing' | 'Guides';
 
 export type IPostItem = {
     id: string;
     title: string;
     coverUrl: string;
-    totalViews: number;
     description: string;
-    totalShares: number;
-    totalComments: number;
-    totalFavorites: number;
-    postedAt: string | number | null;
-    author: {
-        name: string;
-        avatarUrl: string;
-    };
+    category: BlogCategory;
+    readTime: number;
+    postedAt: string;
 };
 
-export function PostItem({
-                             sx,
-                             post,
-                             latestPost,
-                             latestPostLarge,
-                             ...other
-                         }: CardProps & {
+type PostItemProps = {
     post: IPostItem;
-    latestPost: boolean;
-    latestPostLarge: boolean;
-}) {
+    featured?: boolean;
+    onRead?: (post: IPostItem) => void;
+};
+
+export function PostItem({ post, featured = false, onRead }: PostItemProps) {
+    const theme = useTheme();
+
     return (
-        <Card sx={sx} {...other}>
+        <Box
+            component="article"
+            onClick={() => onRead?.(post)}
+            sx={{
+                display: 'flex',
+                flexDirection: featured ? { xs: 'column', md: 'row' } : 'column',
+                height: '100%',
+                borderRadius: 3,
+                overflow: 'hidden',
+                bgcolor: '#ffffff',
+                border: `1px solid ${theme.palette.grey[200]}`,
+                cursor: onRead ? 'pointer' : 'default',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
+                '&:hover': onRead
+                    ? {
+                          transform: 'translateY(-4px)',
+                          borderColor: alpha(BRAND_BLUE, 0.25),
+                          boxShadow: `0 12px 32px ${alpha(BRAND_BLUE, 0.12)}`,
+                          '& .post-cover': { transform: 'scale(1.03)' },
+                          '& .post-read-link': {
+                              color: BRAND_BLUE,
+                              '& .MuiSvgIcon-root': { transform: 'translateX(4px)' },
+                          },
+                      }
+                    : {},
+            }}
+        >
             <Box
-                sx={(theme) => ({
+                sx={{
                     position: 'relative',
-                    pt: 'calc(100% * 3 / 4)',
+                    flexShrink: 0,
+                    width: featured ? { xs: '100%', md: '48%' } : '100%',
+                    pt: featured ? { xs: '56%', md: 0 } : '56%',
+                    minHeight: featured ? { md: 280 } : undefined,
                     overflow: 'hidden',
-                    borderRadius: 2,
-                    ...(latestPostLarge || latestPost
-                        ? {
-                            pt: 'calc(100% * 4 / 3)',
-                            '&:after': {
-                                content: '""',
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                bgcolor: varAlpha(theme.palette.grey['900Channel'], 0.72),
-                                zIndex: 1,
-                            },
-                        }
-                        : {}),
-                })}
+                    bgcolor: alpha(BRAND_BLUE, 0.04),
+                }}
             >
                 <Box
                     component="img"
                     alt={post.title}
                     src={post.coverUrl}
+                    className="post-cover"
                     sx={{
                         position: 'absolute',
-                        top: 0,
+                        inset: 0,
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        transition: 'transform 0.3s ease',
+                    }}
+                />
+                <Chip
+                    label={post.category}
+                    size="small"
+                    sx={{
+                        position: 'absolute',
+                        top: 12,
+                        left: 12,
+                        fontWeight: 700,
+                        fontSize: '0.6875rem',
+                        bgcolor: alpha('#ffffff', 0.95),
+                        color: BRAND_BLUE,
+                        border: `1px solid ${alpha(BRAND_BLUE, 0.15)}`,
                     }}
                 />
             </Box>
 
-            <Box
+            <Stack
+                spacing={1.5}
                 sx={{
-                    p: 3,
-                    ...(latestPostLarge || latestPost
-                        ? {
-                            position: 'absolute',
-                            bottom: 0,
-                            width: '100%',
-                            color: 'common.white',
-                        }
-                        : {}),
+                    flex: 1,
+                    p: featured ? { xs: 2.5, md: 3.5 } : 2.5,
+                    justifyContent: featured ? 'center' : 'flex-start',
                 }}
             >
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                        {fDate(post.postedAt)}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+                        ·
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                        {post.readTime} min read
+                    </Typography>
+                </Stack>
+
                 <Typography
-                    variant="caption"
+                    component="h2"
                     sx={{
-                        mb: 1,
-                        color: (latestPostLarge || latestPost) ? 'common.white' : 'text.disabled',
+                        fontWeight: 800,
+                        fontSize: featured ? { xs: '1.25rem', md: '1.5rem' } : '1.0625rem',
+                        lineHeight: 1.35,
+                        color: theme.palette.grey[900],
+                        letterSpacing: '-0.02em',
                     }}
                 >
-                    {fDate(post.postedAt)}
+                    {post.title}
                 </Typography>
 
-                <Link
-                    variant={latestPostLarge ? 'h5' : 'subtitle2'}
-                    underline="hover"
-                    color="inherit"
+                <Typography
+                    variant="body2"
                     sx={{
+                        color: 'text.secondary',
+                        lineHeight: 1.7,
                         display: '-webkit-box',
-                        WebkitLineClamp: 2,
+                        WebkitLineClamp: featured ? 4 : 3,
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                     }}
                 >
-                    {post.title}
-                </Link>
-            </Box>
-        </Card>
+                    {post.description}
+                </Typography>
+
+                {onRead && (
+                    <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={0.5}
+                        className="post-read-link"
+                        sx={{
+                            pt: 0.5,
+                            color: theme.palette.grey[600],
+                            fontWeight: 600,
+                            fontSize: '0.875rem',
+                            transition: 'color 0.2s ease',
+                        }}
+                    >
+                        Read article
+                        <ArrowForwardIcon
+                            sx={{ fontSize: 16, transition: 'transform 0.2s ease' }}
+                        />
+                    </Stack>
+                )}
+            </Stack>
+        </Box>
     );
 }

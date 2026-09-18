@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -30,6 +31,7 @@ const fieldSx = {
 
 export default function ContactFormSection() {
     const theme = useTheme();
+    const [searchParams] = useSearchParams();
     const [form, setForm] = useState<ContactsRequest>({
         name: '',
         email: '',
@@ -37,6 +39,16 @@ export default function ContactFormSection() {
         message: '',
         file: undefined,
     });
+
+    useEffect(() => {
+        const subject = searchParams.get('subject');
+        if (subject) {
+            setForm((prev) => ({
+                ...prev,
+                message: prev.message || `Hi — I have a question about: ${subject}`,
+            }));
+        }
+    }, [searchParams]);
 
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
