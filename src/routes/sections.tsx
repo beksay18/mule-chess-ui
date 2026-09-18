@@ -41,6 +41,7 @@ export const FaqTitleForm = lazy(() => import('src/sections/faq/faq-title-form')
 export const HelpPage = lazy(() => import('src/pages/help'));
 export const ReturnsPage = lazy(() => import('src/pages/returns'));
 export const AboutUsPage = lazy(() => import('src/pages/about-us'));
+export const ForBusinessPage = lazy(() => import('src/pages/for-business'));
 export const PrivacyPage = lazy(() => import('src/pages/privacy'));
 export const TermsPage = lazy(() => import('src/pages/terms'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -223,6 +224,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'about-us',
         element: <AboutUsPage/>,
+    },
+    {
+        path: 'for-business',
+        element: <ForBusinessPage/>,
     },
     {
         path: 'privacy',

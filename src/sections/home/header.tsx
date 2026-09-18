@@ -132,7 +132,9 @@ export default function Header() {
                                 Shop Stickers
                             </Button>
 
-                            <Button sx={navLinkSx}>For Businesses</Button>
+                            <Button sx={navLinkSx} onClick={() => router.push('/for-business')}>
+                                For Businesses
+                            </Button>
                         </Stack>
                     </Stack>
 
@@ -272,7 +274,12 @@ export default function Header() {
                     <MenuItem onClick={scrollToProducts} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
                         Shop Stickers
                     </MenuItem>
-                    <MenuItem sx={{ borderRadius: 1.5, fontWeight: 500 }}>For Businesses</MenuItem>
+                    <MenuItem
+                        onClick={() => handleNavigate('/for-business')}
+                        sx={{ borderRadius: 1.5, fontWeight: 500 }}
+                    >
+                        For Businesses
+                    </MenuItem>
 
                     {user ? (
                         <>
