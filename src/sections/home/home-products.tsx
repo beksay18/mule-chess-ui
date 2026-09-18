@@ -136,6 +136,9 @@ export default function HomeProducts() {
                                     '& .product-overlay': {
                                         opacity: 1,
                                     },
+                                    '& .product-name-label': {
+                                        transform: 'rotate(0deg)',
+                                    },
                                 },
                             }}
                         >
@@ -220,33 +223,38 @@ export default function HomeProducts() {
                                 </Box>
                             </Box>
 
-                            <Stack spacing={0.75} sx={{ p: 2.5, flexGrow: 1 }}>
+                            <Box
+                                sx={{
+                                    p: 2.5,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    flexGrow: 1,
+                                }}
+                            >
                                 <Typography
+                                    className="product-name-label"
+                                    component="span"
                                     sx={{
-                                        fontWeight: 700,
-                                        fontSize: '1.0625rem',
-                                        color: theme.palette.grey[900],
+                                        display: 'inline-block',
+                                        px: 2,
+                                        py: 0.75,
+                                        fontWeight: 800,
+                                        fontSize: '0.9375rem',
+                                        letterSpacing: '-0.01em',
+                                        color: BRAND_BLUE,
+                                        bgcolor: '#ffffff',
+                                        border: `2px dashed ${alpha(BRAND_BLUE, 0.28)}`,
+                                        borderRadius: 2,
+                                        boxShadow: `2px 2px 0 ${alpha(BRAND_BLUE, 0.08)}`,
+                                        transform: `rotate(${index % 2 === 0 ? -2 : 2}deg)`,
+                                        transition: 'transform 0.3s ease',
+                                        textAlign: 'center',
                                     }}
                                 >
                                     {product.name}
                                 </Typography>
-
-                                {product.description && (
-                                    <Typography
-                                        variant="body2"
-                                        sx={{
-                                            color: 'text.secondary',
-                                            lineHeight: 1.55,
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            overflow: 'hidden',
-                                        }}
-                                    >
-                                        {product.description}
-                                    </Typography>
-                                )}
-                            </Stack>
+                            </Box>
                         </Box>
                     ))}
                 </Box>
