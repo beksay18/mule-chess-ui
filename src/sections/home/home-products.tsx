@@ -41,7 +41,7 @@ export default function HomeProducts() {
     };
 
     const handleProductClick = (productId: number) => {
-        router.push(`/custom-product-details/${productId}`);
+        router.push(`/sticker-builder?productId=${productId}`);
     };
 
     if (products.length === 0) {
@@ -115,7 +115,16 @@ export default function HomeProducts() {
                     {products.map((product, index) => (
                         <Box
                             key={product.id}
+                            role="button"
+                            tabIndex={0}
+                            aria-label={`Open ${product.name} in sticker builder`}
                             onClick={() => handleProductClick(product.id)}
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter' || event.key === ' ') {
+                                    event.preventDefault();
+                                    handleProductClick(product.id);
+                                }
+                            }}
                             sx={{
                                 position: 'relative',
                                 display: 'flex',

@@ -5,6 +5,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
@@ -26,6 +27,7 @@ import { MobileControls } from '../components/mobile-controls';
 import { RightSidebar } from '../components/right-sidebar';
 import { SavedDesignsDialog } from '../components/saved-designs-dialog';
 import { StickerCanvas } from '../components/sticker-canvas';
+import { StickerTypeTitle } from '../components/sticker-type-title';
 
 export function StickerBuilderView() {
     const router = useRouter();
@@ -167,12 +169,39 @@ export function StickerBuilderView() {
                     borderBottom: `1px solid ${alpha(BRAND_BLUE, 0.1)}`,
                 }}
             >
-                <Button href="/" sx={{ textTransform: 'none', fontWeight: 700, color: BRAND_BLUE }}>
-                    Back to shop
-                </Button>
-                <Typography fontWeight={800}>CG Sticker House Builder</Typography>
+                <Stack direction="row" alignItems="center" spacing={1.25} sx={{ minWidth: 0 }}>
+                    <Box
+                        component="a"
+                        href="/"
+                        aria-label="CG Sticker House home"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            flexShrink: 0,
+                            textDecoration: 'none',
+                            '&:hover': { opacity: 0.88 },
+                        }}
+                    >
+                        <Box
+                            component="img"
+                            src="/assets/images/home-products/cg-sticker-house.png"
+                            alt="CG Sticker House"
+                            sx={{
+                                height: { xs: 32, sm: 40 },
+                                width: 'auto',
+                                maxWidth: { xs: 120, sm: 160 },
+                                objectFit: 'contain',
+                                display: 'block',
+                            }}
+                        />
+                    </Box>
+                    <Button href="/" sx={{ textTransform: 'none', fontWeight: 700, color: BRAND_BLUE, flexShrink: 0 }}>
+                        Back to shop
+                    </Button>
+                </Stack>
+                <StickerTypeTitle products={products} product={product} onProductChange={handleProductChange} />
                 <Button href="/cart" sx={{ textTransform: 'none', fontWeight: 600, color: 'text.secondary' }}>
-                    Cart
+                    Go to cart
                 </Button>
             </Box>
 

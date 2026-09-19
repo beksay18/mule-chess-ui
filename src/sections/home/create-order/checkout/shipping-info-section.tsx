@@ -1,13 +1,16 @@
-import React from 'react';
 import {
     Box,
     FormControl,
     InputLabel,
-    MenuItem, Paper,
+    MenuItem,
+    Paper,
     Select,
     TextField,
     Typography,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+
+const BRAND_BLUE = '#175195';
 
 interface ShippingAddress {
     addressLine1: string;
@@ -26,84 +29,81 @@ interface ShippingInfoProps {
 }
 
 export default function ShippingInfoSection({
-                                                shipping,
-                                                setShipping,
-                                                errors,
-                                                usStates,
-                                            }: ShippingInfoProps) {
+    shipping,
+    setShipping,
+    errors,
+    usStates,
+}: ShippingInfoProps) {
     return (
-        <Paper sx={{p: 2, mt: 2}} variant="outlined">
-            <Box>
-                <Typography variant="h6" gutterBottom sx={{mb: 2, mt: 2}}>
-                    Shipping Info
-                </Typography>
-                <Box sx={{display: 'flex', flexDirection: 'column', gap: 2}}>
-
+        <Paper
+            elevation={0}
+            sx={{
+                p: { xs: 2.5, md: 3 },
+                borderRadius: 3,
+                border: `1px solid ${alpha(BRAND_BLUE, 0.12)}`,
+                boxShadow: `0 4px 24px ${alpha(BRAND_BLUE, 0.05)}`,
+            }}
+        >
+            <Typography sx={{ fontWeight: 800, fontSize: '1.0625rem', color: '#0f172a', mb: 2 }}>
+                Shipping address
+            </Typography>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                    label="Address line 1"
+                    fullWidth
+                    required
+                    value={shipping.addressLine1}
+                    error={errors.addressLine1}
+                    helperText={errors.addressLine1 && 'Address is required'}
+                    onChange={(event) => setShipping({ ...shipping, addressLine1: event.target.value })}
+                />
+                <TextField
+                    label="Address line 2"
+                    fullWidth
+                    value={shipping.addressLine2}
+                    onChange={(event) => setShipping({ ...shipping, addressLine2: event.target.value })}
+                />
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
                     <TextField
-                        label="Address Line 1"
+                        label="City"
                         fullWidth
                         required
-                        value={shipping.addressLine1}
-                        error={errors.addressLine1}
-                        helperText={errors.addressLine1 && 'Address Line 1 is required'}
-                        onChange={(e) => setShipping({...shipping, addressLine1: e.target.value})}
+                        value={shipping.city}
+                        error={errors.city}
+                        helperText={errors.city && 'City is required'}
+                        onChange={(event) => setShipping({ ...shipping, city: event.target.value })}
                     />
-
+                    <FormControl fullWidth required error={errors.state}>
+                        <InputLabel>State</InputLabel>
+                        <Select
+                            value={shipping.state}
+                            label="State"
+                            onChange={(event) => setShipping({ ...shipping, state: event.target.value })}
+                        >
+                            {usStates.map((state) => (
+                                <MenuItem key={state} value={state}>
+                                    {state}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                        {errors.state && (
+                            <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.75 }}>
+                                State is required
+                            </Typography>
+                        )}
+                    </FormControl>
+                </Box>
+                <Box sx={{ display: 'flex', gap: 2, flexDirection: { xs: 'column', md: 'row' } }}>
                     <TextField
-                        label="Address Line 2"
+                        label="Postal code"
                         fullWidth
-                        value={shipping.addressLine2}
-                        onChange={(e) => setShipping({...shipping, addressLine2: e.target.value})}
+                        required
+                        value={shipping.postalCode}
+                        error={errors.postalCode}
+                        helperText={errors.postalCode && 'Postal code is required'}
+                        onChange={(event) => setShipping({ ...shipping, postalCode: event.target.value })}
                     />
-
-                    <Box sx={{display: 'flex', gap: 2, flexDirection: {xs: 'column', md: 'row'}}}>
-                        <TextField
-                            label="City"
-                            fullWidth
-                            required
-                            value={shipping.city}
-                            error={errors.city}
-                            helperText={errors.city && 'City is required'}
-                            onChange={(e) => setShipping({...shipping, city: e.target.value})}
-                        />
-                        <FormControl fullWidth required error={errors.state}>
-                            <InputLabel>State</InputLabel>
-                            <Select
-                                value={shipping.state}
-                                onChange={(e) => setShipping({...shipping, state: e.target.value})}
-                                label="State"
-                            >
-                                {usStates.map((state) => (
-                                    <MenuItem key={state} value={state}>
-                                        {state}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                            {errors.state && (
-                                <Typography variant="caption" color="error">
-                                    State is required
-                                </Typography>
-                            )}
-                        </FormControl>
-                    </Box>
-
-                    <Box sx={{display: 'flex', gap: 2, flexDirection: {xs: 'column', md: 'row'}}}>
-                        <TextField
-                            label="Postal Code"
-                            fullWidth
-                            required
-                            value={shipping.postalCode}
-                            error={errors.postalCode}
-                            helperText={errors.postalCode && 'Postal Code is required'}
-                            onChange={(e) => setShipping({...shipping, postalCode: e.target.value})}
-                        />
-                        <TextField
-                            label="Country"
-                            fullWidth
-                            disabled
-                            value={shipping.country}
-                        />
-                    </Box>
+                    <TextField label="Country" fullWidth disabled value={shipping.country} />
                 </Box>
             </Box>
         </Paper>

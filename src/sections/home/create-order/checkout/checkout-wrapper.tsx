@@ -11,14 +11,21 @@ export default function CheckoutWrapper({ clientSecret }: { clientSecret: string
         appearance: {
             theme: 'stripe',
             labels: 'floating',
+            variables: {
+                colorPrimary: '#175195',
+                colorText: '#0f172a',
+                colorDanger: '#b42318',
+                borderRadius: '12px',
+                fontFamily: 'DM Sans, system-ui, sans-serif',
+            },
         },
         paymentMethodOrder: ['card'],
         wallets: {
-            link: 'never',
             applePay: 'never',
             googlePay: 'never',
+            link: 'never',
         },
-    } as any;
+    } as StripeElementsOptions;
 
 
     return (
