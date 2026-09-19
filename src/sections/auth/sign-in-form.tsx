@@ -20,8 +20,12 @@ const fieldSx = {
 
 export function SignInForm({
     onSubmit,
+    isSubmitting = false,
+    onClearError,
 }: {
-    onSubmit: (username: string, password: string) => void;
+    onSubmit: (username: string, password: string) => void | Promise<void>;
+    isSubmitting?: boolean;
+    onClearError?: () => void;
 }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -59,7 +63,10 @@ export function SignInForm({
                 fullWidth
                 label="Email address"
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => {
+                    onClearError?.();
+                    setUsername(e.target.value);
+                }}
                 onKeyDown={handleKeyDown}
                 sx={{ ...fieldSx, mb: 2.5 }}
                 slotProps={{ inputLabel: { shrink: true } }}
@@ -93,7 +100,10 @@ export function SignInForm({
                 label="Password"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                    onClearError?.();
+                    setPassword(e.target.value);
+                }}
                 onKeyDown={handleKeyDown}
                 required
                 error={errors.password}
@@ -126,6 +136,7 @@ export function SignInForm({
                 size="large"
                 variant="contained"
                 type="submit"
+                disabled={isSubmitting}
                 sx={{
                     py: 1.5,
                     fontWeight: 700,
@@ -140,7 +151,7 @@ export function SignInForm({
                     },
                 }}
             >
-                Sign in
+                {isSubmitting ? 'Signing in…' : 'Sign in'}
             </Button>
         </Box>
     );

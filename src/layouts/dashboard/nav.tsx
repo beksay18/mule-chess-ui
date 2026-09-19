@@ -1,11 +1,12 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
 
 import { useEffect } from 'react';
-import { varAlpha } from 'minimal-shared/utils';
-
 import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
-import { useTheme } from '@mui/material/styles';
+import Stack from '@mui/material/Stack';
+import { alpha, useTheme } from '@mui/material/styles';
 import ListItemButton from '@mui/material/ListItemButton';
 import Drawer, { drawerClasses } from '@mui/material/Drawer';
 
@@ -16,6 +17,14 @@ import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import type { NavItem } from '../nav-config-dashboard';
+
+const BRAND_BLUE = '#175195';
+const NAV_BG = '#f6f8fb';
+
+const navSurfaceSx = {
+    bgcolor: NAV_BG,
+    borderRight: `1px solid ${alpha(BRAND_BLUE, 0.08)}`,
+};
 
 // ----------------------------------------------------------------------
 
@@ -49,7 +58,7 @@ export function NavDesktop({
         flexDirection: 'column',
         zIndex: 'var(--layout-nav-zIndex)',
         width: 'var(--layout-nav-vertical-width)',
-        borderRight: `1px solid ${varAlpha(theme.vars.palette.grey['500Channel'], 0.12)}`,
+        ...navSurfaceSx,
         [theme.breakpoints.up(layoutQuery)]: {
           display: 'flex',
         },
@@ -89,6 +98,8 @@ export function NavMobile({
           px: 2.5,
           overflow: 'unset',
           width: 'var(--layout-nav-mobile-width)',
+          ...navSurfaceSx,
+          borderRight: 'none',
           ...sx,
         },
       }}
@@ -105,8 +116,39 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
 
   return (
     <>
-      <Logo />
-        <br/>
+      <Box sx={{ mb: 2.5 }}>
+        <Stack direction="row" alignItems="center" gap={1.5}>
+          <Logo
+            sx={{
+              flex: 1,
+              minWidth: 0,
+              '& img': {
+                width: '100%',
+                maxWidth: 'none',
+                height: 42,
+                objectFit: 'contain',
+                objectPosition: 'left center',
+              },
+            }}
+          />
+          <Chip
+            label="Admin"
+            size="small"
+            sx={{
+              flexShrink: 0,
+              height: 24,
+              fontWeight: 700,
+              fontSize: '0.6875rem',
+              letterSpacing: '0.04em',
+              bgcolor: alpha(BRAND_BLUE, 0.1),
+              color: BRAND_BLUE,
+              border: `1px solid ${alpha(BRAND_BLUE, 0.18)}`,
+            }}
+          />
+        </Stack>
+
+        <Divider sx={{ mt: 2.5, borderColor: alpha(BRAND_BLUE, 0.1) }} />
+      </Box>
 
       {slots?.topArea}
 
@@ -139,27 +181,33 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
                     disableGutters
                     component={RouterLink}
                     href={item.path}
-                    sx={[
-                      (theme) => ({
-                        pl: 2,
+                    sx={{
+                        pl: 1.75,
                         py: 1,
-                        gap: 2,
+                        gap: 1.5,
                         pr: 1.5,
-                        borderRadius: 0.75,
+                        borderRadius: 2,
                         typography: 'body2',
-                        fontWeight: 'fontWeightMedium',
-                        color: theme.vars.palette.text.secondary,
+                        fontWeight: isActived ? 700 : 500,
+                        color: isActived ? BRAND_BLUE : 'text.secondary',
                         minHeight: 44,
-                        ...(isActived && {
-                          fontWeight: 'fontWeightSemiBold',
-                          color: theme.vars.palette.primary.main,
-                          bgcolor: varAlpha(theme.vars.palette.primary.mainChannel, 0.08),
-                          '&:hover': {
-                            bgcolor: varAlpha(theme.vars.palette.primary.mainChannel, 0.16),
-                          },
-                        }),
-                      }),
-                    ]}
+                        border: '1px solid transparent',
+                        transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+                        ...(isActived
+                            ? {
+                                  bgcolor: '#ffffff',
+                                  borderColor: alpha(BRAND_BLUE, 0.12),
+                                  boxShadow: `0 2px 8px ${alpha(BRAND_BLUE, 0.08)}`,
+                                  '&:hover': {
+                                      bgcolor: '#ffffff',
+                                  },
+                              }
+                            : {
+                                  '&:hover': {
+                                      bgcolor: alpha(BRAND_BLUE, 0.06),
+                                  },
+                              }),
+                    }}
                   >
                     <Box component="span" sx={{ width: 24, height: 24 }}>
                       {item.icon}

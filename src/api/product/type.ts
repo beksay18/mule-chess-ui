@@ -23,6 +23,7 @@ export interface ProductRequest {
     maxWidth: number;
     maxHeight: number;
     maxQuantity: number;
+    position?: number | null;
 }
 
 export interface Product {
@@ -39,4 +40,13 @@ export interface Product {
     maxWidth: number;
     maxHeight: number;
     maxQuantity: number;
+    position: number | null;
+}
+
+export function sortProductsByPosition<T extends { position?: number | null }>(items: T[]): T[] {
+    return [...items].sort((a, b) => {
+        const posA = a.position ?? Number.MAX_SAFE_INTEGER;
+        const posB = b.position ?? Number.MAX_SAFE_INTEGER;
+        return posA - posB;
+    });
 }

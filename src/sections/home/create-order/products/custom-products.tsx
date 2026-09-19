@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { useEffect, useState } from 'react';
-import { getActiveProducts, Product } from '../../../../api/product';
+import { getActiveProducts, Product, sortProductsByPosition } from '../../../../api/product';
 import { useParams } from 'react-router-dom';
 import CustomProductTitle from './custom-product-title';
 import { useRouter } from '../../../../routes/hooks';
@@ -23,7 +23,7 @@ export default function CustomProducts() {
 
     const loadProductsByType = async (id: number) => {
         const data = await getActiveProducts(id);
-        setCustomProducts(data);
+        setCustomProducts(sortProductsByPosition(data));
     };
 
     const handleProductClick = (productId: number) => {

@@ -2,6 +2,8 @@ import {GoogleSignInRequest, MessageResponse, SignInRequest, SignInResponse, Sig
 import { axios } from "../http";
 import { ENDPOINTS } from "../constant";
 
+const skipAuthHeader = { headers: { 'x-skip-auth': 'true' } };
+
 export const signIn = (
     payload: SignInRequest
 ): Promise<SignInResponse> =>
@@ -9,7 +11,7 @@ export const signIn = (
         .postWithRetries<SignInResponse, SignInRequest>(
             ENDPOINTS.AUTH.SIGN_IN,
             payload,
-            undefined
+            skipAuthHeader
         )
         .then(({ data }) => data);
 
@@ -20,7 +22,7 @@ export const signUp = (
         .postWithRetries<MessageResponse, SignUpRequest>(
             ENDPOINTS.AUTH.SIGN_UP,
             payload,
-            undefined
+            skipAuthHeader
         )
         .then(({ data }) => data);
 
@@ -31,6 +33,6 @@ export const loginWithGoogle = (
         .postWithRetries<SignInResponse, GoogleSignInRequest>(
             ENDPOINTS.AUTH.LOGIN_WITH_GOOGLE,
             payload,
-            undefined
+            skipAuthHeader
         )
         .then(({ data }) => data);

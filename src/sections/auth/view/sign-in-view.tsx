@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
@@ -31,9 +32,12 @@ export function SignInView() {
     const theme = useTheme();
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleSignIn = useCallback(
         async (username: string, password: string) => {
+            setErrorMessage('');
+            setIsSubmitting(true);
             try {
                 const res = await signIn({ username, password });
 
@@ -48,9 +52,12 @@ export function SignInView() {
                 router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
             } catch (error: any) {
                 const message =
-                    error?.response?.data?.message || 'Sign-in failed. Please try again.';
+                    error?.response?.data?.message ||
+                    'Incorrect email or password. Please try again.';
                 setErrorMessage(message);
                 console.error('Sign-in failed:', error);
+            } finally {
+                setIsSubmitting(false);
             }
         },
         [router]
@@ -109,18 +116,17 @@ export function SignInView() {
                             boxShadow: `0 8px 32px ${alpha(BRAND_BLUE, 0.08)}`,
                         }}
                     >
-                        <SignInForm onSubmit={handleSignIn} />
-
                         {errorMessage && (
-                            <Typography
-                                variant="body2"
-                                color="error"
-                                textAlign="center"
-                                sx={{ mt: 2 }}
-                            >
+                            <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
                                 {errorMessage}
-                            </Typography>
+                            </Alert>
                         )}
+
+                        <SignInForm
+                            onSubmit={handleSignIn}
+                            isSubmitting={isSubmitting}
+                            onClearError={() => setErrorMessage('')}
+                        />
 
                         <Divider sx={{ my: 3 }}>
                             <Typography

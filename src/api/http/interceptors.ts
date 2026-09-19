@@ -24,12 +24,22 @@ export const requestInterceptor = (
 
 export const responseInterceptor = (res: AxiosResponse): AxiosResponse => res;
 
+const AUTH_ENDPOINTS = ['/auth/signin', '/auth/signup', '/auth/login-with-google'];
+
+function isAuthRequest(url?: string) {
+    if (!url) {
+        return false;
+    }
+    return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+}
+
 export const responseErrorInterceptor = (error: AxiosError): Promise<never> => {
     const status = error.response?.status;
+    const requestUrl = error.config?.url;
 
-    if (status === 401 || status === 403) {
+    if ((status === 401 || status === 403) && !isAuthRequest(requestUrl)) {
         SessionStorage.clear();
-        window.location.href = "/";
+        window.location.href = '/sign-in';
     }
 
     return Promise.reject(error);

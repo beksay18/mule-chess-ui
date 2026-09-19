@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useEffect, useState } from 'react';
-import { getActiveProducts, Product } from '../../api/product';
+import { getActiveProducts, Product, sortProductsByPosition } from '../../api/product';
 import { getActiveProductTypes } from '../../api/productType';
 import { useRouter } from '../../routes/hooks';
 
@@ -35,7 +35,9 @@ export default function HomeProducts() {
             featuredTypes.map((type) => getActiveProducts(type.id))
         );
 
-        setProducts(productLists.flat());
+        setProducts(
+            productLists.flatMap((list) => sortProductsByPosition(list))
+        );
     };
 
     const handleProductClick = (productId: number) => {
