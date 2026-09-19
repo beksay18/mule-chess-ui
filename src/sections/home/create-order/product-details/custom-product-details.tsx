@@ -196,6 +196,27 @@ export default function CustomProductDetails() {
                                 >
                                     Next: Upload Artwork
                                 </LoadingButton>
+                                <LoadingButton
+                                    variant="outlined"
+                                    onClick={() => router.push(`/sticker-builder?productId=${customProduct?.id || ''}`)}
+                                    sx={{
+                                        mt: 1.25,
+                                        py: 1.4,
+                                        fontWeight: 'bold',
+                                        fontSize: '1rem',
+                                        borderRadius: 2,
+                                        borderColor: '#175195',
+                                        color: '#175195',
+                                        textTransform: 'none',
+                                        '&:hover': {
+                                            borderColor: '#06853D',
+                                            color: '#06853D',
+                                        },
+                                    }}
+                                    fullWidth
+                                >
+                                    Design online instead
+                                </LoadingButton>
                             </CardContent>
                         </Card>
                     </Box>

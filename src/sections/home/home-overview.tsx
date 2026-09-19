@@ -14,7 +14,7 @@ const BRAND_BLUE = '#175195';
 
 const STEPS = [
     { icon: PaletteOutlinedIcon, title: 'Choose a style', desc: 'Pick from our sticker options' },
-    { icon: UploadOutlinedIcon, title: 'Upload artwork', desc: 'Design it your way online' },
+    { icon: UploadOutlinedIcon, title: 'Design or upload', desc: 'Build online or send artwork' },
     { icon: LocalPrintshopOutlinedIcon, title: 'We print & ship', desc: 'Quality stickers delivered' },
 ] as const;
 
@@ -23,10 +23,6 @@ export default function HomeOverview() {
     const theme = useTheme();
 
     const headerImage = '/assets/images/home-products/cg-sticker-house.png';
-
-    const scrollToProducts = () => {
-        document.getElementById('home-products')?.scrollIntoView({ behavior: 'smooth' });
-    };
 
     return (
         <Box
@@ -145,7 +141,7 @@ export default function HomeOverview() {
                                 variant="contained"
                                 size="large"
                                 endIcon={<ArrowForwardIcon />}
-                                onClick={scrollToProducts}
+                                onClick={() => router.push('/sticker-builder')}
                                 sx={{
                                     px: 4,
                                     py: 1.6,

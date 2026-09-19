@@ -117,17 +117,24 @@ export default function CartPage() {
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                                 <Avatar
                                                     variant="rounded"
-                                                    src={item.imageUrl ? `${baseImageUrl}${item.imageUrl}` : undefined}
+                                                    src={
+                                                        item.previewUrl ||
+                                                        (item.imageUrl?.startsWith('data:')
+                                                            ? item.imageUrl
+                                                            : item.imageUrl
+                                                              ? `${baseImageUrl}${item.imageUrl}`
+                                                              : undefined)
+                                                    }
                                                     sx={{
                                                         width: 70,
                                                         height: 70,
                                                         flexShrink: 0,
-                                                        bgcolor: item.imageUrl ? 'transparent' : 'primary.main',
+                                                        bgcolor: item.previewUrl || item.imageUrl ? 'transparent' : 'primary.main',
                                                         fontSize: 20,
                                                         fontWeight: 'bold',
                                                     }}
                                                 >
-                                                    {!item.imageUrl && item.name.charAt(0)}
+                                                    {!item.previewUrl && !item.imageUrl && item.name.charAt(0)}
                                                 </Avatar>
 
                                                 <Box>
@@ -135,7 +142,20 @@ export default function CartPage() {
                                                     <Typography variant="body2">
                                                         {item.width}&quot; × {item.height}&quot;
                                                     </Typography>
-                                                    <Typography variant="body2">{item.lamination}</Typography>
+                                                    <Typography variant="body2" sx={{ textTransform: 'capitalize' }}>
+                                                        {[item.material, item.lamination || item.finish, item.cutType]
+                                                            .filter(Boolean)
+                                                            .join(' · ')}
+                                                    </Typography>
+                                                    {item.designId && (
+                                                        <Typography
+                                                            variant="body2"
+                                                            sx={{ color: '#175195', cursor: 'pointer', fontWeight: 600 }}
+                                                            onClick={() => router.push(`/sticker-builder?design=${item.designId}`)}
+                                                        >
+                                                            Edit design
+                                                        </Typography>
+                                                    )}
                                                 </Box>
                                             </Box>
                                         </TableCell>

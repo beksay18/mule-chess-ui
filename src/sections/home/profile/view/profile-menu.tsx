@@ -5,6 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LocalShippingOutlinedIcon from '@mui/icons-material/LocalShippingOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import { alpha, useTheme } from '@mui/material/styles';
 import { NavLink, useLocation } from 'react-router-dom';
 import { getCurrentUser } from '../../../../api';
@@ -23,6 +24,12 @@ const menuItems = [
         description: 'Track your sticker orders',
         path: '/my-orders',
         icon: ReceiptLongOutlinedIcon,
+    },
+    {
+        label: 'My Designs',
+        description: 'Saved sticker builder files',
+        path: '/my-designs',
+        icon: PaletteOutlinedIcon,
     },
     {
         label: 'Shipping',

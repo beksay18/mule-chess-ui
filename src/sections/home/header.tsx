@@ -131,6 +131,9 @@ export default function Header() {
                             <Button sx={navLinkSx} onClick={scrollToProducts}>
                                 Shop Stickers
                             </Button>
+                            <Button sx={navLinkSx} onClick={() => router.push('/sticker-builder')}>
+                                Sticker Builder
+                            </Button>
 
                             <Button sx={navLinkSx} onClick={() => router.push('/for-business')}>
                                 For Businesses
@@ -275,6 +278,12 @@ export default function Header() {
                         Shop Stickers
                     </MenuItem>
                     <MenuItem
+                        onClick={() => handleNavigate('/sticker-builder')}
+                        sx={{ borderRadius: 1.5, fontWeight: 500 }}
+                    >
+                        Sticker Builder
+                    </MenuItem>
+                    <MenuItem
                         onClick={() => handleNavigate('/for-business')}
                         sx={{ borderRadius: 1.5, fontWeight: 500 }}
                     >
@@ -294,6 +303,7 @@ export default function Header() {
                             </Box>
                             <MenuItem onClick={() => handleNavigate('/profile')}>Profile</MenuItem>
                             <MenuItem onClick={() => handleNavigate('/my-orders')}>My Orders</MenuItem>
+                            <MenuItem onClick={() => handleNavigate('/my-designs')}>My Designs</MenuItem>
                             {user.role === 'ROLE_ADMIN' && (
                                 <MenuItem onClick={() => handleNavigate('/dashboard')}>Dashboard</MenuItem>
                             )}
@@ -386,6 +396,7 @@ export default function Header() {
                 >
                     <MenuItem onClick={() => handleNavigate('/profile')}>Profile</MenuItem>
                     <MenuItem onClick={() => handleNavigate('/my-orders')}>My Orders</MenuItem>
+                    <MenuItem onClick={() => handleNavigate('/my-designs')}>My Designs</MenuItem>
                     <MenuItem onClick={() => handleNavigate('/my-shipping-addresses')}>
                         Shipping Addresses
                     </MenuItem>

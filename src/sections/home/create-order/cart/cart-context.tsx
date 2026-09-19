@@ -18,6 +18,12 @@ export interface CartItem {
     customDimension: boolean;
     lamination: string;
     imageUrl?: string;
+    previewUrl?: string;
+    material?: string;
+    finish?: string;
+    cutType?: string;
+    designId?: string;
+    designJson?: string;
     discountTiers?: { quantity: number; percentage: number }[];
     artworkFiles?: File[];
     serializedArtworkFiles?: SerializedFile[];
