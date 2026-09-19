@@ -5,6 +5,8 @@ import Drawer from '@mui/material/Drawer';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 
+import type { Product } from 'src/api/product';
+
 import type { StickerBuilderApi } from '../hooks/use-sticker-builder';
 import { LayersPanel } from './layers-panel';
 import { LeftSidebar } from './left-sidebar';
@@ -17,9 +19,12 @@ type MobileTab = 'add' | 'edit' | 'layers' | 'specs' | 'preview';
 type MobileControlsProps = {
     api: StickerBuilderApi;
     previewUrl: string;
+    products: Product[];
+    product: Product | null;
+    onProductChange: (product: Product) => void;
 };
 
-export function MobileControls({ api, previewUrl }: MobileControlsProps) {
+export function MobileControls({ api, previewUrl, products, product, onProductChange }: MobileControlsProps) {
     const [tab, setTab] = useState<MobileTab | null>(null);
 
     return (
@@ -67,7 +72,12 @@ export function MobileControls({ api, previewUrl }: MobileControlsProps) {
                 )}
                 {tab === 'specs' && (
                     <Box sx={{ p: 2 }}>
-                        <SpecsPanel api={api} />
+                        <SpecsPanel
+                            api={api}
+                            products={products}
+                            product={product}
+                            onProductChange={onProductChange}
+                        />
                     </Box>
                 )}
                 {tab === 'preview' && (

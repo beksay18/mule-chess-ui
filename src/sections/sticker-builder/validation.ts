@@ -1,6 +1,8 @@
 import type { DesignElement, StickerDesign, ValidationResult } from './types';
 
 import { STICKER_BORDER, PRINT_SAFE_INSET } from './constants';
+import type { ProductLimits } from './product-limits';
+import { getSizeInches } from './utils';
 
 function isInsidePrintableArea(element: DesignElement, design: StickerDesign): boolean {
     const inset = STICKER_BORDER + PRINT_SAFE_INSET;
@@ -17,7 +19,11 @@ function isInsidePrintableArea(element: DesignElement, design: StickerDesign): b
     );
 }
 
-export function validateDesign(design: StickerDesign): ValidationResult {
+export function validateDesign(
+    design: StickerDesign,
+    limits?: ProductLimits | null,
+    options?: { requireQr?: boolean }
+): ValidationResult {
     const issues: ValidationResult['issues'] = [];
 
     if (!design.elements.length) {
@@ -35,6 +41,32 @@ export function validateDesign(design: StickerDesign): ValidationResult {
         });
     }
 
+    const inches = getSizeInches(design.sticker);
+    const maxWidth = limits?.maxWidth;
+    const maxHeight = limits?.maxHeight;
+    const maxQuantity = limits?.maxQuantity;
+
+    if (inches.width < 0.5 || inches.height < 0.5) {
+        issues.push({
+            code: 'size',
+            message: 'Size must be at least 0.5" on each side.',
+        });
+    }
+
+    if (maxWidth && inches.width > maxWidth) {
+        issues.push({
+            code: 'max-width',
+            message: `Width cannot exceed ${maxWidth}" for this product.`,
+        });
+    }
+
+    if (maxHeight && inches.height > maxHeight) {
+        issues.push({
+            code: 'max-height',
+            message: `Height cannot exceed ${maxHeight}" for this product.`,
+        });
+    }
+
     if (design.sticker.quantity < 1) {
         issues.push({
             code: 'quantity',
@@ -42,15 +74,21 @@ export function validateDesign(design: StickerDesign): ValidationResult {
         });
     }
 
-    const inches = {
-        width: design.sticker.size === 'custom' ? design.sticker.customWidth || 0 : 1,
-        height: design.sticker.size === 'custom' ? design.sticker.customHeight || 0 : 1,
-    };
-    if (design.sticker.size === 'custom' && (inches.width < 0.5 || inches.height < 0.5)) {
+    if (maxQuantity && design.sticker.quantity > maxQuantity) {
         issues.push({
-            code: 'size',
-            message: 'Custom size must be at least 0.5" on each side.',
+            code: 'max-quantity',
+            message: `Quantity cannot exceed ${maxQuantity} for this product.`,
         });
+    }
+
+    if (options?.requireQr) {
+        const hasQr = design.elements.some((element) => element.type === 'image' && element.purpose === 'qr');
+        if (!design.sticker.qrUrl?.trim() || !hasQr) {
+            issues.push({
+                code: 'qr-url',
+                message: 'Add a link to generate the QR code next to this sticker.',
+            });
+        }
     }
 
     return {

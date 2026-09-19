@@ -1,34 +1,122 @@
+import { useEffect, useState } from 'react';
+
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
-import type { StickerShape, StickerFinish, StickerSizeId, CustomShapeKind, StickerMaterial } from '../types';
+import type { Product } from 'src/api/product';
+
+import type { StickerShape, StickerFinish, CustomShapeKind, StickerMaterial } from '../types';
 import type { StickerBuilderApi } from '../hooks/use-sticker-builder';
 
-import {
-    SIZE_OPTIONS,
-    SHAPE_OPTIONS,
-    FINISH_OPTIONS,
-    MATERIAL_OPTIONS,
-    QUANTITY_OPTIONS,
-    CUSTOM_SHAPE_OPTIONS,
-} from '../constants';
+import { SHAPE_OPTIONS, FINISH_OPTIONS, MATERIAL_OPTIONS, CUSTOM_SHAPE_OPTIONS } from '../constants';
+import { sizeIdForDimension, getAllowedDimensions, getAllowedQuantities } from '../product-limits';
+import { isQrCodeProduct } from '../qr';
+import { getSizeInches } from '../utils';
 
 type SpecsPanelProps = {
     api: StickerBuilderApi;
+    products: Product[];
+    product: Product | null;
+    onProductChange: (product: Product) => void;
 };
 
-export function SpecsPanel({ api }: SpecsPanelProps) {
-    const { design, updateSticker, price } = api;
+export function SpecsPanel({ api, products, product, onProductChange }: SpecsPanelProps) {
+    const { design, updateSticker, applyQrLink, price, limits } = api;
     const { sticker } = design;
+    const inches = getSizeInches(sticker);
+    const dimensions = getAllowedDimensions(limits);
+    const quantities = getAllowedQuantities(limits);
+    const maxWidth = limits?.maxWidth ?? 12;
+    const maxHeight = limits?.maxHeight ?? 12;
+    const maxQuantity = limits?.maxQuantity ?? 1000;
+    const showQrField = isQrCodeProduct(product);
+
+    const [useCustomQuantity, setUseCustomQuantity] = useState(() => !quantities.includes(sticker.quantity));
+    const [qrDraft, setQrDraft] = useState(sticker.qrUrl || '');
+    const [qrError, setQrError] = useState('');
+    const [qrBusy, setQrBusy] = useState(false);
+    const matchingPreset = dimensions.find(
+        (dimension) => dimension.width === inches.width && dimension.height === inches.height
+    );
+    const sizeValue = sticker.size === 'custom' || !matchingPreset ? 'custom' : `${matchingPreset.width}x${matchingPreset.height}`;
+    const quantityIsPreset = quantities.includes(sticker.quantity) && !useCustomQuantity;
+    const quantityValue = quantityIsPreset ? String(sticker.quantity) : 'custom';
+
+    useEffect(() => {
+        setQrDraft(sticker.qrUrl || '');
+        setQrError('');
+    }, [product?.id, sticker.qrUrl]);
+
+    const handleApplyQr = async () => {
+        setQrBusy(true);
+        setQrError('');
+        try {
+            await applyQrLink(qrDraft);
+        } catch (error) {
+            setQrError(error instanceof Error ? error.message : 'Could not generate that QR code.');
+        } finally {
+            setQrBusy(false);
+        }
+    };
 
     return (
         <Stack spacing={2}>
             <Typography variant="subtitle2" fontWeight={700}>
                 Sticker specs
             </Typography>
+            {products.length > 0 && (
+                <TextField
+                    select
+                    size="small"
+                    label="Sticker type"
+                    value={product?.id ?? ''}
+                    onChange={(event) => {
+                        const next = products.find((item) => item.id === Number(event.target.value));
+                        if (next) onProductChange(next);
+                    }}
+                >
+                    {products.map((item) => (
+                        <MenuItem key={item.id} value={item.id}>
+                            {item.name}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            )}
+            {showQrField && (
+                <Stack spacing={1}>
+                    <TextField
+                        size="small"
+                        label="QR link"
+                        placeholder="https://your-site.com"
+                        value={qrDraft}
+                        error={Boolean(qrError)}
+                        helperText={qrError || 'This link becomes a QR code next to your sticker.'}
+                        onChange={(event) => {
+                            setQrDraft(event.target.value);
+                            setQrError('');
+                        }}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                                event.preventDefault();
+                                void handleApplyQr();
+                            }
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        size="small"
+                        disabled={qrBusy || !qrDraft.trim()}
+                        onClick={() => void handleApplyQr()}
+                        sx={{ textTransform: 'none', fontWeight: 700 }}
+                    >
+                        {sticker.qrUrl ? 'Update QR code' : 'Add QR next to sticker'}
+                    </Button>
+                </Stack>
+            )}
             <TextField
                 select
                 size="small"
@@ -61,32 +149,63 @@ export function SpecsPanel({ api }: SpecsPanelProps) {
                 select
                 size="small"
                 label="Size"
-                value={sticker.size}
-                onChange={(event) => updateSticker({ size: event.target.value as StickerSizeId })}
+                value={sizeValue}
+                onChange={(event) => {
+                    const value = event.target.value;
+                    if (value === 'custom') {
+                        updateSticker({
+                            size: 'custom',
+                            customWidth: Math.min(inches.width, maxWidth),
+                            customHeight: Math.min(inches.height, maxHeight),
+                        });
+                        return;
+                    }
+                    const [width, height] = value.split('x').map(Number);
+                    updateSticker({
+                        size: sizeIdForDimension(width, height),
+                        customWidth: width,
+                        customHeight: height,
+                    });
+                }}
             >
-                {SIZE_OPTIONS.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                        {option.label}
+                {dimensions.map((dimension) => (
+                    <MenuItem key={`${dimension.width}x${dimension.height}`} value={`${dimension.width}x${dimension.height}`}>
+                        {dimension.width}&quot; × {dimension.height}&quot;
                     </MenuItem>
                 ))}
+                <MenuItem value="custom">Custom</MenuItem>
             </TextField>
-            {sticker.size === 'custom' && (
+            {sizeValue === 'custom' && (
                 <Stack direction="row" spacing={1}>
                     <TextField
                         size="small"
                         type="number"
-                        label='Width "'
-                        value={sticker.customWidth ?? 3}
-                        inputProps={{ min: 0.5, max: 12, step: 0.25 }}
-                        onChange={(event) => updateSticker({ customWidth: Number(event.target.value) })}
+                        label="Width (in)"
+                        value={sticker.customWidth ?? inches.width}
+                        inputProps={{ min: 0.5, max: maxWidth, step: 0.25 }}
+                        error={(sticker.customWidth ?? inches.width) > maxWidth}
+                        helperText={`Max should be ${maxWidth}"`}
+                        onChange={(event) =>
+                            updateSticker({
+                                size: 'custom',
+                                customWidth: Number(event.target.value),
+                            })
+                        }
                     />
                     <TextField
                         size="small"
                         type="number"
-                        label='Height "'
-                        value={sticker.customHeight ?? 3}
-                        inputProps={{ min: 0.5, max: 12, step: 0.25 }}
-                        onChange={(event) => updateSticker({ customHeight: Number(event.target.value) })}
+                        label="Height (in)"
+                        value={sticker.customHeight ?? inches.height}
+                        inputProps={{ min: 0.5, max: maxHeight, step: 0.25 }}
+                        error={(sticker.customHeight ?? inches.height) > maxHeight}
+                        helperText={`Max should be ${maxHeight}"`}
+                        onChange={(event) =>
+                            updateSticker({
+                                size: 'custom',
+                                customHeight: Number(event.target.value),
+                            })
+                        }
                     />
                 </Stack>
             )}
@@ -94,15 +213,39 @@ export function SpecsPanel({ api }: SpecsPanelProps) {
                 select
                 size="small"
                 label="Quantity"
-                value={sticker.quantity}
-                onChange={(event) => updateSticker({ quantity: Number(event.target.value) })}
+                value={quantityValue}
+                onChange={(event) => {
+                    const value = event.target.value;
+                    if (value === 'custom') {
+                        setUseCustomQuantity(true);
+                        updateSticker({ quantity: Math.min(sticker.quantity || 1, maxQuantity) });
+                        return;
+                    }
+                    setUseCustomQuantity(false);
+                    updateSticker({ quantity: Number(value) });
+                }}
             >
-                {QUANTITY_OPTIONS.map((quantity) => (
-                    <MenuItem key={quantity} value={quantity}>
+                {quantities.map((quantity) => (
+                    <MenuItem key={quantity} value={String(quantity)}>
                         {quantity}
                     </MenuItem>
                 ))}
+                <MenuItem value="custom">Custom</MenuItem>
             </TextField>
+            {!quantityIsPreset && (
+                <Stack spacing={0.5}>
+                    <TextField
+                        size="small"
+                        type="number"
+                        label="Custom quantity"
+                        value={sticker.quantity}
+                        inputProps={{ min: 1, max: maxQuantity, step: 1 }}
+                        error={sticker.quantity > maxQuantity}
+                        helperText={`Max should be ${maxQuantity}`}
+                        onChange={(event) => updateSticker({ quantity: Number(event.target.value) })}
+                    />
+                </Stack>
+            )}
             <TextField
                 select
                 size="small"

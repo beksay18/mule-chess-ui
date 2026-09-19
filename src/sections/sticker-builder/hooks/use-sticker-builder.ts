@@ -1,4 +1,6 @@
-import { useRef, useMemo, useState, useCallback } from 'react';
+import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+
+import type { Product } from 'src/api/product';
 
 import type {
     AlignMode,
@@ -10,6 +12,7 @@ import type {
 } from '../types';
 
 import { GRID_SIZE } from '../constants';
+import { getProductLimits, clampDesignToProduct } from '../product-limits';
 import { calculatePrice } from '../pricing';
 import { renderDesignPreview } from '../renderer';
 import {
@@ -21,6 +24,7 @@ import {
     duplicateSavedDesign,
 } from '../storage';
 import {
+    clamp,
     nowIso,
     snapValue,
     cloneDesign,
@@ -31,10 +35,12 @@ import {
     createIconElement,
     createTextElement,
     createEmojiElement,
+    createQrElement,
     createImageElement,
     createShapeElement,
     removeImageBackground,
 } from '../utils';
+import { findQrElement, generateQrDataUrl, getQrPlacement, isQrCodeProduct, isValidQrUrl, normalizeQrUrl } from '../qr';
 import { validateDesign } from '../validation';
 
 
@@ -44,7 +50,7 @@ function snapshotOf(design: StickerDesign): StickerDesign {
     return cloneDesign(design);
 }
 
-export function useStickerBuilder(initialDesignId?: string) {
+export function useStickerBuilder(initialDesignId?: string, product: Product | null = null) {
     const [design, setDesign] = useState<StickerDesign>(() => {
         if (initialDesignId) {
             const saved = getSavedDesign(initialDesignId);
@@ -67,8 +73,17 @@ export function useStickerBuilder(initialDesignId?: string) {
         [design.elements, selectedId]
     );
 
-    const price = useMemo(() => calculatePrice(design.sticker), [design.sticker]);
-    const validation = useMemo(() => validateDesign(design), [design]);
+    const limits = useMemo(() => getProductLimits(product), [product]);
+    const price = useMemo(() => calculatePrice(design.sticker, product), [design.sticker, product]);
+    const validation = useMemo(
+        () => validateDesign(design, limits, { requireQr: isQrCodeProduct(product) }),
+        [design, limits, product]
+    );
+
+    useEffect(() => {
+        if (!product) return;
+        setDesign((current) => clampDesignToProduct(current, product));
+    }, [product]);
 
     const bumpHistory = () => setHistoryTick((value) => value + 1);
 
@@ -149,6 +164,71 @@ export function useStickerBuilder(initialDesignId?: string) {
             addElement(createImageElement(image.src, design.width, design.height, image.width, image.height));
         },
         [addElement, design.height, design.width]
+    );
+
+    const applyQrLink = useCallback(
+        async (rawUrl: string) => {
+            const url = normalizeQrUrl(rawUrl);
+            if (!isValidQrUrl(url)) {
+                throw new Error('Enter a valid link for the QR code.');
+            }
+
+            const src = await generateQrDataUrl(url);
+            const existing = findQrElement(design);
+
+            if (existing) {
+                commit((current) => ({
+                    ...current,
+                    sticker: { ...current.sticker, qrUrl: url },
+                    elements: current.elements.map((element) =>
+                        element.id === existing.id
+                            ? {
+                                  ...element,
+                                  src,
+                                  qrUrl: url,
+                                  purpose: 'qr',
+                                  processedSrc: undefined,
+                                  backgroundRemoved: false,
+                              }
+                            : element
+                    ),
+                }));
+                setSelectedId(existing.id);
+                return existing.id;
+            }
+
+            const placement = getQrPlacement(design);
+            const qr = createQrElement(src, url, placement.x, placement.y, placement.size);
+            commit((current) => {
+                if (findQrElement(current)) {
+                    return {
+                        ...current,
+                        sticker: { ...current.sticker, qrUrl: url },
+                        elements: current.elements.map((element) =>
+                            element.type === 'image' && element.purpose === 'qr'
+                                ? { ...element, src, qrUrl: url, processedSrc: undefined, backgroundRemoved: false }
+                                : element
+                        ),
+                    };
+                }
+
+                return {
+                    ...current,
+                    sticker: { ...current.sticker, qrUrl: url },
+                    elements: [
+                        ...current.elements.map((element) => ({
+                            ...element,
+                            x: element.x + placement.shift.dx,
+                            y: element.y + placement.shift.dy,
+                        })),
+                        qr,
+                    ],
+                };
+            });
+            setSelectedId(qr.id);
+            return qr.id;
+        },
+        [commit, design]
     );
 
     const updateElement = useCallback(
@@ -256,6 +336,16 @@ export function useStickerBuilder(initialDesignId?: string) {
         (patch: Partial<StickerSpec>) => {
             commit((current) => {
                 const sticker = { ...current.sticker, ...patch };
+                const maxWidth = limits?.maxWidth ?? 12;
+                const maxHeight = limits?.maxHeight ?? 12;
+                const maxQuantity = limits?.maxQuantity ?? 1000;
+                if (sticker.customWidth != null) {
+                    sticker.customWidth = clamp(sticker.customWidth, 0.5, maxWidth);
+                }
+                if (sticker.customHeight != null) {
+                    sticker.customHeight = clamp(sticker.customHeight, 0.5, maxHeight);
+                }
+                sticker.quantity = clamp(sticker.quantity, 1, maxQuantity);
                 let next = { ...current, sticker };
                 if (patch.size || patch.customWidth || patch.customHeight) {
                     next = applySizeToDesign({ ...next, sticker }, sticker.size);
@@ -267,7 +357,7 @@ export function useStickerBuilder(initialDesignId?: string) {
                 return next;
             });
         },
-        [commit]
+        [commit, limits]
     );
 
     const resetDesign = useCallback(() => {
@@ -389,6 +479,7 @@ export function useStickerBuilder(initialDesignId?: string) {
         editingTextId,
         setEditingTextId,
         savedDesigns,
+        limits,
         price,
         validation,
         canUndo: pastRef.current.length > 0,
@@ -399,6 +490,7 @@ export function useStickerBuilder(initialDesignId?: string) {
         addShape,
         addIcon,
         addImageFile,
+        applyQrLink,
         updateElement,
         updateSelected,
         deleteSelected,

@@ -50,7 +50,7 @@ export default function MyDesignsPage() {
             </Stack>
 
             {designs.length === 0 && (
-                <Typography color="text.secondary">No saved designs yet. Start one in the Sticker Builder.</Typography>
+                <Typography color="text.secondary">No saved designs yet. Start one in the CG Sticker House Builder.</Typography>
             )}
 
             <Box

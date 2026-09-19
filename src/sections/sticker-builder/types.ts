@@ -69,6 +69,8 @@ export interface ImageElement extends BaseElement {
     outlineWidth: number;
     backgroundRemoved: boolean;
     processedSrc?: string;
+    purpose?: 'qr';
+    qrUrl?: string;
 }
 
 export interface EmojiElement extends BaseElement {
@@ -101,6 +103,7 @@ export interface StickerSpec {
     material: StickerMaterial;
     finish: StickerFinish;
     quantity: number;
+    qrUrl?: string;
 }
 
 export interface StickerDesign {

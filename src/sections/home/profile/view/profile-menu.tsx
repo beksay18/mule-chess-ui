@@ -27,7 +27,7 @@ const menuItems = [
     },
     {
         label: 'My Designs',
-        description: 'Saved sticker builder files',
+        description: 'Saved CG Sticker House Builder files',
         path: '/my-designs',
         icon: PaletteOutlinedIcon,
     },

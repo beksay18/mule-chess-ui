@@ -1,3 +1,5 @@
+import type { Product } from 'src/api/product';
+
 import type { StickerSpec, PriceBreakdown } from './types';
 
 import { getSizeInches } from './utils';
@@ -45,29 +47,38 @@ function getCustomSizeBase(width: number, height: number): number {
     return Math.max(0.42, area * 0.21);
 }
 
-export function getQuantityDiscount(quantity: number): number {
-    const match = QUANTITY_DISCOUNTS.find((tier) => quantity >= tier.quantity);
+export function getQuantityDiscount(
+    quantity: number,
+    tiers?: { quantity: number; percentage: number }[]
+): number {
+    const source = [...(tiers?.length ? tiers : QUANTITY_DISCOUNTS)].sort(
+        (a, b) => b.quantity - a.quantity
+    );
+    const match = source.find((tier) => quantity >= tier.quantity);
     return match?.percentage ?? 0;
 }
 
-export function calculatePrice(sticker: StickerSpec): PriceBreakdown {
+export function calculatePrice(sticker: StickerSpec, product?: Product | null): PriceBreakdown {
     const sizeInches = getSizeInches(sticker);
-    const sizeBase =
-        sticker.size === 'custom'
-            ? getCustomSizeBase(sizeInches.width, sizeInches.height)
-            : SIZE_BASE[sticker.size] ?? getCustomSizeBase(sizeInches.width, sizeInches.height);
+    const sizeBase = product
+        ? product.price
+        : sticker.size === 'custom'
+          ? getCustomSizeBase(sizeInches.width, sizeInches.height)
+          : SIZE_BASE[sticker.size] ?? getCustomSizeBase(sizeInches.width, sizeInches.height);
 
     const unitPrice = Number(
         (
-            sizeBase *
-            MATERIAL_MULTIPLIER[sticker.material] *
-            FINISH_MULTIPLIER[sticker.finish] *
-            CUT_MULTIPLIER[sticker.shape]
+            product
+                ? sizeBase
+                : sizeBase *
+                  MATERIAL_MULTIPLIER[sticker.material] *
+                  FINISH_MULTIPLIER[sticker.finish] *
+                  CUT_MULTIPLIER[sticker.shape]
         ).toFixed(2)
     );
 
     const quantity = Math.max(1, sticker.quantity);
-    const discountPercent = getQuantityDiscount(quantity);
+    const discountPercent = getQuantityDiscount(quantity, product?.discounts);
     const subtotal = unitPrice * quantity;
     const total = subtotal * (1 - discountPercent / 100);
 

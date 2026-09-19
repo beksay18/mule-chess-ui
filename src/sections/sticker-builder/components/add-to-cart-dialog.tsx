@@ -82,6 +82,7 @@ export function AddToCartDialog({
                         <Spec label="Material" value={design.sticker.material} />
                         <Spec label="Finish" value={design.sticker.finish} />
                         <Spec label="Cut" value={design.sticker.shape} />
+                        {design.sticker.qrUrl && <Spec label="QR link" value={design.sticker.qrUrl} />}
                         <Spec label="Price" value={`$${price.total.toFixed(2)}`} />
                     </Box>
                 </Stack>

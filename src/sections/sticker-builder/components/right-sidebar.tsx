@@ -5,6 +5,8 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { alpha } from '@mui/material/styles';
 
+import type { Product } from 'src/api/product';
+
 import type { StickerBuilderApi } from '../hooks/use-sticker-builder';
 import { BRAND_BLUE } from '../constants';
 import { LayersPanel } from './layers-panel';
@@ -17,9 +19,12 @@ type RightTab = 'properties' | 'layers' | 'specs' | 'preview';
 type RightSidebarProps = {
     api: StickerBuilderApi;
     previewUrl: string;
+    products: Product[];
+    product: Product | null;
+    onProductChange: (product: Product) => void;
 };
 
-export function RightSidebar({ api, previewUrl }: RightSidebarProps) {
+export function RightSidebar({ api, previewUrl, products, product, onProductChange }: RightSidebarProps) {
     const [tab, setTab] = useState<RightTab>('properties');
 
     return (
@@ -57,7 +62,14 @@ export function RightSidebar({ api, previewUrl }: RightSidebarProps) {
             <Box sx={{ p: 2, overflow: 'auto', flex: 1 }}>
                 {tab === 'properties' && <PropertiesPanel api={api} />}
                 {tab === 'layers' && <LayersPanel api={api} />}
-                {tab === 'specs' && <SpecsPanel api={api} />}
+                {tab === 'specs' && (
+                    <SpecsPanel
+                        api={api}
+                        products={products}
+                        product={product}
+                        onProductChange={onProductChange}
+                    />
+                )}
                 {tab === 'preview' && <LivePreview previewUrl={previewUrl} design={api.design} />}
             </Box>
         </Box>

@@ -218,6 +218,29 @@ export function createImageElement(
     };
 }
 
+export function createQrElement(src: string, qrUrl: string, x: number, y: number, size: number): ImageElement {
+    return {
+        id: createId('qr'),
+        type: 'image',
+        name: 'QR code',
+        src,
+        qrUrl,
+        purpose: 'qr',
+        processedSrc: undefined,
+        backgroundRemoved: false,
+        crop: { top: 0, right: 0, bottom: 0, left: 0 },
+        outlineColor: '#ffffff',
+        outlineWidth: 0,
+        x,
+        y,
+        width: size,
+        height: size,
+        rotation: 0,
+        opacity: 1,
+        locked: false,
+    };
+}
+
 export function getElementCenter(element: DesignElement): { x: number; y: number } {
     return {
         x: element.x + element.width / 2,

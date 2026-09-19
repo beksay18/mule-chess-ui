@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 
-import { type Product, getProductById, getActiveProducts } from 'src/api/product';
+import { type Product, getActiveProducts, sortProductsByPosition } from 'src/api/product';
 import { getActiveProductTypes } from 'src/api/productType';
 import { useRouter } from 'src/routes/hooks';
 
@@ -29,15 +29,15 @@ import { StickerCanvas } from '../components/sticker-canvas';
 
 export function StickerBuilderView() {
     const router = useRouter();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const productId = searchParams.get('productId');
     const designId = searchParams.get('design');
     const { addItem } = useCart();
 
-    const api = useStickerBuilder(designId || undefined);
-    useKeyboardShortcuts(api);
-
+    const [products, setProducts] = useState<Product[]>([]);
     const [product, setProduct] = useState<Product | null>(null);
+    const api = useStickerBuilder(designId || undefined, product);
+    useKeyboardShortcuts(api);
     const [previewUrl, setPreviewUrl] = useState('');
     const [cartOpen, setCartOpen] = useState(false);
     const [designsOpen, setDesignsOpen] = useState(searchParams.get('panel') === 'designs');
@@ -58,27 +58,36 @@ export function StickerBuilderView() {
 
     useEffect(() => {
         let active = true;
-        const loadProduct = async () => {
+        const loadCatalog = async () => {
             try {
-                if (productId) {
-                    const found = await getProductById(Number(productId));
-                    if (active) setProduct(found);
-                    return;
-                }
-                const types = await getActiveProductTypes();
-                const firstType = types[0];
-                if (!firstType) return;
-                const products = await getActiveProducts(firstType.id);
-                if (active && products[0]) setProduct(products[0]);
+                const types = (await getActiveProductTypes()).filter((type) => type.position === 1);
+                const lists = await Promise.all(types.map((type) => getActiveProducts(type.id)));
+                const catalog = lists.flatMap((list) => sortProductsByPosition(list));
+                if (!active) return;
+                setProducts(catalog);
+                const fromUrl = productId ? catalog.find((item) => item.id === Number(productId)) : undefined;
+                setProduct(fromUrl || catalog[0] || null);
             } catch {
-                if (active) setProduct(null);
+                if (active) {
+                    setProducts([]);
+                    setProduct(null);
+                }
             }
         };
-        void loadProduct();
+        void loadCatalog();
         return () => {
             active = false;
         };
-    }, [productId]);
+        // Load the shop catalog once; productId is read only for the initial selection.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handleProductChange = (next: Product) => {
+        setProduct(next);
+        const params = new URLSearchParams(searchParams);
+        params.set('productId', String(next.id));
+        setSearchParams(params, { replace: true });
+    };
 
     const { design, generatePreview } = api;
 
@@ -137,6 +146,7 @@ export function StickerBuilderView() {
             cutType: api.design.sticker.shape,
             designId: api.design.id,
             designJson: exportDesignJson(api.design),
+            discountTiers: product?.discounts || [],
         });
         setCartOpen(false);
         router.push('/cart');
@@ -160,7 +170,7 @@ export function StickerBuilderView() {
                 <Button href="/" sx={{ textTransform: 'none', fontWeight: 700, color: BRAND_BLUE }}>
                     Back to shop
                 </Button>
-                <Typography fontWeight={800}>Sticker Builder</Typography>
+                <Typography fontWeight={800}>CG Sticker House Builder</Typography>
                 <Button href="/cart" sx={{ textTransform: 'none', fontWeight: 600, color: 'text.secondary' }}>
                     Cart
                 </Button>
@@ -178,7 +188,13 @@ export function StickerBuilderView() {
                 </Box>
                 <StickerCanvas api={api} />
                 <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-                    <RightSidebar api={api} previewUrl={previewUrl} />
+                    <RightSidebar
+                        api={api}
+                        previewUrl={previewUrl}
+                        products={products}
+                        product={product}
+                        onProductChange={handleProductChange}
+                    />
                 </Box>
             </Box>
 
@@ -199,8 +215,9 @@ export function StickerBuilderView() {
                         ${api.price.total.toFixed(2)}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" noWrap>
-                        {getSizeLabel(api.design.sticker)} · {api.design.sticker.quantity} · {api.design.sticker.material}{' '}
-                        · {api.design.sticker.finish}
+                        {[product?.name, getSizeLabel(api.design.sticker), api.design.sticker.quantity]
+                            .filter(Boolean)
+                            .join(' · ')}
                     </Typography>
                     {issue && (
                         <Typography variant="caption" color="warning.main" display="block">
@@ -230,7 +247,13 @@ export function StickerBuilderView() {
                 </Button>
             </Box>
 
-            <MobileControls api={api} previewUrl={previewUrl} />
+            <MobileControls
+                api={api}
+                previewUrl={previewUrl}
+                products={products}
+                product={product}
+                onProductChange={handleProductChange}
+            />
 
             <AddToCartDialog
                 open={cartOpen}
