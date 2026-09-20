@@ -121,7 +121,7 @@ export default function HomeOverview() {
                                     whiteSpace: 'nowrap',
                                 }}
                             >
-                                online for your brand
+                                your customers will keep
                             </Typography>
                         </Box>
 
@@ -132,8 +132,8 @@ export default function HomeOverview() {
                                 lineHeight: 1.75,
                             }}
                         >
-                            Build your sticker your way on our website — pick the size, shape,
-                            and finish, upload your artwork, and we&apos;ll print it for you.
+                            Set the size, cut, and finish, drop in your artwork, and we print
+                            and ship it. What you design is what shows up at the door.
                         </Typography>
 
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

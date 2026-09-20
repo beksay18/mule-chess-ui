@@ -89,63 +89,53 @@ export default function HomeProducts() {
             />
 
             <Container maxWidth="lg" sx={{ position: 'relative' }}>
-                <Stack
-                    direction={{ xs: 'column', md: 'row' }}
-                    alignItems={{ xs: 'flex-start', md: 'flex-end' }}
-                    justifyContent="space-between"
-                    spacing={2.5}
-                    sx={{ mb: { xs: 4, md: 6 } }}
+                <Box
+                    sx={{
+                        mb: { xs: 4, md: 6 },
+                        display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
+                        alignItems: { xs: 'flex-start', md: 'center' },
+                        gap: { xs: 1.25, md: 1.75 },
+                    }}
                 >
-                    <Box>
-                        <Box
-                            sx={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                px: 1.25,
-                                py: 0.4,
-                                mb: 1.25,
-                                borderRadius: 999,
-                                bgcolor: alpha(BRAND_BLUE, 0.08),
-                                border: `1px dashed ${alpha(BRAND_BLUE, 0.28)}`,
-                            }}
-                        >
-                            <Typography
-                                sx={{
-                                    fontWeight: 800,
-                                    fontSize: '0.72rem',
-                                    letterSpacing: '0.08em',
-                                    textTransform: 'uppercase',
-                                    color: BRAND_BLUE,
-                                }}
-                            >
-                                Sticker shop
-                            </Typography>
-                        </Box>
+                    <Box
+                        sx={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            flexShrink: 0,
+                            px: 1.25,
+                            py: 0.4,
+                            borderRadius: 999,
+                            bgcolor: alpha(BRAND_BLUE, 0.08),
+                            border: `1px dashed ${alpha(BRAND_BLUE, 0.28)}`,
+                        }}
+                    >
                         <Typography
-                            component="h2"
                             sx={{
                                 fontWeight: 800,
-                                fontSize: { xs: '1.85rem', md: '2.6rem' },
-                                letterSpacing: '-0.035em',
-                                lineHeight: 1.1,
-                                color: theme.palette.grey[900],
-                                maxWidth: 520,
+                                fontSize: '0.72rem',
+                                letterSpacing: '0.08em',
+                                textTransform: 'uppercase',
+                                color: BRAND_BLUE,
                             }}
                         >
-                            Peel one off the sheet and start designing
+                            Sticker shop
                         </Typography>
                     </Box>
                     <Typography
+                        component="h2"
                         sx={{
-                            color: 'text.secondary',
-                            fontSize: '1.02rem',
-                            maxWidth: 360,
-                            lineHeight: 1.65,
+                            fontWeight: 800,
+                            fontSize: { xs: '1.35rem', md: '1.75rem' },
+                            letterSpacing: '-0.035em',
+                            lineHeight: 1.1,
+                            color: theme.palette.grey[900],
+                            whiteSpace: { md: 'nowrap' },
                         }}
                     >
-                        Six print-ready styles. Click a sticker to open the builder with that type already selected.
+                        Peel one off the sheet and start designing
                     </Typography>
-                </Stack>
+                </Box>
 
                 <Box
                     sx={{
