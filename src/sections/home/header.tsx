@@ -129,10 +129,7 @@ export default function Header() {
 
                         <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
                             <Button sx={navLinkSx} onClick={scrollToProducts}>
-                                Shop Stickers
-                            </Button>
-                            <Button sx={navLinkSx} onClick={() => router.push('/sticker-builder')}>
-                                CG Sticker House Builder
+                                Build Stickers
                             </Button>
 
                             <Button sx={navLinkSx} onClick={() => router.push('/for-business')}>
@@ -275,13 +272,7 @@ export default function Header() {
                     </Stack>
 
                     <MenuItem onClick={scrollToProducts} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
-                        Shop Stickers
-                    </MenuItem>
-                    <MenuItem
-                        onClick={() => handleNavigate('/sticker-builder')}
-                        sx={{ borderRadius: 1.5, fontWeight: 500 }}
-                    >
-                        CG Sticker House Builder
+                        Build Stickers
                     </MenuItem>
                     <MenuItem
                         onClick={() => handleNavigate('/for-business')}
