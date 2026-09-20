@@ -5,7 +5,7 @@ import { useBoolean } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
 import Alert from '@mui/material/Alert';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { NavMobile, NavDesktop } from './nav';
 import { layoutClasses } from '../core/classes';
@@ -198,6 +198,10 @@ export function DashboardLayout({
       sx={[
         {
           [`& .${layoutClasses.sidebarContainer}`]: {
+            position: 'relative',
+            bgcolor: '#f6f8fb',
+            backgroundImage: `radial-gradient(${alpha('#175195', 0.09)} 1.2px, transparent 1.2px)`,
+            backgroundSize: '22px 22px',
             [theme.breakpoints.up(layoutQuery)]: {
               pl: 'var(--layout-nav-vertical-width)',
               transition: theme.transitions.create(['padding-left'], {
