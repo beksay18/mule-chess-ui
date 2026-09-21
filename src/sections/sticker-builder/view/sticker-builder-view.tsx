@@ -62,7 +62,9 @@ export function StickerBuilderView() {
         let active = true;
         const loadCatalog = async () => {
             try {
-                const types = await getActiveProductTypes();
+                const types = (await getActiveProductTypes()).filter(
+                    (type) => Number(type.position) === 1
+                );
                 const lists = await Promise.all(types.map((type) => getActiveProducts(type.id)));
                 const catalog = sortProductsByPosition(lists.flat());
                 if (!active) return;
