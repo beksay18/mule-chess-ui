@@ -62,9 +62,9 @@ export function StickerBuilderView() {
         let active = true;
         const loadCatalog = async () => {
             try {
-                const types = (await getActiveProductTypes()).filter((type) => type.position === 1);
+                const types = await getActiveProductTypes();
                 const lists = await Promise.all(types.map((type) => getActiveProducts(type.id)));
-                const catalog = lists.flatMap((list) => sortProductsByPosition(list));
+                const catalog = sortProductsByPosition(lists.flat());
                 if (!active) return;
                 setProducts(catalog);
                 const fromUrl = productId ? catalog.find((item) => item.id === Number(productId)) : undefined;

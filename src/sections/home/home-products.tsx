@@ -45,19 +45,20 @@ export default function HomeProducts() {
     }, []);
 
     const loadProducts = async () => {
-        const productTypes = await getActiveProductTypes();
-        const featuredTypes = productTypes.filter((type) => type.position === 1);
+        const productTypes = (await getActiveProductTypes()).filter(
+            (type) => Number(type.position) === 1
+        );
 
-        if (featuredTypes.length === 0) {
+        if (productTypes.length === 0) {
             setProducts([]);
             return;
         }
 
         const productLists = await Promise.all(
-            featuredTypes.map((type) => getActiveProducts(type.id))
+            productTypes.map((type) => getActiveProducts(type.id))
         );
 
-        setProducts(productLists.flatMap((list) => sortProductsByPosition(list)));
+        setProducts(sortProductsByPosition(productLists.flat()));
     };
 
     const handleProductClick = (productId: number) => {
