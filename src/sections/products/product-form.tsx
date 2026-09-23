@@ -17,14 +17,35 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { DashboardContent } from '../../layouts/dashboard';
 import {
     createProduct,
+    getFallbackPriceFromMaterials,
     getProductById,
     ProductDimensionRequest,
     ProductDiscountRequest,
+    ProductMaterialRequest,
     ProductRequest,
+    sortDiscountsByQuantity,
     updateProduct,
 } from '../../api/product';
 
 const BRAND_BLUE = '#175195';
+
+const MATERIAL_PRICE_FIELDS = [
+    { id: 'vinyl', label: 'Vinyl' },
+    { id: 'paper', label: 'Paper' },
+    { id: 'holographic', label: 'Holographic' },
+    { id: 'clear', label: 'Clear' },
+] as const;
+
+function emptyMaterials(): ProductMaterialRequest[] {
+    return MATERIAL_PRICE_FIELDS.map((item) => ({ material: item.id, price: 0 }));
+}
+
+function mergeMaterials(materials?: ProductMaterialRequest[]): ProductMaterialRequest[] {
+    return MATERIAL_PRICE_FIELDS.map((item) => ({
+        material: item.id,
+        price: Number(materials?.find((row) => row.material === item.id)?.price) || 0,
+    }));
+}
 
 const fieldSx = {
     '& .MuiOutlinedInput-root': {
@@ -216,33 +237,25 @@ export default function ProductForm() {
         productTypeId: routeProductTypeId,
         dimensions: [],
         discounts: [],
+        materials: emptyMaterials(),
         maxHeight: 0,
         maxWidth: 0,
         maxQuantity: 0,
         position: null,
     });
     const [image, setImage] = useState<File | undefined>(undefined);
-    const [backgroundImage, setBackgroundImage] = useState<File | undefined>(undefined);
     const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null);
-    const [existingBackgroundImageUrl, setExistingBackgroundImageUrl] = useState<string | null>(null);
     const [fieldErrors, setFieldErrors] = useState<Record<string, boolean>>({});
 
     const isDev = import.meta.env.MODE === 'development';
     const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
     const imagePreview = useImagePreview(image);
-    const backgroundPreview = useImagePreview(backgroundImage);
 
     const displayImageUrl = useMemo(() => {
         if (imagePreview) return imagePreview;
         if (existingImageUrl) return `${baseURL}${existingImageUrl}`;
         return null;
     }, [imagePreview, existingImageUrl, baseURL]);
-
-    const displayBackgroundUrl = useMemo(() => {
-        if (backgroundPreview) return backgroundPreview;
-        if (existingBackgroundImageUrl) return `${baseURL}${existingBackgroundImageUrl}`;
-        return null;
-    }, [backgroundPreview, existingBackgroundImageUrl, baseURL]);
 
     useEffect(() => {
         if (params.id) {
@@ -257,18 +270,18 @@ export default function ProductForm() {
             setFormData({
                 name: data.name,
                 description: data.description,
-                price: data.price,
+                price: null,
                 isActive: data.isActive,
                 productTypeId: routeProductTypeId,
                 dimensions: data.dimensions || [],
-                discounts: data.discounts || [],
+                discounts: sortDiscountsByQuantity(data.discounts || []),
+                materials: mergeMaterials(data.materials),
                 maxHeight: data.maxHeight,
                 maxWidth: data.maxWidth,
                 maxQuantity: data.maxQuantity,
                 position: data.position ?? null,
             });
             setExistingImageUrl(data.imageUrl ?? null);
-            setExistingBackgroundImageUrl(data.backgroundImageUrl ?? null);
         } catch (error) {
             console.error('Failed to load product:', error);
         } finally {
@@ -281,14 +294,6 @@ export default function ProductForm() {
     ) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name!]: value }));
-    };
-
-    const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name!]: value === '' ? null : parseFloat(value),
-        }));
     };
 
     const handleWholeNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -340,9 +345,18 @@ export default function ProductForm() {
         field: K,
         value: ProductDiscountRequest[K]
     ) => {
-        const updated = [...formData.discounts];
-        updated[index][field] = value;
-        setFormData((prev) => ({ ...prev, discounts: updated }));
+        setFormData((prev) => {
+            const updated = [...prev.discounts];
+            updated[index] = { ...updated[index], [field]: value };
+            return { ...prev, discounts: updated };
+        });
+    };
+
+    const sortDiscountRows = () => {
+        setFormData((prev) => ({
+            ...prev,
+            discounts: sortDiscountsByQuantity(prev.discounts),
+        }));
     };
 
     const addDiscount = () => {
@@ -358,13 +372,22 @@ export default function ProductForm() {
         setFormData((prev) => ({ ...prev, discounts: updated }));
     };
 
+    const handleMaterialPriceChange = (material: string, value: string) => {
+        const nextPrice = value === '' ? 0 : parseFloat(value);
+        setFormData((prev) => ({
+            ...prev,
+            materials: mergeMaterials(prev.materials).map((row) =>
+                row.material === material ? { ...row, price: Number.isFinite(nextPrice) ? nextPrice : 0 } : row
+            ),
+        }));
+    };
+
     const handleSubmit = async () => {
         setSubmitAttempted(true);
 
         if (
             !formData.name.trim() ||
             !formData.description.trim() ||
-            formData.price === null ||
             formData.maxHeight === null ||
             formData.maxHeight <= 0 ||
             formData.maxWidth === null ||
@@ -380,13 +403,18 @@ export default function ProductForm() {
             const filteredDimensions = formData.dimensions.filter(
                 (dim) => dim.width > 0 && dim.height > 0
             );
-            const filteredDiscounts = formData.discounts.filter(
-                (discount) => discount.quantity > 0
+            const filteredDiscounts = sortDiscountsByQuantity(
+                formData.discounts.filter((discount) => discount.quantity > 0)
+            );
+            const filteredMaterials = mergeMaterials(formData.materials).filter(
+                (row) => row.price > 0
             );
             const payload = {
                 ...formData,
+                price: getFallbackPriceFromMaterials(filteredMaterials),
                 dimensions: filteredDimensions,
                 discounts: filteredDiscounts,
+                materials: filteredMaterials,
                 position:
                     formData.position === null || formData.position === undefined
                         ? undefined
@@ -394,9 +422,9 @@ export default function ProductForm() {
             };
 
             if (params.id) {
-                await updateProduct(Number(params.id), { ...payload, image, backgroundImage });
+                await updateProduct(Number(params.id), { ...payload, image });
             } else {
-                await createProduct({ ...payload, image, backgroundImage });
+                await createProduct({ ...payload, image });
             }
             navigate(`/products/${formData.productTypeId}`);
         } catch (err) {
@@ -436,7 +464,7 @@ export default function ProductForm() {
                     </Button>
                     <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem' }}>
                         {isEdit
-                            ? 'Update product details, sizing limits, and storefront images.'
+                            ? 'Update product details, sizing limits, and storefront image.'
                             : 'Create a new sticker product for this category.'}
                     </Typography>
                 </Box>
@@ -470,18 +498,6 @@ export default function ProductForm() {
                                 selectedFile={image}
                                 onFileChange={setImage}
                                 onClearSelected={() => setImage(undefined)}
-                            />
-                            <ImageUploadPanel
-                                title="Background image"
-                                helperText={
-                                    existingBackgroundImageUrl
-                                        ? 'Current background shown above. Upload a new file to replace it.'
-                                        : 'Used in the product customizer preview.'
-                                }
-                                displayUrl={displayBackgroundUrl}
-                                selectedFile={backgroundImage}
-                                onFileChange={setBackgroundImage}
-                                onClearSelected={() => setBackgroundImage(undefined)}
                             />
                         </Box>
 
@@ -541,26 +557,6 @@ export default function ProductForm() {
                                     helperText="Lower numbers appear first in the shop."
                                     sx={fieldSx}
                                 />
-                                <TextField
-                                    label="Price"
-                                    name="price"
-                                    type="number"
-                                    value={formData.price ?? ''}
-                                    onChange={handleNumberChange}
-                                    fullWidth
-                                    required
-                                    error={
-                                        submitAttempted &&
-                                        (formData.price === null || formData.price <= 0)
-                                    }
-                                    helperText={
-                                        submitAttempted &&
-                                        (formData.price === null || formData.price <= 0)
-                                            ? 'Price must be greater than 0'
-                                            : ''
-                                    }
-                                    sx={fieldSx}
-                                />
                                 <FormControlLabel
                                     control={
                                         <Checkbox
@@ -581,6 +577,42 @@ export default function ProductForm() {
                                     sx={{ mt: { sm: 1 }, ml: 0 }}
                                 />
                             </Stack>
+
+                            <Box sx={sectionSx}>
+                                <Typography sx={{ fontWeight: 700, color: theme.palette.grey[800], mb: 0.5 }}>
+                                    Material prices
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>
+                                    Per-sticker list price at 50 pcs of 3&quot; × 3&quot;. Size and quantity still follow the pack formula. Leave a material blank to keep the built-in relative rate.
+                                </Typography>
+                                <Box
+                                    sx={{
+                                        display: 'grid',
+                                        gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+                                        gap: 2,
+                                    }}
+                                >
+                                    {MATERIAL_PRICE_FIELDS.map((item) => {
+                                        const value =
+                                            mergeMaterials(formData.materials).find((row) => row.material === item.id)
+                                                ?.price ?? 0;
+                                        return (
+                                            <TextField
+                                                key={item.id}
+                                                label={item.label}
+                                                type="number"
+                                                value={value || ''}
+                                                onChange={(event) =>
+                                                    handleMaterialPriceChange(item.id, event.target.value)
+                                                }
+                                                inputProps={{ min: 0, step: 0.01 }}
+                                                helperText="50-pack unit ($ / sticker)"
+                                                sx={fieldSx}
+                                            />
+                                        );
+                                    })}
+                                </Box>
+                            </Box>
 
                             <Box
                                 sx={{
@@ -788,19 +820,20 @@ export default function ProductForm() {
                                                             parseFloat(e.target.value)
                                                         )
                                                     }
+                                                    onBlur={sortDiscountRows}
                                                     sx={{ ...fieldSx, flex: 1 }}
                                                 />
                                                 <TextField
                                                     label="Discount %"
                                                     type="number"
                                                     value={discount.percentage}
-                                                    onChange={(e) =>
-                                                        handleDiscountChange(
-                                                            index,
-                                                            'percentage',
-                                                            parseFloat(e.target.value)
-                                                        )
-                                                    }
+                                                    inputProps={{ min: 0, max: 100, step: 0.1 }}
+                                                    onChange={(e) => {
+                                                        const raw = e.target.value;
+                                                        const next = raw === '' ? 0 : Number(raw);
+                                                        if (Number.isNaN(next)) return;
+                                                        handleDiscountChange(index, 'percentage', next);
+                                                    }}
                                                     sx={{ ...fieldSx, flex: 1 }}
                                                 />
                                                 <IconButton

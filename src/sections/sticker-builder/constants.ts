@@ -45,7 +45,7 @@ export const SIZE_OPTIONS: { id: StickerSizeId; label: string; width: number; he
     { id: 'custom', label: 'Custom', width: 3, height: 3 },
 ];
 
-export const QUANTITY_OPTIONS = [10, 25, 50, 100, 250, 500, 1000];
+export const QUANTITY_OPTIONS = [50, 100, 200, 300, 500, 1000, 2000, 3000, 5000];
 
 export const MATERIAL_OPTIONS: { id: StickerMaterial; label: string; hint: string }[] = [
     { id: 'vinyl', label: 'Vinyl', hint: 'Durable outdoor' },

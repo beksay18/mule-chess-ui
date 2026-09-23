@@ -151,12 +151,14 @@ export function StickerBuilderView() {
             designId: api.design.id,
             designJson: exportDesignJson(api.design),
             discountTiers: product?.discounts || [],
+            materials: product?.materials || [],
         });
         setCartOpen(false);
         router.push('/cart');
     };
 
     const issue = api.validation.issues[0];
+    const { unitPrice, perSticker, quantity, discountPercent, subtotal, total } = api.price;
 
     return (
         <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column', bgcolor: '#f8fafc' }}>
@@ -241,12 +243,65 @@ export function StickerBuilderView() {
                     borderTop: `1px solid ${alpha(BRAND_BLUE, 0.1)}`,
                 }}
             >
-                <Box sx={{ minWidth: 0 }}>
-                    <Typography fontWeight={800} sx={{ fontSize: { xs: 16, md: 20 } }}>
-                        ${api.price.total.toFixed(2)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" noWrap>
-                        {[product?.name, getSizeLabel(api.design.sticker), api.design.sticker.quantity]
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Stack
+                        direction="row"
+                        alignItems="flex-end"
+                        spacing={{ xs: 1.75, sm: 3 }}
+                        sx={{ minWidth: 0, overflowX: 'auto', pb: 0.25 }}
+                    >
+                        <Box sx={{ minWidth: 'fit-content' }}>
+                            <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ letterSpacing: 0.3 }}>
+                                Per sticker
+                            </Typography>
+                            <Stack direction="row" alignItems="baseline" spacing={0.75}>
+                                <Typography fontWeight={800} sx={{ fontSize: { xs: 16, md: 20 }, lineHeight: 1.2 }}>
+                                    ${perSticker.toFixed(2)}
+                                </Typography>
+                                {discountPercent > 0 && (
+                                    <Typography
+                                        variant="caption"
+                                        color="text.secondary"
+                                        sx={{ textDecoration: 'line-through' }}
+                                    >
+                                        ${unitPrice.toFixed(2)}
+                                    </Typography>
+                                )}
+                            </Stack>
+                        </Box>
+                        <Box sx={{ minWidth: 'fit-content' }}>
+                            <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ letterSpacing: 0.3 }}>
+                                Quantity
+                            </Typography>
+                            <Typography fontWeight={800} sx={{ fontSize: { xs: 16, md: 20 }, lineHeight: 1.2 }}>
+                                × {quantity}
+                            </Typography>
+                        </Box>
+                        {discountPercent > 0 && (
+                            <Box sx={{ minWidth: 'fit-content' }}>
+                                <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ letterSpacing: 0.3 }}>
+                                    Discount
+                                </Typography>
+                            <Typography fontWeight={800} color="success.main" sx={{ fontSize: { xs: 16, md: 20 }, lineHeight: 1.2 }}>
+                                −{discountPercent.toFixed(1)}%
+                            </Typography>
+                            </Box>
+                        )}
+                        <Box sx={{ minWidth: 'fit-content' }}>
+                            <Typography variant="caption" color="text.secondary" fontWeight={700} sx={{ letterSpacing: 0.3 }}>
+                                Total
+                            </Typography>
+                            <Typography fontWeight={800} sx={{ fontSize: { xs: 18, md: 22 }, lineHeight: 1.2, color: BRAND_BLUE }}>
+                                ${total.toFixed(2)}
+                            </Typography>
+                        </Box>
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" noWrap display="block" sx={{ mt: 0.25 }}>
+                        {[
+                            product?.name,
+                            getSizeLabel(api.design.sticker),
+                            discountPercent > 0 ? `$${subtotal.toFixed(2)} before discount` : null,
+                        ]
                             .filter(Boolean)
                             .join(' · ')}
                     </Typography>

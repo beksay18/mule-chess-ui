@@ -1,93 +1,215 @@
 import type { Product } from 'src/api/product';
 
-import type { StickerSpec, PriceBreakdown } from './types';
+import type { StickerMaterial, StickerSpec, PriceBreakdown } from './types';
 
 import { getSizeInches } from './utils';
 
-const SIZE_BASE: Record<string, number> = {
-    '2x2': 0.48,
-    '3x3': 0.68,
-    '4x4': 0.98,
-    '5x5': 1.38,
-    '2x4': 0.78,
-};
+export const BASELINE_QUANTITY = 50;
+
+export const PACK_QUANTITIES = [50, 100, 200, 300, 500, 1000, 2000, 3000, 5000];
+
+const MATERIAL_RATE = 0.0185;
 
 const MATERIAL_MULTIPLIER: Record<StickerSpec['material'], number> = {
     vinyl: 1,
-    paper: 0.82,
-    holographic: 1.48,
-    clear: 1.22,
+    paper: 0.88,
+    holographic: 1.85,
+    clear: 1.18,
 };
 
 const FINISH_MULTIPLIER: Record<StickerSpec['finish'], number> = {
-    matte: 1,
-    glossy: 1.08,
+    matte: 0.95,
+    glossy: 1,
 };
 
 const CUT_MULTIPLIER: Record<StickerSpec['shape'], number> = {
-    'die-cut': 1.16,
-    circle: 1,
-    square: 1,
-    rectangle: 1,
-    custom: 1.24,
+    'die-cut': 1,
+    circle: 0.94,
+    square: 0.94,
+    rectangle: 0.94,
+    custom: 1.06,
 };
 
-const QUANTITY_DISCOUNTS: { quantity: number; percentage: number }[] = [
-    { quantity: 1000, percentage: 55 },
-    { quantity: 500, percentage: 50 },
-    { quantity: 250, percentage: 40 },
-    { quantity: 100, percentage: 32 },
-    { quantity: 50, percentage: 22 },
-    { quantity: 25, percentage: 12 },
-    { quantity: 10, percentage: 0 },
-];
+const SETUP_BASE = 32;
+const SETUP_PER_INCH_PERIMETER = 1.2;
+const LABOR_BASE = 2.4;
+const LABOR_PER_INCH_PERIMETER = 0.02;
+const LABOR_EXPONENT = 0.55;
 
-function getCustomSizeBase(width: number, height: number): number {
+const REFERENCE_SPEC: StickerSpec = {
+    shape: 'die-cut',
+    size: '3x3',
+    material: 'vinyl',
+    finish: 'matte',
+    quantity: BASELINE_QUANTITY,
+};
+
+export interface PackQuote {
+    quantity: number;
+    total: number;
+    perSticker: number;
+    discountPercent: number;
+    recommended?: boolean;
+}
+
+export type PricingSource = {
+    price?: number | null;
+    materials?: { material: string; price: number }[] | null;
+} | null;
+
+function money(value: number): number {
+    return Math.max(1, Math.round(value));
+}
+
+function money2(value: number): number {
+    return Number(Math.max(0, value).toFixed(2));
+}
+
+function specMultipliers(sticker: StickerSpec) {
+    return {
+        material: MATERIAL_MULTIPLIER[sticker.material] ?? 1,
+        finish: FINISH_MULTIPLIER[sticker.finish] ?? 1,
+        cut: CUT_MULTIPLIER[sticker.shape] ?? 1,
+    };
+}
+
+function rawPackTotal(width: number, height: number, quantity: number, sticker: StickerSpec): number {
+    const qty = Math.max(1, quantity);
     const area = Math.max(width, 0.5) * Math.max(height, 0.5);
-    return Math.max(0.42, area * 0.21);
+    const perimeter = 2 * (Math.max(width, 0.5) + Math.max(height, 0.5));
+    const { material, finish, cut } = specMultipliers(sticker);
+
+    const setup = SETUP_BASE + SETUP_PER_INCH_PERIMETER * perimeter;
+    const labor = LABOR_BASE + LABOR_PER_INCH_PERIMETER * perimeter;
+    const vinyl = qty * area * MATERIAL_RATE * material * finish;
+    const cutting = labor * qty ** LABOR_EXPONENT;
+
+    return (setup + vinyl + cutting) * cut;
+}
+
+function unscaledListUnit(sticker: StickerSpec): number {
+    const size = getSizeInches(sticker);
+    const total = money(rawPackTotal(size.width, size.height, BASELINE_QUANTITY, sticker));
+    return money2(total / BASELINE_QUANTITY);
+}
+
+export function getConfiguredMaterialPrice(
+    material: StickerMaterial,
+    source?: PricingSource
+): number | undefined {
+    const match = source?.materials?.find((row) => row.material === material);
+    const materialPrice = Number(match?.price);
+    if (Number.isFinite(materialPrice) && materialPrice > 0) return materialPrice;
+    return undefined;
+}
+
+function packScale(sticker: StickerSpec, source?: PricingSource): number {
+    if (!source) return 1;
+
+    const own = getConfiguredMaterialPrice(sticker.material, source);
+    if (own != null) {
+        const formula = unscaledListUnit({ ...REFERENCE_SPEC, material: sticker.material });
+        return formula > 0 ? own / formula : 1;
+    }
+
+    const vinyl = getConfiguredMaterialPrice('vinyl', source);
+    if (vinyl == null) return 1;
+
+    const formulaVinyl = unscaledListUnit({ ...REFERENCE_SPEC, material: 'vinyl' });
+    return formulaVinyl > 0 ? vinyl / formulaVinyl : 1;
+}
+
+export function getPackTotal(
+    sticker: StickerSpec,
+    quantity = sticker.quantity,
+    source?: PricingSource
+): number {
+    const size = getSizeInches(sticker);
+    return money(rawPackTotal(size.width, size.height, quantity, sticker) * packScale(sticker, source));
+}
+
+export function getListUnitPrice(sticker: StickerSpec, source?: PricingSource): number {
+    const baseline = getPackTotal(sticker, BASELINE_QUANTITY, source);
+    return money2(baseline / BASELINE_QUANTITY);
+}
+
+export function getDiscountPercent(
+    sticker: StickerSpec,
+    quantity = sticker.quantity,
+    source?: PricingSource
+): number {
+    const qty = Math.max(1, quantity);
+    if (qty <= BASELINE_QUANTITY) return 0;
+
+    const listUnit = getListUnitPrice(sticker, source);
+    const listTotal = listUnit * qty;
+    const pack = getPackTotal(sticker, qty, source);
+    if (listTotal <= 0) return 0;
+
+    return money2(Math.max(0, (1 - pack / listTotal) * 100));
+}
+
+export function quotePack(
+    sticker: StickerSpec,
+    quantity = sticker.quantity,
+    source?: PricingSource
+): PackQuote {
+    const qty = Math.max(1, quantity);
+    const total = getPackTotal(sticker, qty, source);
+    const discountPercent = getDiscountPercent(sticker, qty, source);
+    return {
+        quantity: qty,
+        total,
+        perSticker: money2(total / qty),
+        discountPercent,
+        recommended: qty === 300,
+    };
+}
+
+export function quoteQuantityTiers(
+    sticker: StickerSpec,
+    quantities: number[],
+    source?: PricingSource
+): PackQuote[] {
+    return quantities.map((quantity) => quotePack(sticker, quantity, source));
 }
 
 export function getQuantityDiscount(
     quantity: number,
     tiers?: { quantity: number; percentage: number }[]
 ): number {
-    const source = [...(tiers?.length ? tiers : QUANTITY_DISCOUNTS)].sort(
-        (a, b) => b.quantity - a.quantity
-    );
+    if (!tiers?.length) {
+        return getDiscountPercent(
+            {
+                shape: 'die-cut',
+                size: '3x3',
+                material: 'vinyl',
+                finish: 'glossy',
+                quantity,
+            },
+            quantity
+        );
+    }
+
+    const source = [...tiers].sort((a, b) => b.quantity - a.quantity);
     const match = source.find((tier) => quantity >= tier.quantity);
     return match?.percentage ?? 0;
 }
 
-export function calculatePrice(sticker: StickerSpec, product?: Product | null): PriceBreakdown {
+export function calculatePrice(sticker: StickerSpec, product?: Product | PricingSource): PriceBreakdown {
     const sizeInches = getSizeInches(sticker);
-    const sizeBase = product
-        ? product.price
-        : sticker.size === 'custom'
-          ? getCustomSizeBase(sizeInches.width, sizeInches.height)
-          : SIZE_BASE[sticker.size] ?? getCustomSizeBase(sizeInches.width, sizeInches.height);
-
-    const unitPrice = Number(
-        (
-            product
-                ? sizeBase
-                : sizeBase *
-                  MATERIAL_MULTIPLIER[sticker.material] *
-                  FINISH_MULTIPLIER[sticker.finish] *
-                  CUT_MULTIPLIER[sticker.shape]
-        ).toFixed(2)
-    );
-
     const quantity = Math.max(1, sticker.quantity);
-    const discountPercent = getQuantityDiscount(quantity, product?.discounts);
-    const subtotal = unitPrice * quantity;
-    const total = subtotal * (1 - discountPercent / 100);
+    const quote = quotePack(sticker, quantity, product);
+    const listUnit = quantity <= BASELINE_QUANTITY ? quote.perSticker : getListUnitPrice(sticker, product);
+    const subtotal = money2(listUnit * quantity);
 
     return {
-        unitPrice,
+        unitPrice: listUnit,
+        perSticker: quote.perSticker,
         quantity,
-        discountPercent,
-        subtotal: Number(subtotal.toFixed(2)),
-        total: Number(total.toFixed(2)),
+        discountPercent: quote.discountPercent,
+        subtotal,
+        total: quote.total,
         sizeInches,
     };
 }

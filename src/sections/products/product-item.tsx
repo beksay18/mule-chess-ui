@@ -122,7 +122,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
 
                 <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
                     <Chip
-                        label={`$${product.price.toFixed(2)}`}
+                        label={`$${(Number(product.price) || 0).toFixed(2)}`}
                         size="small"
                         sx={{
                             height: 24,

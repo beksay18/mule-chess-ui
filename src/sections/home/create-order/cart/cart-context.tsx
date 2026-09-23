@@ -25,6 +25,7 @@ export interface CartItem {
     designId?: string;
     designJson?: string;
     discountTiers?: { quantity: number; percentage: number }[];
+    materials?: { material: string; price: number }[];
     artworkFiles?: File[];
     serializedArtworkFiles?: SerializedFile[];
 }

@@ -1,9 +1,22 @@
 import type { Product, ProductDiscountRequest, ProductDimensionRequest } from 'src/api/product';
 
-import type { StickerDesign, StickerSizeId } from './types';
+import type { StickerDesign, StickerMaterial, StickerSizeId } from './types';
 
-import { SIZE_OPTIONS } from './constants';
+import { QUANTITY_OPTIONS, SIZE_OPTIONS } from './constants';
 import { clamp, getCanvasSize, getSizeInches } from './utils';
+
+const LOCKED_MATERIAL_MATCHES: { id: StickerMaterial; tokens: string[] }[] = [
+    { id: 'holographic', tokens: ['holographic', 'holo'] },
+    { id: 'clear', tokens: ['clear', 'transparent'] },
+    { id: 'paper', tokens: ['paper'] },
+    { id: 'vinyl', tokens: ['vinyl'] },
+];
+
+export function getLockedMaterial(product?: Pick<Product, 'name'> | null): StickerMaterial | null {
+    const name = product?.name?.toLowerCase() ?? '';
+    if (!name) return null;
+    return LOCKED_MATERIAL_MATCHES.find((item) => item.tokens.some((token) => name.includes(token)))?.id ?? null;
+}
 
 export type ProductLimits = {
     maxWidth: number;
@@ -52,14 +65,11 @@ export function getAllowedDimensions(limits: ProductLimits | null): ProductDimen
 }
 
 export function getAllowedQuantities(limits: ProductLimits | null): number[] {
-    if (!limits) return [10, 25, 50, 100, 250, 500, 1000];
+    const fallback = QUANTITY_OPTIONS;
+    if (!limits) return fallback;
 
-    const fromProduct = limits.discounts
-        .map((tier) => tier.quantity)
-        .filter((quantity) => quantity > 0 && quantity <= limits.maxQuantity)
-        .sort((a, b) => a - b);
-
-    return [...new Set(fromProduct)];
+    const allowed = fallback.filter((quantity) => quantity <= limits.maxQuantity);
+    return allowed.length ? allowed : [Math.max(1, limits.maxQuantity)];
 }
 
 export function clampDesignToProduct(design: StickerDesign, product: Product): StickerDesign {
@@ -73,6 +83,7 @@ export function clampDesignToProduct(design: StickerDesign, product: Product): S
     const allowed = getAllowedDimensions(limits);
     const matchesPreset = allowed.some((dimension) => dimension.width === width && dimension.height === height);
     const size = matchesPreset ? sizeIdForDimension(width, height) : 'custom';
+    const lockedMaterial = getLockedMaterial(product);
 
     const nextSticker = {
         ...design.sticker,
@@ -80,6 +91,7 @@ export function clampDesignToProduct(design: StickerDesign, product: Product): S
         customWidth: width,
         customHeight: height,
         quantity,
+        material: lockedMaterial ?? design.sticker.material,
     };
     const canvas = getCanvasSize(nextSticker);
 
@@ -88,6 +100,7 @@ export function clampDesignToProduct(design: StickerDesign, product: Product): S
         design.sticker.customWidth === width &&
         design.sticker.customHeight === height &&
         design.sticker.quantity === quantity &&
+        design.sticker.material === nextSticker.material &&
         design.width === canvas.width &&
         design.height === canvas.height
     ) {

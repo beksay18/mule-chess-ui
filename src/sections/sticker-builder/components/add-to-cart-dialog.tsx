@@ -79,11 +79,12 @@ export function AddToCartDialog({
                     >
                         <Spec label="Size" value={getSizeLabel(design.sticker)} />
                         <Spec label="Quantity" value={String(design.sticker.quantity)} />
+                        <Spec label="Per sticker" value={`$${price.perSticker.toFixed(2)}`} />
                         <Spec label="Material" value={design.sticker.material} />
                         <Spec label="Finish" value={design.sticker.finish} />
                         <Spec label="Cut" value={design.sticker.shape} />
                         {design.sticker.qrUrl && <Spec label="QR link" value={design.sticker.qrUrl} />}
-                        <Spec label="Price" value={`$${price.total.toFixed(2)}`} />
+                        <Spec label="Total" value={`$${price.total.toFixed(2)}`} />
                     </Box>
                 </Stack>
             </DialogContent>

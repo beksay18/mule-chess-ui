@@ -129,6 +129,7 @@ export interface SavedDesignRecord {
 
 export interface PriceBreakdown {
     unitPrice: number;
+    perSticker: number;
     quantity: number;
     discountPercent: number;
     subtotal: number;

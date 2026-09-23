@@ -15,8 +15,27 @@ import CloseIcon from '@mui/icons-material/Close';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useRouter } from '../../../../routes/hooks';
 import { useCart, type CartItem } from './cart-context';
+import { calculatePrice } from '../../../sticker-builder/pricing';
+import type { StickerFinish, StickerMaterial, StickerShape } from '../../../sticker-builder/types';
 
 const BRAND_BLUE = '#175195';
+
+function specFromCartItem(item: CartItem, quantity: number) {
+    const finish: StickerFinish =
+        item.finish === 'glossy' || item.lamination === 'gloss' ? 'glossy' : 'matte';
+    const material = (item.material as StickerMaterial) || 'vinyl';
+    const shape = (item.cutType as StickerShape) || 'die-cut';
+
+    return {
+        shape,
+        size: 'custom' as const,
+        customWidth: item.width,
+        customHeight: item.height,
+        material,
+        finish,
+        quantity,
+    };
+}
 
 function getDiscountForQuantity(
     quantity: number,
@@ -298,8 +317,20 @@ export default function CartPage() {
 
         const updated = [...cartItems];
         const item = updated[index];
-        const newDiscount = getDiscountForQuantity(newQuantity, item.discountTiers);
-        updated[index] = { ...item, quantity: newQuantity, percentage: newDiscount };
+        if (item.designId) {
+            const breakdown = calculatePrice(specFromCartItem(item, newQuantity), {
+                materials: item.materials,
+            });
+            updated[index] = {
+                ...item,
+                quantity: newQuantity,
+                price: breakdown.unitPrice,
+                percentage: breakdown.discountPercent,
+            };
+        } else {
+            const newDiscount = getDiscountForQuantity(newQuantity, item.discountTiers);
+            updated[index] = { ...item, quantity: newQuantity, percentage: newDiscount };
+        }
         setCartItems(updated);
     };
 

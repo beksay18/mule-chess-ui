@@ -7,7 +7,7 @@ import {
     Paper, Card, CardContent,
 } from '@mui/material';
 import {useEffect, useState} from 'react';
-import {getProductById, Product} from '../../../../api/product';
+import {getDisplayPrice, getProductById, Product} from '../../../../api/product';
 import {useParams} from 'react-router-dom';
 import {useRouter} from '../../../../routes/hooks';
 import {useCart} from '../cart/cart-context';
@@ -91,11 +91,12 @@ export default function CustomProductDetails() {
         if (!dimValid || !qtyValid || !laminationValid) return;
 
         const discount = getBestDiscount(quantity.value);
+        const displayPrice = getDisplayPrice(customProduct);
 
         addItem({
             productId: customProduct?.id || 0,
             name: customProduct?.name || '',
-            price: customProduct?.price || 0,
+            price: displayPrice,
             width: dimension.width,
             height: dimension.height,
             quantity: quantity.value,
@@ -125,20 +126,21 @@ export default function CustomProductDetails() {
                         <Typography variant="body2" sx={{mt: 2, color: 'text.secondary'}}>
                             {customProduct?.description}
                         </Typography>
-                        <Box
-                            sx={{
-                                mt: 4,
-                                backgroundImage: customProduct?.backgroundImageUrl
-                                    ? `url(${baseImageUrl}${customProduct.backgroundImageUrl})`
-                                    : undefined,
-                                backgroundSize: 'contain',
-                                backgroundPosition: 'center',
-                                backgroundRepeat: 'no-repeat',
-                                borderRadius: 2,
-                                height: 300,
-                                display: {xs: 'none', md: 'block'}
-                            }}
-                        />
+                        {customProduct?.imageUrl && (
+                            <Box
+                                component="img"
+                                src={`${baseImageUrl}${customProduct.imageUrl}`}
+                                alt={customProduct.name}
+                                sx={{
+                                    mt: 4,
+                                    maxWidth: '100%',
+                                    maxHeight: 300,
+                                    objectFit: 'contain',
+                                    borderRadius: 2,
+                                    display: { xs: 'none', md: 'block' },
+                                }}
+                            />
+                        )}
                     </Box>
 
                     <Box flex={3} display="flex" flexDirection="column" gap={2} sx={{
@@ -160,7 +162,7 @@ export default function CustomProductDetails() {
                                 />
 
                                 <QuantitySelector
-                                    price={customProduct?.price || 0}
+                                    price={getDisplayPrice(customProduct)}
                                     discounts={customProduct?.discounts || []}
                                     selected={quantity}
                                     setSelected={setQuantity}

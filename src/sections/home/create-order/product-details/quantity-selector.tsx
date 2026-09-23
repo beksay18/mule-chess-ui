@@ -42,14 +42,15 @@ export function QuantitySelector({
                                  }: QuantitySelectorProps) {
 
     const initialized = useRef(false);
+    const orderedDiscounts = [...discounts].sort((a, b) => a.quantity - b.quantity);
 
     useEffect(() => {
         if (initialized.current) return;
 
-        if (discounts.length === 0) return;
+        if (orderedDiscounts.length === 0) return;
 
         if (!selected.label) {
-            const first = discounts[0];
+            const first = orderedDiscounts[0];
             setSelected({
                 label: `${first.quantity}|${first.percentage}`,
                 value: first.quantity,
@@ -58,7 +59,7 @@ export function QuantitySelector({
             });
             initialized.current = true;
         }
-    }, [discounts, selected.label, setSelected]);
+    }, [orderedDiscounts, selected.label, setSelected]);
 
 
 
@@ -108,9 +109,7 @@ export function QuantitySelector({
                     )}
             </Box>
             <RadioGroup value={selected.label} onChange={handleRadioChange}>
-                {discounts
-                    .sort((a, b) => a.quantity - b.quantity)
-                    .map((dis, index) => {
+                {orderedDiscounts.map((dis, index) => {
                         const discountedTotal = dis.quantity * price * (1 - dis.percentage / 100);
                         const labelText = `${dis.quantity} × $${price.toFixed(2)} = $${discountedTotal.toFixed(2)} — Save ${dis.percentage}%`;
                         const radioValue = `${dis.quantity}|${dis.percentage}`; // internal value

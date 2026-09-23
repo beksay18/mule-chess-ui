@@ -6,14 +6,16 @@ import MenuItem from '@mui/material/MenuItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 
 import type { Product } from 'src/api/product';
 
 import type { StickerShape, StickerFinish, CustomShapeKind, StickerMaterial } from '../types';
 import type { StickerBuilderApi } from '../hooks/use-sticker-builder';
 
-import { SHAPE_OPTIONS, FINISH_OPTIONS, MATERIAL_OPTIONS, CUSTOM_SHAPE_OPTIONS } from '../constants';
-import { sizeIdForDimension, getAllowedDimensions, getAllowedQuantities } from '../product-limits';
+import { SHAPE_OPTIONS, FINISH_OPTIONS, MATERIAL_OPTIONS, CUSTOM_SHAPE_OPTIONS, BRAND_BLUE, BRAND_GREEN } from '../constants';
+import { sizeIdForDimension, getAllowedDimensions, getAllowedQuantities, getLockedMaterial } from '../product-limits';
+import { quotePack, quoteQuantityTiers } from '../pricing';
 import { isQrCodeProduct } from '../qr';
 import { getSizeInches } from '../utils';
 
@@ -34,6 +36,7 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
     const maxHeight = limits?.maxHeight ?? 12;
     const maxQuantity = limits?.maxQuantity ?? 1000;
     const showQrField = isQrCodeProduct(product);
+    const lockedMaterial = getLockedMaterial(product);
 
     const [useCustomQuantity, setUseCustomQuantity] = useState(() => !quantities.includes(sticker.quantity));
     const [qrDraft, setQrDraft] = useState(sticker.qrUrl || '');
@@ -44,7 +47,8 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
     );
     const sizeValue = sticker.size === 'custom' || !matchingPreset ? 'custom' : `${matchingPreset.width}x${matchingPreset.height}`;
     const quantityIsPreset = quantities.includes(sticker.quantity) && !useCustomQuantity;
-    const quantityValue = quantityIsPreset ? String(sticker.quantity) : 'custom';
+    const quantityQuotes = quoteQuantityTiers(sticker, quantities, product);
+    const selectedQuote = quotePack(sticker, sticker.quantity, product);
 
     useEffect(() => {
         setQrDraft(sticker.qrUrl || '');
@@ -209,29 +213,83 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                     />
                 </Stack>
             )}
-            <TextField
-                select
-                size="small"
-                label="Quantity"
-                value={quantityValue}
-                onChange={(event) => {
-                    const value = event.target.value;
-                    if (value === 'custom') {
-                        setUseCustomQuantity(true);
-                        updateSticker({ quantity: Math.min(sticker.quantity || 1, maxQuantity) });
-                        return;
-                    }
-                    setUseCustomQuantity(false);
-                    updateSticker({ quantity: Number(value) });
-                }}
-            >
-                {quantities.map((quantity) => (
-                    <MenuItem key={quantity} value={String(quantity)}>
-                        {quantity}
-                    </MenuItem>
-                ))}
-                <MenuItem value="custom">Custom</MenuItem>
-            </TextField>
+            <Box>
+                <Typography variant="subtitle2" fontWeight={700} sx={{ mb: 1 }}>
+                    Quantity
+                </Typography>
+                <Stack spacing={0.75}>
+                    {quantityQuotes.map((quote) => {
+                        const selected = quantityIsPreset && quote.quantity === sticker.quantity;
+                        return (
+                            <Button
+                                key={quote.quantity}
+                                onClick={() => {
+                                    setUseCustomQuantity(false);
+                                    updateSticker({ quantity: quote.quantity });
+                                }}
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: 1,
+                                    px: 1.5,
+                                    py: 1,
+                                    minHeight: 44,
+                                    borderRadius: 1.5,
+                                    textTransform: 'none',
+                                    color: 'text.primary',
+                                    border: `1px solid ${selected ? BRAND_BLUE : alpha(BRAND_BLUE, 0.14)}`,
+                                    bgcolor: selected ? alpha(BRAND_BLUE, 0.08) : '#fff',
+                                    '&:hover': {
+                                        borderColor: BRAND_BLUE,
+                                        bgcolor: alpha(BRAND_BLUE, 0.05),
+                                    },
+                                }}
+                            >
+                                <Typography fontWeight={700} fontSize={13}>
+                                    {quote.quantity.toLocaleString()} stickers
+                                    {quote.recommended ? ' ★' : ''}
+                                </Typography>
+                                <Stack direction="row" spacing={1} alignItems="baseline">
+                                    <Typography fontWeight={800} fontSize={13}>
+                                        ${quote.total.toFixed(2)}
+                                    </Typography>
+                                    {quote.discountPercent > 0 && (
+                                        <Typography fontSize={12} fontWeight={800} sx={{ color: BRAND_GREEN }}>
+                                            −{quote.discountPercent.toFixed(1)}%
+                                        </Typography>
+                                    )}
+                                </Stack>
+                            </Button>
+                        );
+                    })}
+                    <Button
+                        onClick={() => {
+                            setUseCustomQuantity(true);
+                            updateSticker({ quantity: Math.min(sticker.quantity || 1, maxQuantity) });
+                        }}
+                        sx={{
+                            justifyContent: 'flex-start',
+                            px: 1.5,
+                            py: 1,
+                            minHeight: 44,
+                            borderRadius: 1.5,
+                            textTransform: 'none',
+                            color: 'text.primary',
+                            fontWeight: 700,
+                            fontSize: 13,
+                            border: `1px solid ${!quantityIsPreset ? BRAND_BLUE : alpha(BRAND_BLUE, 0.14)}`,
+                            bgcolor: !quantityIsPreset ? alpha(BRAND_BLUE, 0.08) : '#fff',
+                            '&:hover': {
+                                borderColor: BRAND_BLUE,
+                                bgcolor: alpha(BRAND_BLUE, 0.05),
+                            },
+                        }}
+                    >
+                        Custom quantity
+                    </Button>
+                </Stack>
+            </Box>
             {!quantityIsPreset && (
                 <Stack spacing={0.5}>
                     <TextField
@@ -241,7 +299,13 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                         value={sticker.quantity}
                         inputProps={{ min: 1, max: maxQuantity, step: 1 }}
                         error={sticker.quantity > maxQuantity}
-                        helperText={`Max should be ${maxQuantity}`}
+                        helperText={
+                            sticker.quantity > maxQuantity
+                                ? `Max should be ${maxQuantity}`
+                                : selectedQuote.discountPercent > 0
+                                  ? `$${selectedQuote.total.toFixed(2)} · ${selectedQuote.discountPercent.toFixed(1)}% off vs 50-pack rate`
+                                  : `$${selectedQuote.total.toFixed(2)} · max ${maxQuantity}`
+                        }
                         onChange={(event) => updateSticker({ quantity: Number(event.target.value) })}
                     />
                 </Stack>
@@ -250,14 +314,16 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                 select
                 size="small"
                 label="Material"
-                value={sticker.material}
+                value={lockedMaterial ?? sticker.material}
+                disabled={Boolean(lockedMaterial)}
+                helperText={lockedMaterial ? 'Set by this sticker type' : undefined}
                 onChange={(event) => updateSticker({ material: event.target.value as StickerMaterial })}
             >
-                {MATERIAL_OPTIONS.map((option) => (
-                    <MenuItem key={option.id} value={option.id}>
-                        {option.label} — {option.hint}
-                    </MenuItem>
-                ))}
+                    {MATERIAL_OPTIONS.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                            {option.label} — {option.hint}
+                        </MenuItem>
+                    ))}
             </TextField>
             <TextField
                 select
@@ -272,16 +338,23 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                     </MenuItem>
                 ))}
             </TextField>
-            <Box>
-                <Typography variant="caption" color="text.secondary">
-                    Estimated total
-                </Typography>
-                <Typography variant="h6" fontWeight={800}>
+            <Box
+                sx={{
+                    p: 1.5,
+                    borderRadius: 2,
+                    border: `1px solid ${alpha(BRAND_BLUE, 0.14)}`,
+                    bgcolor: alpha(BRAND_BLUE, 0.04),
+                }}
+            >
+                <Typography variant="h6" fontWeight={800} sx={{ color: BRAND_BLUE, lineHeight: 1.2 }}>
                     ${price.total.toFixed(2)}
                 </Typography>
+                <Typography variant="caption" color="text.secondary" display="block">
+                    ${price.perSticker.toFixed(2)} / sticker
+                </Typography>
                 {price.discountPercent > 0 && (
-                    <Typography variant="caption" color="success.main">
-                        {price.discountPercent}% quantity discount applied
+                    <Typography variant="caption" fontWeight={700} sx={{ color: BRAND_GREEN }} display="block">
+                        −{price.discountPercent.toFixed(1)}% vs 50-pack rate
                     </Typography>
                 )}
             </Box>
