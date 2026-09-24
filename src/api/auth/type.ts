@@ -43,3 +43,7 @@ export interface MessageResponse {
 export type GoogleSignInRequest = {
     idToken: string;
 };
+
+export type GoogleClientIdResponse = {
+    googleClientId: string;
+};

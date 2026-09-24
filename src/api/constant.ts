@@ -4,6 +4,7 @@ export const ENDPOINTS = {
         SIGN_UP: "/cg-stickers/api/auth/signup",
         FORGOT_PASSWORD: "/cg-stickers/api/auth/forgot-password",
         LOGIN_WITH_GOOGLE: "/cg-stickers/api/auth/login-with-google",
+        GOOGLE_CLIENT_ID: "/cg-stickers/api/auth/google-client-id",
         REFRESH_TOKEN: "/cg-stickers/api/auth/refresh-token"
     },
     PRODUCT_TYPE: {

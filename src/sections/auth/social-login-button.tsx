@@ -1,24 +1,53 @@
-import { useEffect } from 'react';
-import { loginWithGoogle } from 'src/api/auth';
+import { useEffect, useRef } from 'react';
+import { getGoogleClientId, loginWithGoogle } from 'src/api/auth';
 import { SessionStorage } from 'src/api';
 import { useRouter } from 'src/routes/hooks';
 
-export {};
-
 declare global {
     interface Window {
-        google: any;
+        google?: {
+            accounts: {
+                id: {
+                    initialize: (config: Record<string, unknown>) => void;
+                    renderButton: (parent: HTMLElement, options: Record<string, unknown>) => void;
+                };
+            };
+        };
     }
 }
 
-export function SocialLoginButton() {
+function waitForGoogleIdentity(): Promise<NonNullable<Window['google']>['accounts']['id']> {
+    if (window.google?.accounts?.id) {
+        return Promise.resolve(window.google.accounts.id);
+    }
+
+    return new Promise((resolve, reject) => {
+        const started = Date.now();
+        const timer = window.setInterval(() => {
+            if (window.google?.accounts?.id) {
+                window.clearInterval(timer);
+                resolve(window.google.accounts.id);
+                return;
+            }
+            if (Date.now() - started > 10000) {
+                window.clearInterval(timer);
+                reject(new Error('Google Sign-In failed to load. Please refresh and try again.'));
+            }
+        }, 80);
+    });
+}
+
+type SocialLoginButtonProps = {
+    onError?: (message: string) => void;
+};
+
+export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
     const router = useRouter();
+    const callbackRef = useRef<(response: { credential?: string }) => void>(() => undefined);
 
-    const handleCredentialResponse = async (response: any) => {
-        console.log("Google credential response:", response);
-
+    callbackRef.current = async (response) => {
         if (!response?.credential) {
-            console.error("Missing Google credential");
+            onError?.('Google did not return a sign-in credential. Please try again.');
             return;
         }
 
@@ -34,28 +63,53 @@ export function SocialLoginButton() {
             });
 
             router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
-        } catch (error) {
-            console.error('Google login failed:', error);
+        } catch (error: unknown) {
+            const message =
+                error && typeof error === 'object' && 'response' in error
+                    ? (error as { response?: { data?: { message?: string } } }).response?.data
+                          ?.message
+                    : undefined;
+            onError?.(message || 'Google sign-in failed. Please try again.');
         }
     };
 
-    // Initialize Google Sign-In on mount
     useEffect(() => {
-        if (window.google?.accounts?.id) {
-            window.google.accounts.id.initialize({
-                client_id: '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',
-                callback: handleCredentialResponse,
+        let cancelled = false;
+        const button = document.getElementById('google-login-button');
+        if (!button) return undefined;
+
+        Promise.all([getGoogleClientId(), waitForGoogleIdentity()])
+            .then(([clientId, googleId]) => {
+                if (cancelled) return;
+                if (!clientId) {
+                    throw new Error('Google Sign-In is not configured.');
+                }
+                googleId.initialize({
+                    client_id: clientId,
+                    callback: (response: { credential?: string }) => callbackRef.current(response),
+                    ux_mode: 'popup',
+                    auto_select: false,
+                });
+                button.replaceChildren();
+                googleId.renderButton(button, {
+                    theme: 'outline',
+                    size: 'large',
+                    width: 320,
+                    text: 'signin_with',
+                    shape: 'rectangular',
+                });
+            })
+            .catch((error: Error) => {
+                if (!cancelled) onError?.(error.message);
             });
 
-            window.google.accounts.id.renderButton(
-                document.getElementById('google-login-button'),
-                { theme: 'outline', size: 'large', width: 300 }
-            );
-        }
-    }, []);
+        return () => {
+            cancelled = true;
+        };
+    }, [onError]);
 
     return (
-        <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', minHeight: 44 }}>
             <div id="google-login-button" />
         </div>
     );

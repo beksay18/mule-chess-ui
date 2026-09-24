@@ -24,7 +24,7 @@ export const requestInterceptor = (
 
 export const responseInterceptor = (res: AxiosResponse): AxiosResponse => res;
 
-const AUTH_ENDPOINTS = ['/auth/signin', '/auth/signup', '/auth/login-with-google'];
+const AUTH_ENDPOINTS = ['/auth/signin', '/auth/signup', '/auth/login-with-google', '/auth/google-client-id'];
 
 function isAuthRequest(url?: string) {
     if (!url) {

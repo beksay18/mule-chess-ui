@@ -142,7 +142,7 @@ export function SignInView() {
                         </Divider>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <SocialLoginButton />
+                            <SocialLoginButton onError={setErrorMessage} />
                         </Box>
 
                         <Typography

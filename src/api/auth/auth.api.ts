@@ -1,4 +1,4 @@
-import {GoogleSignInRequest, MessageResponse, SignInRequest, SignInResponse, SignUpRequest} from "./type";
+import {GoogleClientIdResponse, GoogleSignInRequest, MessageResponse, SignInRequest, SignInResponse, SignUpRequest} from "./type";
 import { axios } from "../http";
 import { ENDPOINTS } from "../constant";
 
@@ -36,3 +36,8 @@ export const loginWithGoogle = (
             skipAuthHeader
         )
         .then(({ data }) => data);
+
+export const getGoogleClientId = (): Promise<string> =>
+    axios
+        .getWithRetries<GoogleClientIdResponse>(ENDPOINTS.AUTH.GOOGLE_CLIENT_ID, skipAuthHeader)
+        .then(({ data }) => data.googleClientId);
