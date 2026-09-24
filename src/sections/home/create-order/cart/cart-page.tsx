@@ -320,6 +320,7 @@ export default function CartPage() {
         if (item.designId) {
             const breakdown = calculatePrice(specFromCartItem(item, newQuantity), {
                 materials: item.materials,
+                discounts: item.discountTiers,
             });
             updated[index] = {
                 ...item,

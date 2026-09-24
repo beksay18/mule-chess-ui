@@ -19,6 +19,10 @@ import { quotePack, quoteQuantityTiers } from '../pricing';
 import { isQrCodeProduct } from '../qr';
 import { getSizeInches } from '../utils';
 
+function formatDiscountPercent(value: number): string {
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
+}
+
 type SpecsPanelProps = {
     api: StickerBuilderApi;
     products: Product[];
@@ -256,7 +260,7 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                                     </Typography>
                                     {quote.discountPercent > 0 && (
                                         <Typography fontSize={12} fontWeight={800} sx={{ color: BRAND_GREEN }}>
-                                            −{quote.discountPercent.toFixed(1)}%
+                                            −{formatDiscountPercent(quote.discountPercent)}%
                                         </Typography>
                                     )}
                                 </Stack>
@@ -303,7 +307,7 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                             sticker.quantity > maxQuantity
                                 ? `Max should be ${maxQuantity}`
                                 : selectedQuote.discountPercent > 0
-                                  ? `$${selectedQuote.total.toFixed(2)} · ${selectedQuote.discountPercent.toFixed(1)}% off vs 50-pack rate`
+                                  ? `$${selectedQuote.total.toFixed(2)} · ${formatDiscountPercent(selectedQuote.discountPercent)}% off`
                                   : `$${selectedQuote.total.toFixed(2)} · max ${maxQuantity}`
                         }
                         onChange={(event) => updateSticker({ quantity: Number(event.target.value) })}
@@ -354,7 +358,7 @@ export function SpecsPanel({ api, products, product, onProductChange }: SpecsPan
                 </Typography>
                 {price.discountPercent > 0 && (
                     <Typography variant="caption" fontWeight={700} sx={{ color: BRAND_GREEN }} display="block">
-                        −{price.discountPercent.toFixed(1)}% vs 50-pack rate
+                        −{formatDiscountPercent(price.discountPercent)}% off
                     </Typography>
                 )}
             </Box>

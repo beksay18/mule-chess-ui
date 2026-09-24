@@ -283,7 +283,7 @@ export function StickerBuilderView() {
                                     Discount
                                 </Typography>
                             <Typography fontWeight={800} color="success.main" sx={{ fontSize: { xs: 16, md: 20 }, lineHeight: 1.2 }}>
-                                −{discountPercent.toFixed(1)}%
+                                −{Number.isInteger(discountPercent) ? discountPercent : discountPercent.toFixed(1)}%
                             </Typography>
                             </Box>
                         )}

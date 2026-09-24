@@ -68,6 +68,17 @@ export function getAllowedQuantities(limits: ProductLimits | null): number[] {
     const fallback = QUANTITY_OPTIONS;
     if (!limits) return fallback;
 
+    const fromDiscounts = [...new Set((limits.discounts || []).map((tier) => tier.quantity))]
+        .filter((quantity) => quantity > 0 && quantity <= limits.maxQuantity)
+        .sort((a, b) => a - b);
+
+    if (fromDiscounts.length) {
+        if (!fromDiscounts.includes(50) && 50 <= limits.maxQuantity) {
+            return [50, ...fromDiscounts];
+        }
+        return fromDiscounts;
+    }
+
     const allowed = fallback.filter((quantity) => quantity <= limits.maxQuantity);
     return allowed.length ? allowed : [Math.max(1, limits.maxQuantity)];
 }

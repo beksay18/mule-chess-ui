@@ -55,6 +55,7 @@ export interface PackQuote {
 export type PricingSource = {
     price?: number | null;
     materials?: { material: string; price: number }[] | null;
+    discounts?: { quantity: number; percentage: number }[] | null;
 } | null;
 
 function money(value: number): number {
@@ -119,18 +120,36 @@ function packScale(sticker: StickerSpec, source?: PricingSource): number {
     return formulaVinyl > 0 ? vinyl / formulaVinyl : 1;
 }
 
-export function getPackTotal(
+function formulaPackTotal(
     sticker: StickerSpec,
-    quantity = sticker.quantity,
+    quantity: number,
     source?: PricingSource
 ): number {
     const size = getSizeInches(sticker);
     return money(rawPackTotal(size.width, size.height, quantity, sticker) * packScale(sticker, source));
 }
 
+function hasAdminDiscounts(source?: PricingSource): boolean {
+    return Boolean(source?.discounts?.length);
+}
+
+export function getPackTotal(
+    sticker: StickerSpec,
+    quantity = sticker.quantity,
+    source?: PricingSource
+): number {
+    const qty = Math.max(1, quantity);
+    if (hasAdminDiscounts(source)) {
+        const listUnit = getListUnitPrice(sticker, source);
+        const discount = getQuantityDiscount(qty, source?.discounts ?? undefined);
+        return money(listUnit * qty * (1 - discount / 100));
+    }
+
+    return formulaPackTotal(sticker, qty, source);
+}
+
 export function getListUnitPrice(sticker: StickerSpec, source?: PricingSource): number {
-    const baseline = getPackTotal(sticker, BASELINE_QUANTITY, source);
-    return money2(baseline / BASELINE_QUANTITY);
+    return money2(formulaPackTotal(sticker, BASELINE_QUANTITY, source) / BASELINE_QUANTITY);
 }
 
 export function getDiscountPercent(
@@ -139,11 +158,15 @@ export function getDiscountPercent(
     source?: PricingSource
 ): number {
     const qty = Math.max(1, quantity);
+    if (hasAdminDiscounts(source)) {
+        return money2(Math.max(0, getQuantityDiscount(qty, source?.discounts ?? undefined)));
+    }
+
     if (qty <= BASELINE_QUANTITY) return 0;
 
     const listUnit = getListUnitPrice(sticker, source);
     const listTotal = listUnit * qty;
-    const pack = getPackTotal(sticker, qty, source);
+    const pack = formulaPackTotal(sticker, qty, source);
     if (listTotal <= 0) return 0;
 
     return money2(Math.max(0, (1 - pack / listTotal) * 100));
@@ -200,7 +223,7 @@ export function calculatePrice(sticker: StickerSpec, product?: Product | Pricing
     const sizeInches = getSizeInches(sticker);
     const quantity = Math.max(1, sticker.quantity);
     const quote = quotePack(sticker, quantity, product);
-    const listUnit = quantity <= BASELINE_QUANTITY ? quote.perSticker : getListUnitPrice(sticker, product);
+    const listUnit = getListUnitPrice(sticker, product);
     const subtotal = money2(listUnit * quantity);
 
     return {

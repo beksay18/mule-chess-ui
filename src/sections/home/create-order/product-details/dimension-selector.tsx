@@ -103,8 +103,7 @@ export function DimensionSelector({
         val: string
     ) => {
         const parsed = Number(val);
-        const isInteger = Number.isInteger(parsed);
-        const isValid = isInteger && parsed > 0;
+        const isValid = Number.isFinite(parsed) && parsed > 0;
 
         const width = field === 'width' ? parsed : selected.width;
         const height = field === 'height' ? parsed : selected.height;
@@ -170,6 +169,7 @@ export function DimensionSelector({
                                 value={selected.width > 0 ? selected.width : ''}
                                 onChange={(e) => handleCustomChange('width', e.target.value)}
                                 error={showError && (selected.width <= 0 || selected.width > maxWidth)}
+                                inputProps={{ min: 0.1, step: 0.1 }}
                                 sx={{width: 150}}
                                 size="small"
                                 required
@@ -177,11 +177,6 @@ export function DimensionSelector({
                             {showError && (!selected.width || selected.width <= 0) && (
                                 <Typography variant="caption" color="error">
                                     Width is required
-                                </Typography>
-                            )}
-                            {showError && !Number.isInteger(selected.width) && (
-                                <Typography variant="caption" color="error">
-                                    Must be whole number
                                 </Typography>
                             )}
                             {showError && selected.width > maxWidth && (
@@ -198,6 +193,7 @@ export function DimensionSelector({
                                 value={selected.height || ''}
                                 onChange={(e) => handleCustomChange('height', e.target.value)}
                                 error={showError && (selected.height <= 0 || selected.height > maxHeight)}
+                                inputProps={{ min: 0.1, step: 0.1 }}
                                 sx={{width: 150}}
                                 size="small"
                                 required
@@ -205,11 +201,6 @@ export function DimensionSelector({
                             {showError && (!selected.height || selected.height <= 0) && (
                                 <Typography variant="caption" color="error">
                                     Height is required
-                                </Typography>
-                            )}
-                            {showError && !Number.isInteger(selected.height) && (
-                                <Typography variant="caption" color="error">
-                                    Must be whole number
                                 </Typography>
                             )}
                             {showError && selected.height > maxHeight && (

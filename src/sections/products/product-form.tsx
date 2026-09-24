@@ -732,27 +732,27 @@ export default function ProductForm() {
                                                 <TextField
                                                     label="Width"
                                                     type="number"
-                                                    value={dim.width}
-                                                    onChange={(e) =>
-                                                        handleDimensionChange(
-                                                            index,
-                                                            'width',
-                                                            parseFloat(e.target.value)
-                                                        )
-                                                    }
+                                                    value={dim.width || ''}
+                                                    inputProps={{ min: 0, step: 0.1 }}
+                                                    onChange={(e) => {
+                                                        const raw = e.target.value;
+                                                        const next = raw === '' ? 0 : Number(raw);
+                                                        if (Number.isNaN(next)) return;
+                                                        handleDimensionChange(index, 'width', next);
+                                                    }}
                                                     sx={{ ...fieldSx, flex: 1 }}
                                                 />
                                                 <TextField
                                                     label="Height"
                                                     type="number"
-                                                    value={dim.height}
-                                                    onChange={(e) =>
-                                                        handleDimensionChange(
-                                                            index,
-                                                            'height',
-                                                            parseFloat(e.target.value)
-                                                        )
-                                                    }
+                                                    value={dim.height || ''}
+                                                    inputProps={{ min: 0, step: 0.1 }}
+                                                    onChange={(e) => {
+                                                        const raw = e.target.value;
+                                                        const next = raw === '' ? 0 : Number(raw);
+                                                        if (Number.isNaN(next)) return;
+                                                        handleDimensionChange(index, 'height', next);
+                                                    }}
                                                     sx={{ ...fieldSx, flex: 1 }}
                                                 />
                                                 <IconButton
