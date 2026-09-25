@@ -73,9 +73,11 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
         }
     };
 
+    const buttonRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         let cancelled = false;
-        const button = document.getElementById('google-login-button');
+        const button = buttonRef.current;
         if (!button) return undefined;
 
         Promise.all([getGoogleClientId(), waitForGoogleIdentity()])
@@ -84,6 +86,7 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
                 if (!clientId) {
                     throw new Error('Google Sign-In is not configured.');
                 }
+                const width = Math.min(400, Math.max(200, Math.floor(button.offsetWidth)));
                 googleId.initialize({
                     client_id: clientId,
                     callback: (response: { credential?: string }) => callbackRef.current(response),
@@ -94,7 +97,7 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
                 googleId.renderButton(button, {
                     theme: 'outline',
                     size: 'large',
-                    width: 320,
+                    width,
                     text: 'signin_with',
                     shape: 'rectangular',
                 });
@@ -108,9 +111,5 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
         };
     }, [onError]);
 
-    return (
-        <div style={{ display: 'flex', justifyContent: 'center', minHeight: 44 }}>
-            <div id="google-login-button" />
-        </div>
-    );
+    return <div ref={buttonRef} style={{ width: '100%', minHeight: 44 }} />;
 }
