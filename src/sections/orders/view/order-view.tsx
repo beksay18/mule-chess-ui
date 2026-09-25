@@ -48,6 +48,7 @@ export function OrderView() {
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState<string[]>([]);
     const [orderNumber, setOrderNumber] = useState('');
+    const [customer, setCustomer] = useState('');
     const [filterVersion, setFilterVersion] = useState(0);
     const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
 
@@ -120,23 +121,29 @@ export function OrderView() {
 
         const statusMatch = filterQuery.match(/orderStatus:([^,]*)/);
         const numberMatch = filterQuery.match(/orderNumber:([^,]*)/);
+        const customerMatch = filterQuery.match(/customer:([^,]*)/);
 
         const orderStatus = statusMatch ? statusMatch[1].split('|') : [];
         const extractedOrderNumber = numberMatch ? numberMatch[1] : '';
+        const extractedCustomer = customerMatch ? customerMatch[1] : '';
 
         setFilterState({ orderStatus });
         setOrderNumber(extractedOrderNumber);
+        setCustomer(extractedCustomer);
 
         setFilterVersion((prev) => prev + 1);
     }, [location.search]);
 
-    const applyCombinedFilters = (orderNum: string, statuses: string[]) => {
+    const applyCombinedFilters = (orderNum: string, customerName: string, statuses: string[]) => {
         let filterString = '';
         if (statuses.length > 0) {
             filterString += `orderStatus:${statuses.join('|')}`;
         }
         if (orderNum) {
             filterString += `${filterString ? ',' : ''}orderNumber:${orderNum}`;
+        }
+        if (customerName.trim()) {
+            filterString += `${filterString ? ',' : ''}customer:${customerName.trim()}`;
         }
         searchParams.set('page', '0');
         if (filterString) {
@@ -161,7 +168,7 @@ export function OrderView() {
     const handleStatusTab = (_event: React.SyntheticEvent, value: StatusTab) => {
         const statuses = value === 'ALL' ? [] : [value];
         setFilterState({ orderStatus: statuses });
-        applyCombinedFilters(orderNumber, statuses);
+        applyCombinedFilters(orderNumber, customer, statuses);
     };
 
     const allCount = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
@@ -196,10 +203,16 @@ export function OrderView() {
 
                 <OrderTableToolbar
                     orderNumber={orderNumber}
+                    customer={customer}
                     onFilterOrderNumber={(event: React.ChangeEvent<HTMLInputElement>) => {
                         const value = event.target.value;
                         setOrderNumber(value);
-                        applyCombinedFilters(value, filterState.orderStatus ?? []);
+                        applyCombinedFilters(value, customer, filterState.orderStatus ?? []);
+                    }}
+                    onFilterCustomer={(event: React.ChangeEvent<HTMLInputElement>) => {
+                        const value = event.target.value;
+                        setCustomer(value);
+                        applyCombinedFilters(orderNumber, value, filterState.orderStatus ?? []);
                     }}
                 />
 
