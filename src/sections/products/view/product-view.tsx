@@ -15,7 +15,6 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { useRouter } from 'src/routes/hooks';
 import {
     deleteProduct,
-    getDisplayPrice,
     getProductByProductTypeId,
     Product,
     sortProductsByPosition,
@@ -34,7 +33,6 @@ function mapToProductItem(
         id: product.id,
         name: product.name,
         description: product.description,
-        price: getDisplayPrice(product),
         productType: product.productType.name || 'Unknown',
         status: product.isActive ? 'active' : 'inactive',
         coverUrl: product.imageUrl || '',

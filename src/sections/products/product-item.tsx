@@ -16,7 +16,6 @@ export type ProductItemProps = {
     id: number;
     name: string;
     description: string;
-    price: number;
     productType: string;
     status: string;
     coverUrl?: string;
@@ -121,17 +120,6 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
                 </Box>
 
                 <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
-                    <Chip
-                        label={`$${(Number(product.price) || 0).toFixed(2)}`}
-                        size="small"
-                        sx={{
-                            height: 24,
-                            fontWeight: 700,
-                            fontSize: '0.6875rem',
-                            bgcolor: alpha(BRAND_BLUE, 0.1),
-                            color: BRAND_BLUE,
-                        }}
-                    />
                     <Chip
                         label={isActive ? 'Active' : 'Inactive'}
                         size="small"

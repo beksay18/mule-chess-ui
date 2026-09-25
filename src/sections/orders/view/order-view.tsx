@@ -8,17 +8,30 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
+import Tab from '@mui/material/Tab';
+import Tabs from '@mui/material/Tabs';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
 import { TableNoData } from '../../../utils/table-no-data';
 import { OrderTableHead } from '../order-table-head';
 import { OrderTableRow } from '../order-table-row';
-import { getAllOrders, OrderContent } from 'src/api/order';
+import { getAllOrders, getOrderStatusCount, OrderContent } from 'src/api/order';
 import { useRouter } from '../../../routes/hooks';
 import {OrderTableToolbar} from "../order-table-toolbar";
 import {FiltersProps} from "../order-filters";
 import {useLocation} from "react-router";
+
+const STATUS_TABS = [
+    { value: 'ALL', label: 'All' },
+    { value: 'NEW', label: 'New' },
+    { value: 'IN_PROGRESS', label: 'In progress' },
+    { value: 'READY_TO_SHIP', label: 'Ready to ship' },
+    { value: 'SHIPPED', label: 'Shipped' },
+    { value: 'CANCELLED', label: 'Cancelled' },
+] as const;
+
+type StatusTab = (typeof STATUS_TABS)[number]['value'];
 
 export function OrderView() {
     const [searchParams] = useSearchParams();
@@ -36,6 +49,7 @@ export function OrderView() {
     const [selected, setSelected] = useState<string[]>([]);
     const [orderNumber, setOrderNumber] = useState('');
     const [filterVersion, setFilterVersion] = useState(0);
+    const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -70,6 +84,18 @@ export function OrderView() {
 
         fetchOrders();
     }, [page, rowsPerPage, filters, filterVersion]);
+
+    useEffect(() => {
+        getOrderStatusCount()
+            .then((counts) => {
+                const next: Record<string, number> = {};
+                counts.forEach((item) => {
+                    next[item.status] = item.count;
+                });
+                setStatusCounts(next);
+            })
+            .catch(() => setStatusCounts({}));
+    }, [filters]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         const params = new URLSearchParams(location.search);
@@ -126,6 +152,20 @@ export function OrderView() {
         setFilterVersion((prev) => prev + 1);
     };
 
+    const activeStatus: StatusTab =
+        filterState.orderStatus?.length === 1 &&
+        STATUS_TABS.some((tab) => tab.value === filterState.orderStatus?.[0])
+            ? (filterState.orderStatus[0] as StatusTab)
+            : 'ALL';
+
+    const handleStatusTab = (_event: React.SyntheticEvent, value: StatusTab) => {
+        const statuses = value === 'ALL' ? [] : [value];
+        setFilterState({ orderStatus: statuses });
+        applyCombinedFilters(orderNumber, statuses);
+    };
+
+    const allCount = Object.values(statusCounts).reduce((sum, count) => sum + count, 0);
+
     const from = page * rowsPerPage + 1;
     const to = Math.min((page + 1) * rowsPerPage, totalOrders);
 
@@ -134,18 +174,32 @@ export function OrderView() {
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Card>
+                <Tabs
+                    value={activeStatus}
+                    onChange={handleStatusTab}
+                    variant="scrollable"
+                    scrollButtons="auto"
+                    sx={{ px: 2, borderBottom: 1, borderColor: 'divider' }}
+                >
+                    {STATUS_TABS.map((tab) => {
+                        const hasCounts = Object.keys(statusCounts).length > 0;
+                        const count = tab.value === 'ALL' ? allCount : (statusCounts[tab.value] ?? 0);
+                        return (
+                            <Tab
+                                key={tab.value}
+                                value={tab.value}
+                                label={hasCounts ? `${tab.label} (${count})` : tab.label}
+                            />
+                        );
+                    })}
+                </Tabs>
+
                 <OrderTableToolbar
                     orderNumber={orderNumber}
-                    filters={filterState}
                     onFilterOrderNumber={(event: React.ChangeEvent<HTMLInputElement>) => {
                         const value = event.target.value;
                         setOrderNumber(value);
                         applyCombinedFilters(value, filterState.orderStatus ?? []);
-                    }}
-                    onApplyFilters={(appliedFilters, inputOrderNumber) => {
-                        setFilterState(appliedFilters);
-                        setOrderNumber(inputOrderNumber);
-                        applyCombinedFilters(inputOrderNumber, appliedFilters.orderStatus ?? []);
                     }}
                 />
 
