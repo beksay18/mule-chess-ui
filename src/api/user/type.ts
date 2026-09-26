@@ -14,4 +14,9 @@ export interface UserContent {
     provider: string;
 }
 
+export interface UpdateUserAccessRequest {
+    role: 'user' | 'admin';
+    active: boolean;
+}
+
 

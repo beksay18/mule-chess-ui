@@ -37,6 +37,7 @@ export const ENDPOINTS = {
     },
     USER: {
         GET_ALL_USERS: "/cg-stickers/api/user/all-users",
+        UPDATE_ACCESS: (id: number | string) => `/cg-stickers/api/user/${id}/access`,
     },
     REVIEWS: {
         PRODUCT_REVIEW: "/cg-stickers/api/review/product-reviews",

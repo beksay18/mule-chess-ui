@@ -41,12 +41,6 @@ function buildFilter(filters: UserFiltersState, search: string) {
         parts.push('active:false');
     }
 
-    if (filters.role === 'admin') {
-        parts.push('role:ROLE_ADMIN');
-    } else if (filters.role === 'customer') {
-        parts.push('role:ROLE_USER');
-    }
-
     if (filters.provider === 'google') {
         parts.push('provider:GOOGLE');
     } else if (filters.provider === 'email') {
@@ -164,7 +158,7 @@ export function UserView() {
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
                 <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    Registered customer and admin accounts.
+                    Registered customer accounts. Change a customer&apos;s role or mark the account active or inactive.
                 </Typography>
 
                 <Card
@@ -298,7 +292,7 @@ export function UserView() {
                                     />
                                     <TableBody>
                                         {users.map((row) => (
-                                            <UserTableRow key={row.userId} row={row} />
+                                            <UserTableRow key={row.userId} row={row} onChanged={fetchUsers} />
                                         ))}
                                     </TableBody>
                                 </Table>

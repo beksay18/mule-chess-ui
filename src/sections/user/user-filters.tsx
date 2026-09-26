@@ -17,18 +17,15 @@ import { Scrollbar } from 'src/components/scrollbar';
 const BRAND_BLUE = '#175195';
 
 export type StatusFilter = 'all' | 'active' | 'inactive';
-export type RoleFilter = 'all' | 'admin' | 'customer';
 export type ProviderFilter = 'all' | 'google' | 'email';
 
 export type UserFiltersState = {
     status: StatusFilter;
-    role: RoleFilter;
     provider: ProviderFilter;
 };
 
 export const DEFAULT_USER_FILTERS: UserFiltersState = {
     status: 'all',
-    role: 'all',
     provider: 'all',
 };
 
@@ -43,12 +40,6 @@ const STATUS_OPTIONS: FilterOption<StatusFilter>[] = [
     { value: 'inactive', label: 'Inactive' },
 ];
 
-const ROLE_OPTIONS: FilterOption<RoleFilter>[] = [
-    { value: 'all', label: 'All roles' },
-    { value: 'admin', label: 'Admin' },
-    { value: 'customer', label: 'Customer' },
-];
-
 const PROVIDER_OPTIONS: FilterOption<ProviderFilter>[] = [
     { value: 'all', label: 'All sign-in' },
     { value: 'google', label: 'Google' },
@@ -56,7 +47,7 @@ const PROVIDER_OPTIONS: FilterOption<ProviderFilter>[] = [
 ];
 
 export function hasActiveUserFilters(filters: UserFiltersState) {
-    return filters.status !== 'all' || filters.role !== 'all' || filters.provider !== 'all';
+    return filters.status !== 'all' || filters.provider !== 'all';
 }
 
 type FilterGroupProps<T extends string> = {
@@ -232,16 +223,6 @@ export function UserFilters({
                             value={tempFilters.status}
                             onChange={(value) =>
                                 setTempFilters((prev) => ({ ...prev, status: value }))
-                            }
-                            chipSx={filterChipSx}
-                        />
-
-                        <FilterGroup
-                            label="Role"
-                            options={ROLE_OPTIONS}
-                            value={tempFilters.role}
-                            onChange={(value) =>
-                                setTempFilters((prev) => ({ ...prev, role: value }))
                             }
                             chipSx={filterChipSx}
                         />
