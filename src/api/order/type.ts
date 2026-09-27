@@ -126,3 +126,10 @@ export interface OrderStatusCount {
     status: string;
     count: number;
 }
+
+export interface MonthlyOrderReport {
+    year: number;
+    month: number;
+    orderCount: number;
+    revenue: number;
+}

@@ -13,7 +13,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import {useRouter, usePathname} from 'src/routes/hooks';
 
 import {getCurrentUser} from "../../api";
-import {logout} from "../../api";
+import {logoutSession} from "../../api";
 import type {ButtonProps} from '@mui/material/Button';
 
 // ----------------------------------------------------------------------
@@ -51,8 +51,7 @@ export function AccountPopover({data = [], sx, ...other}: AccountPopoverProps) {
     );
 
     const handleLogout = useCallback(() => {
-        logout();
-        router.push('/sign-in');
+        void logoutSession().finally(() => router.push('/sign-in'));
     }, [router]);
 
     const user = getCurrentUser();

@@ -7,8 +7,11 @@ import react from '@vitejs/plugin-react-swc';
 
 const PORT = 3039;
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   base: '/',
+  define: {
+    'import.meta.env.VITE_APP_RELEASE': JSON.stringify(command === 'build' ? Date.now().toString() : 'dev'),
+  },
   plugins: [
     react(),
     checker({
@@ -47,4 +50,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

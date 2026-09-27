@@ -1,6 +1,6 @@
 import {axios} from "../http";
 import {ENDPOINTS} from "../constant";
-import {MyOrderResponsePage, OrderRequest, OrderResponse, OrderResponsePage, OrderStatusCount} from "./type";
+import {MonthlyOrderReport, MyOrderResponsePage, OrderRequest, OrderResponse, OrderResponsePage, OrderStatusCount} from "./type";
 
 export const createOrder = async (
     payload: OrderRequest
@@ -121,6 +121,45 @@ export const createLabel = async (orderId: number | string): Promise<{ message: 
     );
     return data;
 };
+
+export const getMonthlyOrderReport = async (): Promise<MonthlyOrderReport[]> => {
+    try {
+        const { data } = await axios.get<MonthlyOrderReport[]>(ENDPOINTS.ORDER.MONTHLY_REPORT);
+        if (Array.isArray(data)) {
+            return data;
+        }
+    } catch {
+        // Older API builds do not have this report yet.
+    }
+    return aggregateMonthlyOrders();
+};
+
+async function aggregateMonthlyOrders(): Promise<MonthlyOrderReport[]> {
+    const months = new Map<string, MonthlyOrderReport>();
+    let page = 0;
+    let last = false;
+
+    while (!last && page < 50) {
+        const response = await getAllOrders({ page, size: 100 });
+        const orders = response.content ?? [];
+        orders.forEach((order) => {
+            const placed = new Date(order.dateCreated);
+            const year = placed.getFullYear();
+            const month = placed.getMonth() + 1;
+            const key = `${year}-${month}`;
+            const row = months.get(key) ?? { year, month, orderCount: 0, revenue: 0 };
+            row.orderCount += 1;
+            if (order.orderStatus !== 'CANCELLED') {
+                row.revenue += Number(order.totalAmount) || 0;
+            }
+            months.set(key, row);
+        });
+        last = response.last || orders.length === 0;
+        page += 1;
+    }
+
+    return [...months.values()].sort((a, b) => a.year - b.year || a.month - b.month);
+}
 
 export const getOrderStatusCount = (userId?: string): Promise<OrderStatusCount[]> =>
     axios

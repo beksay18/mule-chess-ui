@@ -6,6 +6,9 @@ import App from './app';
 import {routesSection} from './routes/sections';
 import {ErrorBoundary} from './routes/components';
 import {CartProvider} from "./sections/home/create-order/cart/cart-context";
+import {applyReleaseSession} from "./api/release-session";
+
+applyReleaseSession();
 
 // ----------------------------------------------------------------------
 

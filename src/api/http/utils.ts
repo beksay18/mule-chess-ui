@@ -14,12 +14,12 @@ export const fetchAndValidateAccessToken = (): string | null => {
 };
 
 export const isTokenExpired = (token?: string): boolean => {
-    let tokenExpired: boolean = true;
-
-    if (!isNil(token)) {
-        const decoded: { exp: number } = jwtDecode(token);
-        tokenExpired = new Date() > new Date(decoded.exp * 1000 - 60000);
+    if (isNil(token)) {
+        return true;
     }
-
-    return tokenExpired;
+    const decoded: { exp?: number } = jwtDecode(token);
+    if (!decoded.exp) {
+        return false;
+    }
+    return new Date() > new Date(decoded.exp * 1000 - 60000);
 };

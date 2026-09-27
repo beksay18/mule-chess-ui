@@ -5,7 +5,8 @@ export const ENDPOINTS = {
         FORGOT_PASSWORD: "/cg-stickers/api/auth/forgot-password",
         LOGIN_WITH_GOOGLE: "/cg-stickers/api/auth/login-with-google",
         GOOGLE_CLIENT_ID: "/cg-stickers/api/auth/google-client-id",
-        REFRESH_TOKEN: "/cg-stickers/api/auth/refresh-token"
+        REFRESH_TOKEN: "/cg-stickers/api/auth/refresh-token",
+        LOGOUT: "/cg-stickers/api/auth/logout"
     },
     PRODUCT_TYPE: {
         GET_ALL_PRODUCT_TYPES: "/cg-stickers/api/product-types",
@@ -31,6 +32,7 @@ export const ENDPOINTS = {
         GET_ORDER_BY_ID: (id: number | string) => `/cg-stickers/api/orders/overview/${id}`,
         NEW_COUNT: "/cg-stickers/api/orders/new-count",
         STATUS_COUNT: "/cg-stickers/api/orders/status-count",
+        MONTHLY_REPORT: "/cg-stickers/api/orders/monthly-report",
         START_PROCESSING: (id: number | string) => `/cg-stickers/api/orders/${id}/start-processing`,
         READY_TO_SHIP: (id: number | string) => `/cg-stickers/api/orders/${id}/ready-to-ship`,
         CREATE_LABEL: (id: number | string) => `/cg-stickers/api/orders/${id}/create-label`,

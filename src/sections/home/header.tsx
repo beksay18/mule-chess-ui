@@ -17,7 +17,7 @@ import Popover from '@mui/material/Popover';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Badge from '@mui/material/Badge';
-import { getCurrentUser, logout } from '../../api';
+import { getCurrentUser, logoutSession } from '../../api';
 import { useRouter } from '../../routes/hooks';
 import { useCart } from './create-order/cart/cart-context';
 
@@ -59,8 +59,7 @@ export default function Header() {
     );
 
     const handleLogout = useCallback(() => {
-        logout();
-        router.push('/sign-in');
+        void logoutSession().finally(() => router.push('/sign-in'));
     }, [router]);
 
     const scrollToProducts = () => {

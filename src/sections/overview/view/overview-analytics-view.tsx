@@ -1,21 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import Box from '@mui/material/Box';
-import Chip from '@mui/material/Chip';
-import CircularProgress from '@mui/material/CircularProgress';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 import { getCurrentUser } from '../../../api';
-import { getAllOrders, getOrderStatusCount, OrderContent, OrderStatusCount } from '../../../api/order';
+import { getMonthlyOrderReport, getOrderStatusCount, MonthlyOrderReport, OrderStatusCount } from '../../../api/order';
 import { useRouter } from '../../../routes/hooks';
+import { MonthlyReport } from '../monthly-report';
 
 const STATUS_CARDS = [
     { status: 'NEW', label: 'New', bg: '#e7f6fb', color: '#0e7490' },
@@ -32,38 +25,23 @@ const cardSx = {
     boxShadow: 'none',
 };
 
-const formatWhen = (value: string) =>
-    new Date(value).toLocaleString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-    });
-
-const statusLabel = (status: string) =>
-    STATUS_CARDS.find((card) => card.status === status)?.label ?? status.replace(/_/g, ' ');
-
-const statusColor = (status: string) =>
-    STATUS_CARDS.find((card) => card.status === status)?.color ?? '#334155';
-
 export function OverviewAnalyticsView() {
     const router = useRouter();
     const user = getCurrentUser();
     const [statusCounts, setStatusCounts] = useState<OrderStatusCount[]>([]);
-    const [recentOrders, setRecentOrders] = useState<OrderContent[]>([]);
+    const [monthlyReport, setMonthlyReport] = useState<MonthlyOrderReport[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const load = async () => {
             setLoading(true);
             try {
-                const [counts, orders] = await Promise.all([
+                const [counts, report] = await Promise.all([
                     getOrderStatusCount(),
-                    getAllOrders({ page: 0, size: 6 }),
+                    getMonthlyOrderReport(),
                 ]);
                 setStatusCounts(counts);
-                setRecentOrders(orders.content ?? []);
+                setMonthlyReport(report);
             } catch (error) {
                 console.error('Failed to load dashboard', error);
             } finally {
@@ -163,76 +141,7 @@ export function OverviewAnalyticsView() {
                 ))}
             </Box>
 
-            <Paper elevation={0} sx={{ ...cardSx, overflow: 'hidden' }}>
-                <Box sx={{ px: 2.5, py: 2 }}>
-                    <Typography sx={{ fontWeight: 800, fontSize: '1.05rem' }}>Recent orders</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Latest orders across every status.
-                    </Typography>
-                </Box>
-
-                {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-                        <CircularProgress size={28} />
-                    </Box>
-                ) : recentOrders.length === 0 ? (
-                    <Typography color="text.secondary" sx={{ px: 2.5, pb: 3 }}>
-                        No orders yet.
-                    </Typography>
-                ) : (
-                    <Box sx={{ overflowX: 'auto' }}>
-                        <Table size="medium">
-                            <TableHead>
-                                <TableRow>
-                                    {['Order', 'Customer', 'Ship to', 'Total', 'Status', 'Placed'].map((heading) => (
-                                        <TableCell
-                                            key={heading}
-                                            sx={{ color: 'text.secondary', fontWeight: 700, borderColor: 'grey.100' }}
-                                        >
-                                            {heading}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {recentOrders.map((order) => (
-                                    <TableRow
-                                        key={order.orderId}
-                                        hover
-                                        onClick={() => router.push(`/order-details/${order.orderId}`)}
-                                        sx={{ cursor: 'pointer' }}
-                                    >
-                                        <TableCell sx={{ fontWeight: 800 }}>#{order.orderNumber}</TableCell>
-                                        <TableCell>
-                                            {order.customerFirstName} {order.customerLastName}
-                                        </TableCell>
-                                        <TableCell>
-                                            {[order.city, order.state].filter(Boolean).join(', ') || '—'}
-                                        </TableCell>
-                                        <TableCell sx={{ fontWeight: 700 }}>
-                                            ${Number(order.totalAmount).toFixed(2)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Chip
-                                                size="small"
-                                                label={statusLabel(order.orderStatus)}
-                                                sx={{
-                                                    fontWeight: 700,
-                                                    color: statusColor(order.orderStatus),
-                                                    bgcolor: `${statusColor(order.orderStatus)}14`,
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
-                                            {formatWhen(order.dateCreated)}
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </Box>
-                )}
-            </Paper>
+            <MonthlyReport rows={monthlyReport} loading={loading} />
         </DashboardContent>
     );
 }
