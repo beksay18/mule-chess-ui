@@ -21,14 +21,17 @@ import { ContactsContent, getAllContacts, getNewContactCount } from '../../../ap
 
 const BRAND_BLUE = '#175195';
 
-const STATUS_FILTERS = ['All', 'NEW', 'DONE'] as const;
+const STATUS_FILTERS = ['All', 'Waiting', 'Replied'] as const;
 type StatusFilter = (typeof STATUS_FILTERS)[number];
 
 function buildStatusFilter(status: StatusFilter) {
-    if (status === 'All') {
-        return '';
+    if (status === 'Waiting') {
+        return 'waiting:true';
     }
-    return `contactStatus:${status}`;
+    if (status === 'Replied') {
+        return 'waiting:false';
+    }
+    return '';
 }
 
 export function ContactsView() {
@@ -105,19 +108,16 @@ export function ContactsView() {
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
                 <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    Customer messages from the contact form. Review new submissions and mark them
-                    as done when handled.
+                    Customer messages from the contact form. A contact stays Waiting until someone replies.
                 </Typography>
 
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
                     {STATUS_FILTERS.map((status) => {
                         const isActive = activeStatus === status;
-                        const label =
-                            status === 'All' ? 'All' : status === 'NEW' ? 'New' : 'Done';
                         return (
                             <Chip
                                 key={status}
-                                label={label}
+                                label={status}
                                 clickable
                                 onClick={() => handleStatusChange(status)}
                                 sx={{
@@ -138,7 +138,7 @@ export function ContactsView() {
                     })}
                     {newCount > 0 && (
                         <Chip
-                            label={`${newCount} new`}
+                            label={`${newCount} waiting`}
                             sx={{
                                 fontWeight: 700,
                                 bgcolor: alpha(BRAND_BLUE, 0.1),

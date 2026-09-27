@@ -35,7 +35,7 @@ export const getNewContactCount = (): Promise<number> =>
     axios.get<number>(ENDPOINTS.CONTACTS.NEW_COUNT).then(({ data }) => data);
 
 export const getContactReplies = (id: number): Promise<ContactReply[]> =>
-    axios.get<ContactReply[]>(ENDPOINTS.CONTACTS.REPLIES(id)).then(({ data }) => data);
+    axios.get<ContactReply[]>(ENDPOINTS.CONTACTS.REPLIES(id), { timeout: 20000 }).then(({ data }) => data);
 
 export const replyToContact = (id: number, message: string, file?: File): Promise<ContactReply> => {
     const formData = new FormData();

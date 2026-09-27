@@ -9,6 +9,7 @@ export interface ContactsContent {
     fileUrl: string,
     dateCreated: string,
     contactStatus: string;
+    waiting?: boolean;
 }
 
 export interface ContactsResponse {
@@ -24,6 +25,7 @@ export interface ContactReply {
     fileName?: string;
     sentAt: string;
     authorName?: string;
+    fromCustomer?: boolean;
 }
 
 export interface ContactsRequest {

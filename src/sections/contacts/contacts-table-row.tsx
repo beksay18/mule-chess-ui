@@ -15,12 +15,10 @@ import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import AttachFileOutlinedIcon from '@mui/icons-material/AttachFileOutlined';
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import ReplyOutlinedIcon from '@mui/icons-material/ReplyOutlined';
-import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import { alpha, useTheme } from '@mui/material/styles';
-import { ContactReply, getContactReplies, markContactAsDone, replyToContact } from '../../api/contacts';
+import { ContactReply, getContactReplies, replyToContact } from '../../api/contacts';
 
 const BRAND_BLUE = '#175195';
 
@@ -33,6 +31,7 @@ export type ContactsProps = {
     fileUrl: string;
     dateCreated: string;
     contactStatus: string;
+    waiting?: boolean;
 };
 
 type ContactsTableRowProps = {
@@ -40,19 +39,11 @@ type ContactsTableRowProps = {
     onMarkedDone: () => void;
 };
 
-function getStatusStyle(status: string) {
-    const normalized = status?.toLowerCase();
-    if (normalized === 'new') {
-        return { label: 'New', bgcolor: alpha(BRAND_BLUE, 0.12), color: BRAND_BLUE };
+function getStatusStyle(waiting: boolean) {
+    if (waiting) {
+        return { label: 'Waiting', bgcolor: alpha('#ed6c02', 0.12), color: '#b45309' };
     }
-    if (normalized === 'done') {
-        return { label: 'Done', bgcolor: alpha('#4caf50', 0.12), color: '#2e7d32' };
-    }
-    return {
-        label: status || 'Unknown',
-        bgcolor: alpha(BRAND_BLUE, 0.08),
-        color: BRAND_BLUE,
-    };
+    return { label: 'Replied', bgcolor: alpha('#4caf50', 0.12), color: '#2e7d32' };
 }
 
 function formatDate(dateStr: string) {
@@ -80,8 +71,6 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const threadRef = useRef<HTMLDivElement>(null);
     const [detailOpen, setDetailOpen] = useState(false);
-    const [confirmOpen, setConfirmOpen] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
     const [replies, setReplies] = useState<ContactReply[]>([]);
     const [repliesLoading, setRepliesLoading] = useState(false);
     const [replyText, setReplyText] = useState('');
@@ -91,8 +80,8 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
 
     const isDev = import.meta.env.MODE === 'development';
     const baseURL = isDev ? import.meta.env.VITE_API_BASE_IMAGE_URL : '';
-    const isNew = row.contactStatus?.toLowerCase() === 'new';
-    const status = getStatusStyle(row.contactStatus);
+    const waiting = row.waiting !== false;
+    const status = getStatusStyle(waiting);
 
     useEffect(() => {
         let active = true;
@@ -145,24 +134,11 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
             if (fileInputRef.current) {
                 fileInputRef.current.value = '';
             }
+            onMarkedDone();
         } catch {
             setSendError('The email could not be sent. Try again.');
         } finally {
             setSending(false);
-        }
-    };
-
-    const handleMarkAsDone = async () => {
-        try {
-            setIsLoading(true);
-            await markContactAsDone(row.id);
-            setConfirmOpen(false);
-            setDetailOpen(false);
-            onMarkedDone();
-        } catch (error) {
-            console.error('Failed to mark as done', error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -171,7 +147,7 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
             <TableRow
                 hover
                 sx={{
-                    bgcolor: isNew ? alpha(BRAND_BLUE, 0.03) : 'inherit',
+                    bgcolor: waiting ? alpha('#ed6c02', 0.04) : 'inherit',
                     '&:last-child td': { borderBottom: 0 },
                 }}
             >
@@ -217,27 +193,11 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
                 </TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                     <Stack direction="row" spacing={0.25} justifyContent="flex-end">
-                        <Tooltip title="View message">
-                            <IconButton size="small" onClick={() => setDetailOpen(true)} sx={{ color: BRAND_BLUE }}>
-                                <VisibilityOutlinedIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
                         <Tooltip title="Reply by email">
                             <IconButton size="small" onClick={() => setDetailOpen(true)} sx={{ color: BRAND_BLUE }}>
                                 <ReplyOutlinedIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
-                        {isNew && (
-                            <Tooltip title="Mark as done">
-                                <IconButton
-                                    size="small"
-                                    onClick={() => setConfirmOpen(true)}
-                                    sx={{ color: '#2e7d32' }}
-                                >
-                                    <CheckCircleOutlineIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
-                        )}
                     </Stack>
                 </TableCell>
             </TableRow>
@@ -303,20 +263,25 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
                                 </Box>
                             )}
 
-                            {replies.map((reply) => (
+                            {replies.map((reply) => {
+                                const fromCustomer = Boolean(reply.fromCustomer);
+                                return (
                                 <Box
                                     key={reply.id}
                                     sx={{
-                                        alignSelf: 'flex-end',
+                                        alignSelf: fromCustomer ? 'flex-start' : 'flex-end',
                                         maxWidth: '88%',
-                                        bgcolor: alpha(BRAND_BLUE, 0.08),
+                                        bgcolor: fromCustomer ? 'grey.100' : alpha(BRAND_BLUE, 0.08),
                                         borderRadius: 2,
                                         px: 1.5,
                                         py: 1.25,
                                     }}
                                 >
-                                    <Typography variant="caption" sx={{ fontWeight: 700, color: BRAND_BLUE }}>
-                                        {reply.authorName || 'You'}
+                                    <Typography
+                                        variant="caption"
+                                        sx={{ fontWeight: 700, color: fromCustomer ? 'text.primary' : BRAND_BLUE }}
+                                    >
+                                        {reply.authorName || (fromCustomer ? row.name : 'You')}
                                     </Typography>
                                     <Typography sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>
                                         {reply.message}
@@ -335,10 +300,11 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
                                         </Button>
                                     )}
                                     <Typography variant="caption" sx={{ display: 'block', color: 'text.disabled', mt: 0.5 }}>
-                                        Sent {formatDate(reply.sentAt)}
+                                        {fromCustomer ? formatDate(reply.sentAt) : `Sent ${formatDate(reply.sentAt)}`}
                                     </Typography>
                                 </Box>
-                            ))}
+                                );
+                            })}
                         </Box>
 
                         <TextField
@@ -402,49 +368,11 @@ export function ContactsTableRow({ row, onMarkedDone }: ContactsTableRowProps) {
                     >
                         {sending ? 'Sending…' : 'Send email'}
                     </Button>
-                    {isNew && (
-                        <Button
-                            onClick={() => {
-                                setDetailOpen(false);
-                                setConfirmOpen(true);
-                            }}
-                            sx={{ textTransform: 'none', fontWeight: 600, color: '#2e7d32' }}
-                        >
-                            Mark as done
-                        </Button>
-                    )}
                     <Button
                         onClick={() => setDetailOpen(false)}
                         sx={{ textTransform: 'none', fontWeight: 600 }}
                     >
                         Close
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)} maxWidth="xs" fullWidth>
-                <DialogTitle sx={{ fontWeight: 700 }}>Mark as done?</DialogTitle>
-                <DialogContent>
-                    <Typography sx={{ color: 'text.secondary' }}>
-                        This will mark the message from {row.name} as handled.
-                    </Typography>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2.5 }}>
-                    <Button onClick={() => setConfirmOpen(false)} sx={{ textTransform: 'none' }}>
-                        Cancel
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleMarkAsDone}
-                        disabled={isLoading}
-                        sx={{
-                            textTransform: 'none',
-                            fontWeight: 700,
-                            bgcolor: BRAND_BLUE,
-                            '&:hover': { bgcolor: '#124578' },
-                        }}
-                    >
-                        {isLoading ? 'Saving…' : 'Confirm'}
                     </Button>
                 </DialogActions>
             </Dialog>
