@@ -60,6 +60,15 @@ export const ENDPOINTS = {
         MARK_DONE: (id: number) => `/cg-stickers/api/contacts/mark-done/${id}`,
         NEW_COUNT: "/cg-stickers/api/contacts/new-count",
     },
+    BLOG: {
+        GET_PUBLISHED: "/cg-stickers/api/blog/public",
+        GET_PUBLISHED_BY_ID: (id: number | string) => `/cg-stickers/api/blog/public/${id}`,
+        GET_ALL: "/cg-stickers/api/blog",
+        GET_BY_ID: (id: number | string) => `/cg-stickers/api/blog/${id}`,
+        CREATE: "/cg-stickers/api/blog",
+        UPDATE: (id: number | string) => `/cg-stickers/api/blog/${id}`,
+        DELETE: (id: number | string) => `/cg-stickers/api/blog/${id}`,
+    },
     FAQ: {
         CREATE_TITLE: "/cg-stickers/api/faq/create-title",
         UPDATE_TITLE: (id: number) => `/cg-stickers/api/faq/${id}`,

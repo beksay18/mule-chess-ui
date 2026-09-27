@@ -37,6 +37,8 @@ export const ContactForm = lazy(() => import('src/pages/contacts-form'));
 export const ProductTypesPage = lazy(() => import('src/pages/product-types'));
 export const ProductTypeForm = lazy(() => import('src/sections/productTypes/product-type-form'));
 export const FaqPage = lazy(() => import('src/pages/faq'));
+export const BlogAdminPage = lazy(() => import('src/pages/blog-admin'));
+export const BlogPostForm = lazy(() => import('src/sections/blog/blog-form'));
 export const FaqTitleForm = lazy(() => import('src/sections/faq/faq-title-form'));
 export const HelpPage = lazy(() => import('src/pages/help'));
 export const ReturnsPage = lazy(() => import('src/pages/returns'));
@@ -45,6 +47,7 @@ export const ForBusinessPage = lazy(() => import('src/pages/for-business'));
 export const PrivacyPage = lazy(() => import('src/pages/privacy'));
 export const TermsPage = lazy(() => import('src/pages/terms'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
+export const BlogArticlePage = lazy(() => import('src/pages/blog-article'));
 export const StickerBuilderPage = lazy(() => import('src/pages/sticker-builder'));
 export const MyDesignsPage = lazy(() => import('../pages/profile/my-designs'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
@@ -142,6 +145,24 @@ export const routesSection: RouteObject[] = [
                     {
                         path: 'faq-form/:titleId/:faqId?',
                         element: <FaqForm />,
+                    },
+                ],
+            },
+            {
+                path: 'blog-posts',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <Outlet/>
+                    </RoleGuard>
+                ),
+                children: [
+                    {path: '', element: <BlogAdminPage/>},
+                    {
+                        path: 'form',
+                        children: [
+                            {index: true, element: <BlogPostForm/>},
+                            {path: ':id', element: <BlogPostForm/>},
+                        ],
                     },
                 ],
             },
@@ -250,6 +271,10 @@ export const routesSection: RouteObject[] = [
     {
         path: 'blog',
         element: <BlogPage/>,
+    },
+    {
+        path: 'blog/:id',
+        element: <BlogArticlePage/>,
     },
     {
         path: '404',

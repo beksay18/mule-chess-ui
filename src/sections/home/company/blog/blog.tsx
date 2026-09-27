@@ -1,13 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
+import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
 import { alpha, useTheme } from '@mui/material/styles';
+import { blogCoverSrc, getPublishedPosts } from 'src/api/blog';
+import { articleExcerpt } from 'src/sections/blog/article-html';
 import { useRouter } from '../../../../routes/hooks';
 import BlogTitle from './blog-title';
 import { BlogCategory, IPostItem, PostItem } from './post-item';
@@ -16,76 +19,57 @@ const BRAND_BLUE = '#175195';
 
 const CATEGORIES: Array<BlogCategory | 'All'> = ['All', 'Design tips', 'Marketing', 'Guides'];
 
-const POSTS: IPostItem[] = [
-    {
-        id: '1',
-        title: '5 creative ways to use custom stickers for your brand',
-        coverUrl: '/assets/images/product/product-11.webp',
-        description:
-            'From packaging to event swag, stickers are one of the most versatile tools in your marketing kit. Here are five practical ideas to put your brand in more hands — without blowing your budget.',
-        category: 'Marketing',
-        readTime: 4,
-        postedAt: '2025-06-01T00:00:00',
-    },
-    {
-        id: '2',
-        title: 'Glossy vs matte: choosing the right sticker finish',
-        coverUrl: '/assets/images/product/product-5.webp',
-        description:
-            'Finish changes how your design looks and feels in the real world. Compare gloss and matte so you can pick the option that matches your artwork, surface, and vibe.',
-        category: 'Guides',
-        readTime: 3,
-        postedAt: '2025-05-20T00:00:00',
-    },
-    {
-        id: '3',
-        title: 'Custom sticker packs that make events unforgettable',
-        coverUrl: '/assets/images/product/product-3.webp',
-        description:
-            'Sticker packs turn guests into walking billboards. Learn how to theme a pack for conferences, pop-ups, and community events that people actually want to take home.',
-        category: 'Marketing',
-        readTime: 5,
-        postedAt: '2025-05-10T00:00:00',
-    },
-    {
-        id: '4',
-        title: 'How to prepare artwork for sticker printing',
-        coverUrl: '/assets/images/home-products/cg-sticker-house.png',
-        description:
-            'Clean files mean sharper prints. A quick checklist for resolution, bleed, color, and file types so your stickers look exactly how you designed them.',
-        category: 'Design tips',
-        readTime: 6,
-        postedAt: '2025-04-28T00:00:00',
-    },
-    {
-        id: '5',
-        title: 'Why die-cut stickers stand out on shelves and laptops',
-        coverUrl: '/assets/images/product/product-12.webp',
-        description:
-            'Custom shapes grab attention instantly. See when die-cut makes sense, how to design for cut lines, and why creators and brands love the extra personality.',
-        category: 'Design tips',
-        readTime: 4,
-        postedAt: '2025-04-15T00:00:00',
-    },
-];
-
 export default function Blog() {
     const theme = useTheme();
     const router = useRouter();
+    const [posts, setPosts] = useState<IPostItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState(false);
     const [activeCategory, setActiveCategory] = useState<(typeof CATEGORIES)[number]>('All');
+
+    useEffect(() => {
+        let active = true;
+        getPublishedPosts()
+            .then((data) => {
+                if (!active) return;
+                setPosts(
+                    data.map((post) => ({
+                        id: String(post.id),
+                        title: post.title,
+                        coverUrl: blogCoverSrc(post.coverUrl),
+                        description: articleExcerpt(post.description),
+                        category: post.category,
+                        readTime: post.readTime,
+                        postedAt: post.postedAt,
+                    }))
+                );
+            })
+            .catch((err) => {
+                console.error('Failed to load blog posts', err);
+                if (!active) return;
+                setLoadError(true);
+                setPosts([]);
+            })
+            .finally(() => {
+                if (active) setLoading(false);
+            });
+        return () => {
+            active = false;
+        };
+    }, []);
 
     const filteredPosts = useMemo(() => {
         if (activeCategory === 'All') {
-            return POSTS;
+            return posts;
         }
-        return POSTS.filter((post) => post.category === activeCategory);
-    }, [activeCategory]);
+        return posts.filter((post) => post.category === activeCategory);
+    }, [activeCategory, posts]);
 
     const featuredPost = filteredPosts[0] ?? null;
     const gridPosts = filteredPosts.slice(1);
 
     const handleReadPost = (post: IPostItem) => {
-        router.push(`/contact-us?subject=${encodeURIComponent(`Blog: ${post.title}`)}`);
+        router.push(`/blog/${post.id}`);
     };
 
     return (
@@ -127,7 +111,17 @@ export default function Blog() {
                     })}
                 </Stack>
 
-                {filteredPosts.length > 0 ? (
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}>
+                        <CircularProgress sx={{ color: BRAND_BLUE }} />
+                    </Box>
+                ) : loadError ? (
+                    <Box sx={{ py: 8, textAlign: 'center', color: 'text.secondary' }}>
+                        <Typography sx={{ fontWeight: 600, color: theme.palette.grey[700] }}>
+                            Blog posts are unavailable right now.
+                        </Typography>
+                    </Box>
+                ) : filteredPosts.length > 0 ? (
                     <Stack spacing={3}>
                         {featuredPost && (
                             <PostItem
@@ -165,21 +159,23 @@ export default function Blog() {
                             sx={{ fontSize: 48, color: alpha(BRAND_BLUE, 0.25), mb: 1.5 }}
                         />
                         <Typography sx={{ fontWeight: 600, color: theme.palette.grey[700], mb: 0.5 }}>
-                            No articles in this category yet
+                            {posts.length === 0 ? 'No articles yet' : 'No articles in this category yet'}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 2 }}>
                             Check back soon — we&apos;re always adding new sticker tips.
                         </Typography>
-                        <Button
-                            onClick={() => setActiveCategory('All')}
-                            sx={{
-                                fontWeight: 600,
-                                color: BRAND_BLUE,
-                                textTransform: 'none',
-                            }}
-                        >
-                            View all articles
-                        </Button>
+                        {posts.length > 0 && (
+                            <Button
+                                onClick={() => setActiveCategory('All')}
+                                sx={{
+                                    fontWeight: 600,
+                                    color: BRAND_BLUE,
+                                    textTransform: 'none',
+                                }}
+                            >
+                                View all articles
+                            </Button>
+                        )}
                     </Box>
                 )}
             </Container>
