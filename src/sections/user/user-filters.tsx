@@ -22,11 +22,13 @@ export type ProviderFilter = 'all' | 'google' | 'email';
 export type UserFiltersState = {
     status: StatusFilter;
     provider: ProviderFilter;
+    role: string;
 };
 
 export const DEFAULT_USER_FILTERS: UserFiltersState = {
     status: 'all',
     provider: 'all',
+    role: 'all',
 };
 
 type FilterOption<T extends string> = {
@@ -47,7 +49,7 @@ const PROVIDER_OPTIONS: FilterOption<ProviderFilter>[] = [
 ];
 
 export function hasActiveUserFilters(filters: UserFiltersState) {
-    return filters.status !== 'all' || filters.provider !== 'all';
+    return filters.status !== 'all' || filters.provider !== 'all' || filters.role !== 'all';
 }
 
 type FilterGroupProps<T extends string> = {

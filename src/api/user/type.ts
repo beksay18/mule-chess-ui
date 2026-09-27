@@ -14,6 +14,11 @@ export interface UserContent {
     provider: string;
 }
 
+export interface RoleOption {
+    id: number;
+    name: string;
+}
+
 export interface UpdateUserAccessRequest {
     role: 'user' | 'admin';
     active: boolean;

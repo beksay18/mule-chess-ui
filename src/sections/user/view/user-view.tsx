@@ -19,7 +19,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import { alpha, useTheme } from '@mui/material/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
-import { getAllUsers, type UserContent } from '../../../api/user';
+import { getAllRoles, getAllUsers, type RoleOption, type UserContent } from '../../../api/user';
 import { useRouter } from '../../../routes/hooks';
 import {
     DEFAULT_USER_FILTERS,
@@ -31,6 +31,24 @@ import { UserTableHead } from '../user-table-head';
 import { UserTableRow } from '../user-table-row';
 
 const BRAND_BLUE = '#175195';
+
+function roleLabel(name: string) {
+    const key = name.toLowerCase();
+    if (key === 'all') return 'All';
+    if (key === 'user') return 'Customer';
+    if (key === 'admin') return 'Admin';
+    return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
+function sortRoles(roles: RoleOption[]) {
+    const rank = (name: string) => {
+        const key = name.toLowerCase();
+        if (key === 'user') return 0;
+        if (key === 'admin') return 1;
+        return 2;
+    };
+    return [...roles].sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
+}
 
 function buildFilter(filters: UserFiltersState, search: string) {
     const parts: string[] = [];
@@ -45,6 +63,10 @@ function buildFilter(filters: UserFiltersState, search: string) {
         parts.push('provider:GOOGLE');
     } else if (filters.provider === 'email') {
         parts.push('provider:LOCAL');
+    }
+
+    if (filters.role !== 'all') {
+        parts.push(`role.name:${filters.role}`);
     }
 
     const trimmedSearch = search.trim();
@@ -69,6 +91,10 @@ export function UserView() {
     const [searchInput, setSearchInput] = useState('');
     const [searchQuery, setSearchQuery] = useState('');
     const [filterOpen, setFilterOpen] = useState(false);
+    const [roles, setRoles] = useState<RoleOption[]>([
+        { id: 2, name: 'user' },
+        { id: 1, name: 'admin' },
+    ]);
     const [loading, setLoading] = useState(false);
 
     const filters = buildFilter(appliedFilters, searchQuery);
@@ -104,6 +130,18 @@ export function UserView() {
     useEffect(() => {
         fetchUsers();
     }, [fetchUsers]);
+
+    useEffect(() => {
+        getAllRoles()
+            .then((data) => {
+                if (data.length > 0) {
+                    setRoles(sortRoles(data));
+                }
+            })
+            .catch((error) => {
+                console.error('Failed to load roles', error);
+            });
+    }, []);
 
     const resetPage = useCallback(() => {
         setPage(0);
@@ -158,7 +196,7 @@ export function UserView() {
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
                 <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    Registered customer accounts. Change a customer&apos;s role or mark the account active or inactive.
+                    Registered accounts, including admins. Filter by role, then change a customer&apos;s role or status.
                 </Typography>
 
                 <Card
@@ -169,6 +207,49 @@ export function UserView() {
                         overflow: 'hidden',
                     }}
                 >
+                    <Stack
+                        direction="row"
+                        spacing={1}
+                        flexWrap="wrap"
+                        useFlexGap
+                        sx={{
+                            px: { xs: 2, md: 2.5 },
+                            py: 1.75,
+                            borderBottom: `1px solid ${alpha(BRAND_BLUE, 0.08)}`,
+                        }}
+                    >
+                        {[{ id: 0, name: 'all' }, ...roles].map((role) => {
+                            const selected = appliedFilters.role === role.name;
+                            const label = roleLabel(role.name);
+                            return (
+                                <Button
+                                    key={role.name}
+                                    onClick={() => {
+                                        setAppliedFilters((current) => ({ ...current, role: role.name }));
+                                        resetPage();
+                                    }}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        fontSize: '0.875rem',
+                                        borderRadius: 50,
+                                        px: 2,
+                                        py: 0.5,
+                                        minWidth: 0,
+                                        bgcolor: selected ? BRAND_BLUE : '#ffffff',
+                                        color: selected ? '#ffffff' : theme.palette.grey[800],
+                                        border: `1px solid ${selected ? BRAND_BLUE : alpha(BRAND_BLUE, 0.2)}`,
+                                        '&:hover': {
+                                            bgcolor: selected ? '#124578' : alpha(BRAND_BLUE, 0.06),
+                                        },
+                                    }}
+                                >
+                                    {label}
+                                </Button>
+                            );
+                        })}
+                    </Stack>
+
                     <Box
                         sx={{
                             px: { xs: 2, md: 2.5 },

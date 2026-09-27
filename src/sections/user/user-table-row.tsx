@@ -100,10 +100,7 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
         if (nextRole === role) {
             return;
         }
-        if (
-            nextRole === 'admin' &&
-            !window.confirm('Make this user an admin? They will no longer appear in this list.')
-        ) {
+        if (nextRole === 'admin' && !window.confirm('Make this user an admin?')) {
             return;
         }
         save(nextRole, row.active);
@@ -163,7 +160,7 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
                 <Select
                     size="small"
                     value={role}
-                    disabled={saving}
+                    disabled={saving || role === 'admin'}
                     onChange={(event) => handleRoleChange(event.target.value as AccountRole)}
                     sx={{ minWidth: 130, bgcolor: '#ffffff' }}
                 >
@@ -176,7 +173,7 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
                     control={
                         <Switch
                             checked={Boolean(row.active)}
-                            disabled={saving}
+                            disabled={saving || role === 'admin'}
                             onChange={(_, checked) => save(role, checked)}
                             sx={{
                                 '& .MuiSwitch-switchBase.Mui-checked': { color: '#2e7d32' },
