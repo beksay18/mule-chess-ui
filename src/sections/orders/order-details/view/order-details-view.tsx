@@ -1,14 +1,12 @@
 import {
     Box,
     Typography,
-    Button, Snackbar, Alert,
+    Button, Snackbar, Alert, Chip, Stack,
 } from '@mui/material';
 import {DashboardContent} from 'src/layouts/dashboard';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {useEffect, useState} from 'react';
 import {CustomerOrderResponse, getOrderById} from '../../../../api/orderDetails';
-import {useRouter} from "../../../../routes/hooks";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {toast} from 'react-toastify';
 import {createLabel, markOrderReadyToShip, startProcessingOrder} from "../../../../api/order";
 import {OrderSummary} from "../order-summary";
@@ -17,12 +15,20 @@ import {ShippingInfo} from "../shipping-info";
 import {ProductList} from "../product-list";
 import Dialog from "@mui/material/Dialog";
 
-type OrderDetailProps = {
-    setOrderStatus: (status: string) => void;
+const STATUS_DISPLAY: Record<string, { label: string; color: string; bg: string }> = {
+    NEW: { label: 'New', color: '#0e7490', bg: '#e7f6fb' },
+    IN_PROGRESS: { label: 'In progress', color: '#6b21a8', bg: '#f3e8ff' },
+    READY_TO_SHIP: { label: 'Ready to ship', color: '#92400e', bg: '#fef3c7' },
+    SHIPPED: { label: 'Shipped', color: '#166534', bg: '#dcfce7' },
+    CANCELLED: { label: 'Cancelled', color: '#991b1b', bg: '#fee2e2' },
 };
 
-export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
-    const router = useRouter();
+type OrderDetailProps = {
+    setOrderStatus: (status: string) => void;
+    setOrderNumber: (orderNumber: string) => void;
+};
+
+export function OrderDetailsView({setOrderStatus, setOrderNumber}: OrderDetailProps) {
     const {id} = useParams();
     const [order, setOrder] = useState<CustomerOrderResponse | null>(null);
     const isDev = import.meta.env.MODE === 'development';
@@ -48,7 +54,13 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
     };
 
     useEffect(() => {
-        if (id) getOrderById(Number(id)).then(setOrder);
+        if (id) {
+            getOrderById(Number(id)).then((loaded) => {
+                setOrder(loaded);
+                setOrderStatus(loaded.orderStatus);
+                setOrderNumber(loaded.orderNumber);
+            });
+        }
     }, [id]);
 
     const handleStartProcessing = async () => {
@@ -61,6 +73,7 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             const updated = await getOrderById(Number(id));
             setOrder(updated);
             setOrderStatus(updated.orderStatus);
+            setOrderNumber(updated.orderNumber);
         } catch (error: any) {
             showSnackbar(error?.response?.data?.message || "Failed to start processing.", 'error');
         }
@@ -76,6 +89,7 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             const updated = await getOrderById(Number(id));
             setOrder(updated);
             setOrderStatus(updated.orderStatus);
+            setOrderNumber(updated.orderNumber);
         } catch (error: any) {
             showSnackbar(error?.response?.data?.message || "Failed to mark ready to ship.", 'error');
         }
@@ -91,6 +105,7 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
             const updated = await getOrderById(Number(id));
             setOrder(updated);
             setOrderStatus(updated.orderStatus);
+            setOrderNumber(updated.orderNumber);
         } catch (error: any) {
             showSnackbar(error?.response?.data?.message || "Failed to create label", 'error');
         }
@@ -102,25 +117,20 @@ export function OrderDetailsView({setOrderStatus}: OrderDetailProps) {
     return (
         <DashboardContent maxWidth="xl">
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                <Box>
-                    <Box display="flex" alignItems="center" gap={2}>
-                        <Button
-                            startIcon={<ArrowBackIcon/>}
-                            onClick={() => router.back()}
-                            variant="outlined"
-                            size="small"
-                            sx={{textTransform: 'none'}}
-                        >
-                            Back
-                        </Button>
-                        <Typography variant="h4" noWrap>
-                            Order #{order.orderNumber}
-                        </Typography>
-                    </Box>
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Chip
+                        size="small"
+                        label={STATUS_DISPLAY[order.orderStatus]?.label ?? order.orderStatus}
+                        sx={{
+                            fontWeight: 700,
+                            color: STATUS_DISPLAY[order.orderStatus]?.color ?? 'text.primary',
+                            bgcolor: STATUS_DISPLAY[order.orderStatus]?.bg ?? 'grey.100',
+                        }}
+                    />
                     <Typography variant="body2" color="text.secondary">
                         Placed on {new Date(order.dateCreated).toLocaleString()}
                     </Typography>
-                </Box>
+                </Stack>
 
                 <Box>
                     {order.orderStatus === 'NEW' && (

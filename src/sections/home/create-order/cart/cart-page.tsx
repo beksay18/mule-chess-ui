@@ -14,7 +14,7 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useRouter } from '../../../../routes/hooks';
-import { useCart, type CartItem } from './cart-context';
+import { cartItemHasArtwork, useCart, type CartItem } from './cart-context';
 import { calculatePrice } from '../../../sticker-builder/pricing';
 import type { StickerFinish, StickerMaterial, StickerShape } from '../../../sticker-builder/types';
 
@@ -90,6 +90,8 @@ function CartLineItem({
     onEditDesign,
 }: CartLineItemProps) {
     const theme = useTheme();
+    const router = useRouter();
+    const hasArtwork = cartItemHasArtwork(item);
     const imageUrl = getItemImageUrl(item, baseImageUrl);
     const specs = formatSpecs(item);
     const lineTotal = getLineTotal(item);
@@ -173,6 +175,31 @@ function CartLineItem({
                             />
                         ))}
                     </Stack>
+                )}
+                {hasArtwork ? (
+                    <Typography variant="body2" sx={{ color: '#2e7d32', fontWeight: 700, mb: 1 }}>
+                        Artwork attached
+                    </Typography>
+                ) : (
+                    <Typography
+                        component="button"
+                        variant="body2"
+                        onClick={() => router.push(`/product-upload/${item.productId}`)}
+                        sx={{
+                            display: 'block',
+                            mb: 1,
+                            p: 0,
+                            border: 0,
+                            bgcolor: 'transparent',
+                            color: 'error.main',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            textAlign: 'left',
+                            '&:hover': { textDecoration: 'underline' },
+                        }}
+                    >
+                        Artwork is required. Upload a file.
+                    </Typography>
                 )}
                 {item.designId && (
                     <Typography
@@ -343,7 +370,10 @@ export default function CartPage() {
     const orderTotal = subtotal - totalDiscount;
     const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+    const artworkMissing = cartItems.some((item) => !cartItemHasArtwork(item));
+
     const handleCheckout = () => {
+        if (artworkMissing) return;
         router.push('/checkout');
     };
 
@@ -547,12 +577,19 @@ export default function CartPage() {
                                 </Box>
                             </Stack>
 
+                            {artworkMissing && (
+                                <Typography color="error" sx={{ mt: 2, fontWeight: 700, fontSize: '0.875rem' }}>
+                                    Upload artwork for every item before checkout.
+                                </Typography>
+                            )}
+
                             <Button
                                 fullWidth
                                 variant="contained"
                                 size="large"
                                 endIcon={<LockOutlinedIcon />}
                                 onClick={handleCheckout}
+                                disabled={artworkMissing}
                                 sx={{
                                     mt: 3,
                                     py: 1.5,

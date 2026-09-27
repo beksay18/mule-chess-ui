@@ -19,6 +19,7 @@ export interface LineItemRequest {
     quantity: number;
     percentage: number;
     customDimension: boolean;
+    artworkFiles?: File[];
 }
 
 export interface ShippingAddressRequest {

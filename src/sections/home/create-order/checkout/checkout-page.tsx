@@ -31,12 +31,71 @@ import {
 } from '../../../../api/shippingAddress';
 import { useRouter } from '../../../../routes/hooks';
 import { formatUsPhoneNumber, isValidUsPhoneNumber, stripPhoneDigits } from '../../../../utils/validator';
-import { useCart } from '../cart/cart-context';
+import { cartItemHasArtwork, resolveArtworkFiles, useCart } from '../cart/cart-context';
 import ContactInfoSection from './contact-info-section';
 import OrderSummary from './order-summary';
 import ShippingInfoSection from './shipping-info-section';
 
 const BRAND_BLUE = '#175195';
+
+const US_STATE_CODES: Record<string, string> = {
+    Alabama: 'AL',
+    Alaska: 'AK',
+    Arizona: 'AZ',
+    Arkansas: 'AR',
+    California: 'CA',
+    Colorado: 'CO',
+    Connecticut: 'CT',
+    Delaware: 'DE',
+    Florida: 'FL',
+    Georgia: 'GA',
+    Hawaii: 'HI',
+    Idaho: 'ID',
+    Illinois: 'IL',
+    Indiana: 'IN',
+    Iowa: 'IA',
+    Kansas: 'KS',
+    Kentucky: 'KY',
+    Louisiana: 'LA',
+    Maine: 'ME',
+    Maryland: 'MD',
+    Massachusetts: 'MA',
+    Michigan: 'MI',
+    Minnesota: 'MN',
+    Mississippi: 'MS',
+    Missouri: 'MO',
+    Montana: 'MT',
+    Nebraska: 'NE',
+    Nevada: 'NV',
+    'New Hampshire': 'NH',
+    'New Jersey': 'NJ',
+    'New Mexico': 'NM',
+    'New York': 'NY',
+    'North Carolina': 'NC',
+    'North Dakota': 'ND',
+    Ohio: 'OH',
+    Oklahoma: 'OK',
+    Oregon: 'OR',
+    Pennsylvania: 'PA',
+    'Rhode Island': 'RI',
+    'South Carolina': 'SC',
+    'South Dakota': 'SD',
+    Tennessee: 'TN',
+    Texas: 'TX',
+    Utah: 'UT',
+    Vermont: 'VT',
+    Virginia: 'VA',
+    Washington: 'WA',
+    'West Virginia': 'WV',
+    Wisconsin: 'WI',
+    Wyoming: 'WY',
+};
+
+const toStripeState = (state: string) => {
+    const trimmed = state.trim();
+    if (trimmed.length === 2) return trimmed.toUpperCase();
+    return US_STATE_CODES[trimmed] ?? trimmed;
+};
 
 const sectionCardSx = {
     p: { xs: 2.5, md: 3 },
@@ -81,15 +140,7 @@ export default function CheckoutPage() {
         postalCode: false,
     });
 
-    const lineItems: LineItemRequest[] = cartItems.map((item) => ({
-        productId: item.productId,
-        width: item.width,
-        height: item.height,
-        quantity: item.quantity,
-        percentage: item.percentage,
-        customDimension: item.customDimension,
-        artworkFiles: item.artworkFiles,
-    }));
+    const artworkMissing = cartItems.some((item) => !cartItemHasArtwork(item));
 
     const subtotal = cartItems.reduce((total, item) => {
         const itemTotal = item.price * item.quantity * (1 - item.percentage / 100);
@@ -110,7 +161,21 @@ export default function CheckoutPage() {
 
         const hasError = Object.values(newErrors).some(Boolean);
         setErrors(newErrors);
-        if (hasError || isPlacingOrder) return;
+        if (hasError || isPlacingOrder || artworkMissing) return;
+
+        const lineItems: LineItemRequest[] = await Promise.all(
+            cartItems.map(async (item) => ({
+                productId: item.productId,
+                width: item.width,
+                height: item.height,
+                quantity: item.quantity,
+                percentage: item.percentage,
+                customDimension: item.customDimension,
+                artworkFiles: await resolveArtworkFiles(item),
+            }))
+        );
+
+        if (lineItems.some((item) => !item.artworkFiles?.length)) return;
 
         if (!stripe || !elements) {
             alert('Stripe is not ready.');
@@ -120,11 +185,27 @@ export default function CheckoutPage() {
         setIsPlacingOrder(true);
 
         try {
+            const phoneDigits = stripPhoneDigits(customerPhone);
             const { error, paymentIntent } = await stripe.confirmPayment({
                 elements,
                 redirect: 'if_required',
                 confirmParams: {
                     return_url: window.location.href,
+                    payment_method_data: {
+                        billing_details: {
+                            name: `${customerFirstName.trim()} ${customerLastName.trim()}`.trim(),
+                            email: customerEmail.trim(),
+                            phone: phoneDigits ? `+1${phoneDigits}` : undefined,
+                            address: {
+                                line1: shipping.addressLine1.trim(),
+                                line2: shipping.addressLine2.trim() || undefined,
+                                city: shipping.city.trim(),
+                                state: toStripeState(shipping.state),
+                                postal_code: shipping.postalCode.trim(),
+                                country: 'US',
+                            },
+                        },
+                    },
                 },
             });
 
@@ -190,12 +271,18 @@ export default function CheckoutPage() {
     }, [user?.userId]);
 
     const placeOrderButton = (
+        <Stack spacing={1}>
+            {artworkMissing && (
+                <Typography color="error" sx={{ fontWeight: 700, fontSize: '0.875rem', textAlign: 'center' }}>
+                    Upload artwork for every item before placing the order.
+                </Typography>
+            )}
         <Button
             variant="contained"
             size="large"
             fullWidth
             onClick={handlePlaceOrder}
-            disabled={isPlacingOrder}
+            disabled={isPlacingOrder || artworkMissing}
             endIcon={<LockOutlinedIcon />}
             sx={{
                 py: 1.6,
@@ -217,6 +304,7 @@ export default function CheckoutPage() {
         >
             {isPlacingOrder ? 'Placing order...' : 'Place order'}
         </Button>
+        </Stack>
     );
 
     return (

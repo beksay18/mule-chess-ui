@@ -20,6 +20,7 @@ export default function UploadArtwork() {
     const router = useRouter();
     const fileInputRef = React.useRef<HTMLInputElement>(null);
     const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+    const [artworkError, setArtworkError] = React.useState(false);
     const { updateArtworkFilesForItem } = useCart();
 
     const handleUploadFiles = () => {
@@ -29,6 +30,7 @@ export default function UploadArtwork() {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             const newFile = event.target.files[0];
+            setArtworkError(false);
             setSelectedFiles((prev) => [...prev, newFile]);
             event.target.value = '';
         }
@@ -38,8 +40,12 @@ export default function UploadArtwork() {
         setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const handleAddToCart = () => {
-        updateArtworkFilesForItem(Number(id), selectedFiles);
+    const handleAddToCart = async () => {
+        if (selectedFiles.length === 0) {
+            setArtworkError(true);
+            return;
+        }
+        await updateArtworkFilesForItem(Number(id), selectedFiles);
         router.push(`/cart`);
     };
 
@@ -136,9 +142,11 @@ export default function UploadArtwork() {
                         variant="outlined"
                     />
                 </Box>
-                <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
-                    or, you can skip this step and email your artwork to us later.
-                </Typography>
+                {artworkError && (
+                    <Typography variant="body2" color="error" sx={{ textAlign: 'center', fontWeight: 700 }}>
+                        Upload at least one artwork file to continue.
+                    </Typography>
+                )}
                 <Box
                     sx={{
                         mt: 4,

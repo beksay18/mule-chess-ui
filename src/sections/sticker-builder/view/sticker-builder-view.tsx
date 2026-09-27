@@ -14,7 +14,7 @@ import { type Product, getActiveProducts, sortProductsByPosition } from 'src/api
 import { getActiveProductTypes } from 'src/api/productType';
 import { useRouter } from 'src/routes/hooks';
 
-import { useCart } from '../../home/create-order/cart/cart-context';
+import { dataUrlToFile, useCart } from '../../home/create-order/cart/cart-context';
 import { BRAND_BLUE, BRAND_GREEN } from '../constants';
 import { useKeyboardShortcuts } from '../hooks/use-keyboard-shortcuts';
 import { useStickerBuilder } from '../hooks/use-sticker-builder';
@@ -134,6 +134,7 @@ export function StickerBuilderView() {
         if (!api.validation.valid) return;
         const preview = previewUrl || (await api.generatePreview(true));
         await api.persistDesign();
+        const artworkName = `${(api.design.name || 'sticker-artwork').replace(/[^\w.-]+/g, '-')}.png`;
         addItem({
             productId: product?.id || 0,
             name: api.design.name || product?.name || 'Custom sticker',
@@ -145,6 +146,8 @@ export function StickerBuilderView() {
             customDimension: api.design.sticker.size === 'custom',
             lamination: api.design.sticker.finish === 'glossy' ? 'gloss' : 'matte',
             previewUrl: preview,
+            artworkFiles: [dataUrlToFile(preview, artworkName)],
+            serializedArtworkFiles: [{ name: artworkName, type: 'image/png', base64: preview }],
             material: api.design.sticker.material,
             finish: api.design.sticker.finish,
             cutType: api.design.sticker.shape,

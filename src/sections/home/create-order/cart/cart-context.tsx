@@ -40,6 +40,47 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+export function dataUrlToFile(dataUrl: string, fileName: string): File {
+    const [header, data] = dataUrl.split(',');
+    const mimeMatch = header?.match(/:(.*?);/);
+    const mime = mimeMatch?.[1] || 'image/png';
+    const binary = atob(data || '');
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) {
+        bytes[index] = binary.charCodeAt(index);
+    }
+    return new File([bytes], fileName, { type: mime });
+}
+
+export function cartItemHasArtwork(item: CartItem): boolean {
+    if (item.artworkFiles?.some((file) => file instanceof File && file.size > 0)) {
+        return true;
+    }
+    if (item.serializedArtworkFiles?.some((file) => file.base64?.startsWith('data:'))) {
+        return true;
+    }
+    return Boolean(item.previewUrl?.startsWith('data:image'));
+}
+
+export async function resolveArtworkFiles(item: CartItem): Promise<File[]> {
+    const liveFiles = item.artworkFiles?.filter((file) => file instanceof File && file.size > 0) ?? [];
+    if (liveFiles.length > 0) {
+        return liveFiles;
+    }
+
+    const serialized = item.serializedArtworkFiles?.filter((file) => file.base64?.startsWith('data:')) ?? [];
+    if (serialized.length > 0) {
+        return serialized.map((file) => dataUrlToFile(file.base64, file.name || 'artwork'));
+    }
+
+    if (item.previewUrl?.startsWith('data:image')) {
+        const safeName = (item.name || 'artwork').replace(/[^\w.-]+/g, '-');
+        return [dataUrlToFile(item.previewUrl, `${safeName}.png`)];
+    }
+
+    return [];
+}
+
 const fileToBase64 = (file: File): Promise<SerializedFile> =>
     new Promise((resolve, reject) => {
         const reader = new FileReader();

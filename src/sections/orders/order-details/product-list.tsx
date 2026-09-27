@@ -1,77 +1,186 @@
-import {Box, Typography, Avatar, Stack, Divider, Card, CardContent} from '@mui/material';
-import { Icon } from '@iconify/react';
-import React from 'react';
+import Box from '@mui/material/Box';
+import Divider from '@mui/material/Divider';
+import Paper from '@mui/material/Paper';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+import Inventory2OutlinedIcon from '@mui/icons-material/Inventory2Outlined';
 
-interface ArtworkProps {
-    imageUrl: string;
-    index: number;
-    baseURL: string;
-}
+import { LineItemResponse } from '../../../api/orderDetails';
 
-const Artwork = ({ imageUrl, index, baseURL }: ArtworkProps) => {
-    const artworkUrl = `${baseURL}${imageUrl}`;
-    return (
-        <Box
-            sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mt: 2, ml: 8 }}
-        >
-            <img
-                src={artworkUrl}
-                alt={`Artwork ${index + 1}`}
-                style={{ width: 80, height: 'auto', borderRadius: 4, border: '1px solid #ccc' }}
-            />
-            <a
-                href={artworkUrl}
-                download={`artwork-${index + 1}.png`}
-                target="_blank"
-                rel="noopener noreferrer"
-            >
-                <Typography variant="caption" color="primary" sx={{ cursor: 'pointer', textDecoration: 'underline', '&:hover': { color: 'primary.dark' } }}>
-                    Download Artwork {index + 1}
-                </Typography>
-            </a>
-        </Box>
-    );
+const cardSx = {
+    borderRadius: 2.5,
+    border: '1px solid',
+    borderColor: 'grey.200',
+    boxShadow: 'none',
 };
 
-export function ProductList({ lineItems, baseURL }: { lineItems: any[]; baseURL: string }) {
+const resolveImageUrl = (imageUrl: string | undefined, baseURL: string) => {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http') || imageUrl.startsWith('data:')) return imageUrl;
+    return `${baseURL}${imageUrl}`;
+};
+
+const formatDiscount = (percentage: number) => {
+    const value = Number(percentage);
+    if (!value) return 'None';
+    return `${value}% off`;
+};
+
+function Spec({ label, value }: { label: string; value: string }) {
     return (
-        <Card elevation={2} sx={{ borderRadius: 2 }}>
-            <CardContent>
-            <Typography variant="h6" gutterBottom>
-                <Icon icon="mdi:cart" style={{ marginRight: 8 }} />
-                Products
+        <Box
+            sx={{
+                px: 1.5,
+                py: 1.25,
+                borderRadius: 1.5,
+                bgcolor: 'grey.50',
+                border: '1px solid',
+                borderColor: 'grey.100',
+            }}
+        >
+            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700 }}>
+                {label}
             </Typography>
+            <Typography sx={{ fontWeight: 700, color: 'grey.900', mt: 0.25 }}>{value}</Typography>
+        </Box>
+    );
+}
+
+function ArtworkFile({ imageUrl, index, baseURL }: { imageUrl: string; index: number; baseURL: string }) {
+    const artworkUrl = resolveImageUrl(imageUrl, baseURL);
+
+    return (
+        <Box sx={{ width: 140 }}>
+            <Box
+                component="a"
+                href={artworkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{
+                    display: 'block',
+                    width: 140,
+                    height: 140,
+                    borderRadius: 1.5,
+                    overflow: 'hidden',
+                    border: '1px solid',
+                    borderColor: 'grey.200',
+                    bgcolor: 'grey.50',
+                }}
+            >
+                <Box
+                    component="img"
+                    src={artworkUrl}
+                    alt={`Artwork ${index + 1}`}
+                    sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+            </Box>
+            <Typography
+                component="a"
+                href={artworkUrl}
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                variant="caption"
+                sx={{ display: 'inline-block', mt: 0.75, fontWeight: 700, color: 'primary.main' }}
+            >
+                Download artwork {index + 1}
+            </Typography>
+        </Box>
+    );
+}
+
+export function ProductList({ lineItems, baseURL }: { lineItems: LineItemResponse[]; baseURL: string }) {
+    const countLabel = `${lineItems.length} item${lineItems.length === 1 ? '' : 's'}`;
+
+    return (
+        <Paper elevation={0} sx={{ ...cardSx, p: { xs: 2, md: 2.5 } }}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                <Stack direction="row" spacing={1} alignItems="center">
+                    <Inventory2OutlinedIcon fontSize="small" color="action" />
+                    <Typography sx={{ fontWeight: 800, fontSize: '1.05rem' }}>Products</Typography>
+                </Stack>
+                <Typography variant="body2" color="text.secondary">
+                    {countLabel}
+                </Typography>
+            </Stack>
             <Divider sx={{ mb: 2 }} />
-            {lineItems.map((item, index) => (
-                <Box key={index} sx={{ mb: 2 }}>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                        <Box display="flex" alignItems="center" flex={1}>
-                            <Avatar src={item.imageUrl} variant="rounded" sx={{ width: 56, height: 56, mr: 2 }} />
-                            <Box>
-                                <Typography fontWeight={500}>{item.productName}</Typography>
-                                <Typography variant="body2" color="text.secondary">
-                                    {item.width}&quot; x {item.height}&quot; · {item.isCustomDimension ? 'Custom' : 'Standard'}
-                                </Typography>
+
+            <Stack spacing={3} divider={<Divider flexItem />}>
+                {lineItems.map((item, index) => {
+                    const imageUrl = resolveImageUrl(item.imageUrl, baseURL);
+                    const artworks = item.artworks ?? [];
+
+                    return (
+                        <Box key={`${item.productId}-${index}`}>
+                            <Stack direction="row" spacing={2} alignItems="center">
+                                <Box
+                                    sx={{
+                                        width: 72,
+                                        height: 72,
+                                        flexShrink: 0,
+                                        borderRadius: 1.5,
+                                        overflow: 'hidden',
+                                        border: '1px solid',
+                                        borderColor: 'grey.200',
+                                        bgcolor: 'grey.50',
+                                    }}
+                                >
+                                    {imageUrl ? (
+                                        <Box
+                                            component="img"
+                                            src={imageUrl}
+                                            alt={item.productName}
+                                            sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                        />
+                                    ) : null}
+                                </Box>
+                                <Box>
+                                    <Typography sx={{ fontWeight: 800, color: 'grey.900' }}>
+                                        {item.productName}
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary">
+                                        Product #{item.productId}
+                                    </Typography>
+                                </Box>
+                            </Stack>
+
+                            <Box
+                                sx={{
+                                    mt: 2,
+                                    display: 'grid',
+                                    gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(4, 1fr)' },
+                                    gap: 1.25,
+                                }}
+                            >
+                                <Spec label="Size" value={`${item.width}" × ${item.height}"`} />
+                                <Spec label="Size type" value={item.isCustomDimension ? 'Custom' : 'Standard'} />
+                                <Spec label="Quantity" value={String(item.quantity)} />
+                                <Spec label="Discount" value={formatDiscount(item.percentage)} />
+                            </Box>
+
+                            <Box sx={{ mt: 2 }}>
+                                <Typography sx={{ fontWeight: 800, mb: 1 }}>Artwork</Typography>
+                                {artworks.length > 0 ? (
+                                    <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
+                                        {artworks.map((url, artworkIndex) => (
+                                            <ArtworkFile
+                                                key={`${url}-${artworkIndex}`}
+                                                imageUrl={url}
+                                                index={artworkIndex}
+                                                baseURL={baseURL}
+                                            />
+                                        ))}
+                                    </Stack>
+                                ) : (
+                                    <Typography variant="body2" color="text.secondary">
+                                        No artwork was uploaded for this item.
+                                    </Typography>
+                                )}
                             </Box>
                         </Box>
-
-                        <Typography variant="body2" color="text.secondary" flex={1}>
-                            Qty: {item.quantity}
-                        </Typography>
-
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 'auto' }}>
-                            {item.percentage}%
-                        </Typography>
-                    </Stack>
-                    <>
-                        {item.artworks.map((url: string, i: number) => (
-                            <Artwork key={i} imageUrl={url} index={i} baseURL={baseURL} />
-                        ))}
-                    </>
-                    {index < lineItems.length - 1 && <Divider sx={{ my: 2 }} />}
-                </Box>
-            ))}
-            </CardContent>
-        </Card>
+                    );
+                })}
+            </Stack>
+        </Paper>
     );
 }

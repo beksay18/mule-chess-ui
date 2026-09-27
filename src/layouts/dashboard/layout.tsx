@@ -25,11 +25,12 @@ import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
 import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {useRouter} from "../../routes/hooks";
 import {useEffect, useState} from "react";
 import {getNewContactCount} from "../../api/contacts";
 import {getNewOrdersCount} from "../../api/order";
-import {Chip} from "@mui/material";
 
 // ----------------------------------------------------------------------
 
@@ -41,7 +42,7 @@ export type DashboardLayoutProps = LayoutBaseProps & {
     header?: HeaderSectionProps;
     main?: MainSectionProps;
   };
-    orderStatus?: string;
+    orderNumber?: string;
 };
 
 export function DashboardLayout({
@@ -50,7 +51,7 @@ export function DashboardLayout({
   children,
   slotProps,
   layoutQuery = 'lg',
-                                    orderStatus,
+                                    orderNumber,
 }: DashboardLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
@@ -70,15 +71,8 @@ export function DashboardLayout({
     return '';
   };
 
-    const statusColorMap: Record<string, 'default' | 'secondary' | 'secondary' | 'error' | 'primary' | 'success' | 'warning'> = {
-        NEW: 'primary',
-        IN_PROGRESS: 'secondary',
-        READY_TO_SHIP: 'warning',
-        SHIPPED: 'success',
-        CANCELLED: 'error',
-    };
-
   const pageTitle = getPageTitle(location.pathname);
+  const isOrderDetails = location.pathname.startsWith('/order-details');
 
     useEffect(() => {
         getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
@@ -107,23 +101,26 @@ export function DashboardLayout({
               onClick={onOpen}
               sx={{ mr: 1, ml: -1, [theme.breakpoints.up(layoutQuery)]: { display: 'none' } }}
           />
-          {pageTitle && (
+          {isOrderDetails ? (
+              <Box display="flex" alignItems="center" gap={1.5} ml={1}>
+                  <Button
+                      startIcon={<ArrowBackIcon />}
+                      onClick={() => router.back()}
+                      variant="outlined"
+                      size="small"
+                      sx={{ textTransform: 'none' }}
+                  >
+                      Back
+                  </Button>
+                  <Typography variant="h4" noWrap>
+                      {orderNumber ? `Order #${orderNumber}` : 'Order'}
+                  </Typography>
+              </Box>
+          ) : pageTitle ? (
               <Typography variant="h4" ml={3} noWrap>
                 {pageTitle}
               </Typography>
-          )}
-            {orderStatus && (
-                <Box display="flex" alignItems="center" ml={3} gap={2}>
-                    <Typography variant="h4" noWrap>{pageTitle}</Typography>
-                    {['NEW', 'IN_PROGRESS', 'READY_TO_SHIP', 'CANCELLED', 'SHIPPED'].includes(orderStatus || '') && (
-                        <Chip
-                            label={orderStatus}
-                            color={statusColorMap[orderStatus as keyof typeof statusColorMap] || 'default'}
-                            sx={{ fontWeight: 500 }}
-                        />
-                    )}
-                </Box>
-            )}
+          ) : null}
           <NavMobile data={navData} open={open} onClose={onClose} />
         </>
       ),
