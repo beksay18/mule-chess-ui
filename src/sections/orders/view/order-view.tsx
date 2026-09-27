@@ -49,6 +49,7 @@ export function OrderView() {
     const [selected, setSelected] = useState<string[]>([]);
     const [orderNumber, setOrderNumber] = useState('');
     const [customer, setCustomer] = useState('');
+    const [userId, setUserId] = useState('');
     const [filterVersion, setFilterVersion] = useState(0);
     const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
 
@@ -87,7 +88,8 @@ export function OrderView() {
     }, [page, rowsPerPage, filters, filterVersion]);
 
     useEffect(() => {
-        getOrderStatusCount()
+        const selectedUserId = filters.match(/userId:([^,]*)/)?.[1];
+        getOrderStatusCount(selectedUserId)
             .then((counts) => {
                 const next: Record<string, number> = {};
                 counts.forEach((item) => {
@@ -122,19 +124,27 @@ export function OrderView() {
         const statusMatch = filterQuery.match(/orderStatus:([^,]*)/);
         const numberMatch = filterQuery.match(/orderNumber:([^,]*)/);
         const customerMatch = filterQuery.match(/customer:([^,]*)/);
+        const userIdMatch = filterQuery.match(/userId:([^,]*)/);
 
         const orderStatus = statusMatch ? statusMatch[1].split('|') : [];
         const extractedOrderNumber = numberMatch ? numberMatch[1] : '';
         const extractedCustomer = customerMatch ? customerMatch[1] : '';
+        const extractedUserId = userIdMatch ? userIdMatch[1] : '';
 
         setFilterState({ orderStatus });
         setOrderNumber(extractedOrderNumber);
-        setCustomer(extractedCustomer);
+        setUserId(extractedUserId);
+        setCustomer(extractedUserId ? params.get('userName') || '' : extractedCustomer);
 
         setFilterVersion((prev) => prev + 1);
     }, [location.search]);
 
-    const applyCombinedFilters = (orderNum: string, customerName: string, statuses: string[]) => {
+    const applyCombinedFilters = (
+        orderNum: string,
+        customerName: string,
+        statuses: string[],
+        selectedUserId: string = userId
+    ) => {
         let filterString = '';
         if (statuses.length > 0) {
             filterString += `orderStatus:${statuses.join('|')}`;
@@ -142,19 +152,28 @@ export function OrderView() {
         if (orderNum) {
             filterString += `${filterString ? ',' : ''}orderNumber:${orderNum}`;
         }
-        if (customerName.trim()) {
+        if (selectedUserId) {
+            filterString += `${filterString ? ',' : ''}userId:${selectedUserId}`;
+        } else if (customerName.trim()) {
             filterString += `${filterString ? ',' : ''}customer:${customerName.trim()}`;
         }
-        searchParams.set('page', '0');
+        const params = new URLSearchParams(location.search);
+        params.set('page', '0');
         if (filterString) {
-            searchParams.set('filter', filterString);
+            params.set('filter', filterString);
         } else {
-            searchParams.delete('filter');
+            params.delete('filter');
+        }
+        if (selectedUserId && customerName.trim()) {
+            params.set('userName', customerName.trim());
+        } else {
+            params.delete('userName');
         }
 
-        router.push(`/orders?${searchParams.toString()}`);
+        router.push(`/orders?${params.toString()}`);
 
         setFilters(filterString);
+        setUserId(selectedUserId);
         setPage(0);
         setFilterVersion((prev) => prev + 1);
     };
@@ -212,7 +231,8 @@ export function OrderView() {
                     onFilterCustomer={(event: React.ChangeEvent<HTMLInputElement>) => {
                         const value = event.target.value;
                         setCustomer(value);
-                        applyCombinedFilters(orderNumber, value, filterState.orderStatus ?? []);
+                        setUserId('');
+                        applyCombinedFilters(orderNumber, value, filterState.orderStatus ?? [], '');
                     }}
                 />
 
@@ -251,7 +271,11 @@ export function OrderView() {
                                             currentPage={page}
                                         />
                                     ))}
-                                    {notFound && <TableNoData searchQuery={filters} />}
+                                    {notFound && (
+                                        <TableNoData
+                                            searchQuery={userId ? customer || 'this customer' : filters}
+                                        />
+                                    )}
                                 </TableBody>
                             </Table>
                         )}

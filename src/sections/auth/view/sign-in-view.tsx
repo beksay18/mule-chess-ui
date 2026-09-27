@@ -49,7 +49,9 @@ export function SignInView() {
                     person: res.person,
                 });
 
-                router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
+                router.push(
+                    res.role === 'ROLE_ADMIN' ? '/dashboard' : res.role === 'ROLE_MANAGER' ? '/user' : '/'
+                );
             } catch (error: any) {
                 const message =
                     error?.response?.data?.message ||

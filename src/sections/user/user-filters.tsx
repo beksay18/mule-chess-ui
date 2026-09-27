@@ -25,6 +25,14 @@ export type UserFiltersState = {
     role: string;
 };
 
+export function roleLabel(name: string) {
+    const key = name.toLowerCase();
+    if (key === 'all') return 'All';
+    if (key === 'user') return 'Customer';
+    if (key === 'admin') return 'Admin';
+    return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 export const DEFAULT_USER_FILTERS: UserFiltersState = {
     status: 'all',
     provider: 'all',

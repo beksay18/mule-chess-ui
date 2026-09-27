@@ -12,6 +12,7 @@ export interface UserContent {
     role: string;
     active: boolean;
     provider: string;
+    orderCount: number;
 }
 
 export interface RoleOption {
@@ -20,7 +21,7 @@ export interface RoleOption {
 }
 
 export interface UpdateUserAccessRequest {
-    role: 'user' | 'admin';
+    role: string;
     active: boolean;
 }
 

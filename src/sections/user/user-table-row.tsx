@@ -1,5 +1,6 @@
 import Avatar from '@mui/material/Avatar';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from '@mui/material/Link';
@@ -12,7 +13,9 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useState } from 'react';
-import { updateUserAccess } from 'src/api/user';
+import { updateUserAccess, type RoleOption } from 'src/api/user';
+import { useRouter } from 'src/routes/hooks';
+import { roleLabel } from './user-filters';
 
 const BRAND_BLUE = '#175195';
 
@@ -26,14 +29,15 @@ export type UserProps = {
     role: string;
     active: boolean;
     provider: string;
+    orderCount?: number;
 };
 
 type UserTableRowProps = {
     row: UserProps;
+    roles: RoleOption[];
+    readOnly?: boolean;
     onChanged: () => void;
 };
-
-type AccountRole = 'user' | 'admin';
 
 function getInitials(firstName: string, lastName: string) {
     const first = firstName?.charAt(0) ?? '';
@@ -41,8 +45,8 @@ function getInitials(firstName: string, lastName: string) {
     return `${first}${last}`.toUpperCase() || '?';
 }
 
-function normalizeRole(role: string): AccountRole {
-    return role?.toUpperCase().includes('ADMIN') ? 'admin' : 'user';
+function normalizeRole(role: string) {
+    return role?.trim().toLowerCase() || 'user';
 }
 
 function getProviderStyle(provider: string) {
@@ -74,8 +78,9 @@ function errorMessage(error: unknown) {
     return 'Could not update this user. Please try again.';
 }
 
-export function UserTableRow({ row, onChanged }: UserTableRowProps) {
+export function UserTableRow({ row, roles, readOnly = false, onChanged }: UserTableRowProps) {
     const theme = useTheme();
+    const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -83,7 +88,11 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
     const provider = getProviderStyle(row.provider);
     const role = normalizeRole(row.role);
 
-    const save = async (nextRole: AccountRole, active: boolean) => {
+    const roleOptions = roles.some((item) => item.name.toLowerCase() === role)
+        ? roles
+        : [...roles, { id: -1, name: role }];
+
+    const save = async (nextRole: string, active: boolean) => {
         setSaving(true);
         setError('');
         try {
@@ -96,7 +105,7 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
         }
     };
 
-    const handleRoleChange = (nextRole: AccountRole) => {
+    const handleRoleChange = (nextRole: string) => {
         if (nextRole === role) {
             return;
         }
@@ -157,23 +166,30 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
             </TableCell>
             <TableCell sx={{ color: 'text.secondary' }}>{row.phoneNumber || '—'}</TableCell>
             <TableCell>
-                <Select
-                    size="small"
-                    value={role}
-                    disabled={saving || role === 'admin'}
-                    onChange={(event) => handleRoleChange(event.target.value as AccountRole)}
-                    sx={{ minWidth: 130, bgcolor: '#ffffff' }}
-                >
-                    <MenuItem value="user">Customer</MenuItem>
-                    <MenuItem value="admin">Admin</MenuItem>
-                </Select>
+                {readOnly ? (
+                    <Typography sx={{ fontWeight: 600 }}>{roleLabel(role)}</Typography>
+                ) : (
+                    <Select
+                        size="small"
+                        value={role}
+                        disabled={saving || role === 'admin'}
+                        onChange={(event) => handleRoleChange(event.target.value)}
+                        sx={{ minWidth: 130, bgcolor: '#ffffff' }}
+                    >
+                        {roleOptions.map((item) => (
+                            <MenuItem key={item.name} value={item.name.toLowerCase()}>
+                                {roleLabel(item.name)}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                )}
             </TableCell>
             <TableCell>
                 <FormControlLabel
                     control={
                         <Switch
                             checked={Boolean(row.active)}
-                            disabled={saving || role === 'admin'}
+                            disabled={saving || readOnly || role === 'admin'}
                             onChange={(_, checked) => save(role, checked)}
                             sx={{
                                 '& .MuiSwitch-switchBase.Mui-checked': { color: '#2e7d32' },
@@ -206,6 +222,38 @@ export function UserTableRow({ row, onChanged }: UserTableRowProps) {
                         color: provider.color,
                     }}
                 />
+            </TableCell>
+            <TableCell>
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Typography sx={{ fontWeight: 700, minWidth: 16 }}>
+                        {row.orderCount ?? 0}
+                    </Typography>
+                    {!readOnly && (
+                        <Button
+                            size="small"
+                            variant="outlined"
+                            onClick={() => {
+                                const name = fullName === '—' ? row.username : fullName;
+                                const params = new URLSearchParams({
+                                    page: '0',
+                                    filter: `userId:${row.userId}`,
+                                    userName: name,
+                                });
+                                router.push(`/orders?${params.toString()}`);
+                            }}
+                            sx={{
+                                textTransform: 'none',
+                                fontWeight: 700,
+                                borderRadius: 20,
+                                whiteSpace: 'nowrap',
+                                color: BRAND_BLUE,
+                                borderColor: alpha(BRAND_BLUE, 0.4),
+                            }}
+                        >
+                            View orders
+                        </Button>
+                    )}
+                </Stack>
             </TableCell>
             <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>
                 {formatDate(row.dateCreated)}

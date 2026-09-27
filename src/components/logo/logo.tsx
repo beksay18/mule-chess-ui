@@ -24,7 +24,8 @@ export function Logo({
     ...other
 }: LogoProps) {
     const user = getCurrentUser();
-    const href = user?.role === 'ROLE_ADMIN' ? '/dashboard' : '/';
+    const href =
+        user?.role === 'ROLE_ADMIN' ? '/dashboard' : user?.role === 'ROLE_MANAGER' ? '/user' : '/';
 
     return (
         <LogoRoot

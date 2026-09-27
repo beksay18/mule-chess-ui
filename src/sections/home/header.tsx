@@ -165,9 +165,9 @@ export default function Header() {
                             sx={{ display: { xs: 'none', md: 'flex' } }}
                         >
                             {user ? (
-                                user.role === 'ROLE_ADMIN' ? (
+                                user.role === 'ROLE_ADMIN' || user.role === 'ROLE_MANAGER' ? (
                                     <Button
-                                        onClick={() => router.push('/dashboard')}
+                                        onClick={() => router.push(user.role === 'ROLE_MANAGER' ? '/user' : '/dashboard')}
                                         variant="outlined"
                                         sx={{
                                             textTransform: 'none',
@@ -182,7 +182,7 @@ export default function Header() {
                                             },
                                         }}
                                     >
-                                        Dashboard
+                                        {user.role === 'ROLE_MANAGER' ? 'Customers' : 'Dashboard'}
                                     </Button>
                                 ) : (
                                     <Button
@@ -297,6 +297,9 @@ export default function Header() {
                             <MenuItem onClick={() => handleNavigate('/my-designs')}>My Designs</MenuItem>
                             {user.role === 'ROLE_ADMIN' && (
                                 <MenuItem onClick={() => handleNavigate('/dashboard')}>Dashboard</MenuItem>
+                            )}
+                            {user.role === 'ROLE_MANAGER' && (
+                                <MenuItem onClick={() => handleNavigate('/user')}>Customers</MenuItem>
                             )}
                             <Box sx={{ mt: 2 }}>
                                 <Button fullWidth color="error" variant="outlined" onClick={handleLogout}>

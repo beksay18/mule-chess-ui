@@ -122,7 +122,9 @@ export const createLabel = async (orderId: number | string): Promise<{ message: 
     return data;
 };
 
-export const getOrderStatusCount = (): Promise<OrderStatusCount[]> =>
+export const getOrderStatusCount = (userId?: string): Promise<OrderStatusCount[]> =>
     axios
-        .get<OrderStatusCount[]>(ENDPOINTS.ORDER.STATUS_COUNT)
+        .get<OrderStatusCount[]>(ENDPOINTS.ORDER.STATUS_COUNT, {
+            params: userId ? { userId } : undefined,
+        })
         .then(({ data }) => data);

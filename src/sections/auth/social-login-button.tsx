@@ -62,7 +62,9 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
                 person: res.person,
             });
 
-            router.push(res.role === 'ROLE_ADMIN' ? '/dashboard' : '/');
+            router.push(
+                res.role === 'ROLE_ADMIN' ? '/dashboard' : res.role === 'ROLE_MANAGER' ? '/user' : '/'
+            );
         } catch (error: unknown) {
             const message =
                 error && typeof error === 'object' && 'response' in error

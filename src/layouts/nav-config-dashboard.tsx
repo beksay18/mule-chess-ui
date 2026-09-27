@@ -14,7 +14,18 @@ export type NavItem = {
   info?: React.ReactNode;
 };
 
-export const getNavData = (newOrderCount: number): NavItem[] => [
+export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
+  if (role === 'ROLE_MANAGER') {
+    return [
+      {
+        title: 'Users',
+        path: '/user',
+        icon: icon('ic-user'),
+      },
+    ];
+  }
+
+  return [
   {
     title: 'Dashboard',
     path: '/dashboard',
@@ -57,3 +68,4 @@ export const getNavData = (newOrderCount: number): NavItem[] => [
     icon: <ExtensionIcon />,
   },
 ];
+};

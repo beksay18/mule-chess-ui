@@ -86,10 +86,38 @@ export const routesSection: RouteObject[] = [
             </AuthGuard>
         ),
         children: [
-            {path: 'dashboard', element: <DashboardPage/>},
-            {path: 'orders', element: <OrdersPage/>},
-            {path: 'user', element: <UserPage/>},
-            {path: 'contacts', element: <ContactsPage/>},
+            {
+                path: 'dashboard',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <DashboardPage/>
+                    </RoleGuard>
+                ),
+            },
+            {
+                path: 'orders',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <OrdersPage/>
+                    </RoleGuard>
+                ),
+            },
+            {
+                path: 'user',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
+                        <UserPage/>
+                    </RoleGuard>
+                ),
+            },
+            {
+                path: 'contacts',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                        <ContactsPage/>
+                    </RoleGuard>
+                ),
+            },
             {
                 path: 'products-types',
                 element: (

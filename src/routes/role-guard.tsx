@@ -18,7 +18,7 @@ export default function RoleGuard({ children, allowedRoles }: Props) {
     const hasAccess = allowedRoles.includes(user.role);
 
     if (!hasAccess) {
-        return <Navigate to="/404" />;
+        return <Navigate to={user.role === 'ROLE_MANAGER' ? '/user' : '/404'} />;
     }
 
     return <>{children}</>;

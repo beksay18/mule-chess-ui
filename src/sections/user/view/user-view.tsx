@@ -19,11 +19,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import { alpha, useTheme } from '@mui/material/styles';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Scrollbar } from 'src/components/scrollbar';
+import { getCurrentUser } from '../../../api';
 import { getAllRoles, getAllUsers, type RoleOption, type UserContent } from '../../../api/user';
 import { useRouter } from '../../../routes/hooks';
 import {
     DEFAULT_USER_FILTERS,
     hasActiveUserFilters,
+    roleLabel,
     UserFilters,
     type UserFiltersState,
 } from '../user-filters';
@@ -31,14 +33,6 @@ import { UserTableHead } from '../user-table-head';
 import { UserTableRow } from '../user-table-row';
 
 const BRAND_BLUE = '#175195';
-
-function roleLabel(name: string) {
-    const key = name.toLowerCase();
-    if (key === 'all') return 'All';
-    if (key === 'user') return 'Customer';
-    if (key === 'admin') return 'Admin';
-    return name.charAt(0).toUpperCase() + name.slice(1);
-}
 
 function sortRoles(roles: RoleOption[]) {
     const rank = (name: string) => {
@@ -50,7 +44,7 @@ function sortRoles(roles: RoleOption[]) {
     return [...roles].sort((a, b) => rank(a.name) - rank(b.name) || a.name.localeCompare(b.name));
 }
 
-function buildFilter(filters: UserFiltersState, search: string) {
+function buildFilter(filters: UserFiltersState, search: string, customersOnly: boolean) {
     const parts: string[] = [];
 
     if (filters.status === 'active') {
@@ -65,7 +59,9 @@ function buildFilter(filters: UserFiltersState, search: string) {
         parts.push('provider:LOCAL');
     }
 
-    if (filters.role !== 'all') {
+    if (customersOnly) {
+        parts.push('role.name:user');
+    } else if (filters.role !== 'all') {
         parts.push(`role.name:${filters.role}`);
     }
 
@@ -81,6 +77,7 @@ export function UserView() {
     const theme = useTheme();
     const [searchParams] = useSearchParams();
     const router = useRouter();
+    const customersOnly = getCurrentUser()?.role === 'ROLE_MANAGER';
 
     const initialPage = parseInt(searchParams.get('page') || '0', 10);
     const [page, setPage] = useState(initialPage);
@@ -97,7 +94,7 @@ export function UserView() {
     ]);
     const [loading, setLoading] = useState(false);
 
-    const filters = buildFilter(appliedFilters, searchQuery);
+    const filters = buildFilter(appliedFilters, searchQuery, customersOnly);
 
     const fetchUsers = useCallback(async () => {
         setLoading(true);
@@ -196,7 +193,9 @@ export function UserView() {
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
                 <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    Registered accounts, including admins. Filter by role, then change a customer&apos;s role or status.
+                    {customersOnly
+                        ? 'Customer accounts.'
+                        : 'Registered accounts, including admins. Filter by role, then change a customer\u2019s role or status.'}
                 </Typography>
 
                 <Card
@@ -207,6 +206,7 @@ export function UserView() {
                         overflow: 'hidden',
                     }}
                 >
+                    {!customersOnly && (
                     <Stack
                         direction="row"
                         spacing={1}
@@ -249,6 +249,7 @@ export function UserView() {
                             );
                         })}
                     </Stack>
+                    )}
 
                     <Box
                         sx={{
@@ -360,7 +361,7 @@ export function UserView() {
                                     )}
                                 </Box>
                             ) : (
-                                <Table sx={{ minWidth: 900 }}>
+                                <Table sx={{ minWidth: 1100 }}>
                                     <UserTableHead
                                         headLabel={[
                                             { id: 'user', label: 'User', minWidth: 260 },
@@ -368,12 +369,19 @@ export function UserView() {
                                             { id: 'role', label: 'Role', minWidth: 100 },
                                             { id: 'active', label: 'Status', minWidth: 90 },
                                             { id: 'provider', label: 'Provider', minWidth: 90 },
+                                            { id: 'orders', label: 'Orders', minWidth: 180 },
                                             { id: 'dateCreated', label: 'Joined', minWidth: 160 },
                                         ]}
                                     />
                                     <TableBody>
                                         {users.map((row) => (
-                                            <UserTableRow key={row.userId} row={row} onChanged={fetchUsers} />
+                                            <UserTableRow
+                                                key={row.userId}
+                                                row={row}
+                                                roles={roles}
+                                                readOnly={customersOnly}
+                                                onChanged={fetchUsers}
+                                            />
                                         ))}
                                     </TableBody>
                                 </Table>
