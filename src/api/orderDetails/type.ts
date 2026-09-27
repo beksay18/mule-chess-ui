@@ -11,6 +11,7 @@ export type CustomerOrderResponse = {
     dateCreated: string;
     lineItems: LineItemResponse[];
     payment: PaymentDTO;
+    timeline?: { status: string; occurredAt?: string | null; actorName?: string | null }[];
 };
 
 export type CustomerUserDTO = {

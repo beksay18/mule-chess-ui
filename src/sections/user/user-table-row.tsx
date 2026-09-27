@@ -228,8 +228,7 @@ export function UserTableRow({ row, roles, readOnly = false, onChanged }: UserTa
                     <Typography sx={{ fontWeight: 700, minWidth: 16 }}>
                         {row.orderCount ?? 0}
                     </Typography>
-                    {!readOnly && (
-                        <Button
+                    <Button
                             size="small"
                             variant="outlined"
                             onClick={() => {
@@ -252,7 +251,6 @@ export function UserTableRow({ row, roles, readOnly = false, onChanged }: UserTa
                         >
                             View orders
                         </Button>
-                    )}
                 </Stack>
             </TableCell>
             <TableCell sx={{ color: 'text.secondary', whiteSpace: 'nowrap' }}>

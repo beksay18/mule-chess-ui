@@ -78,12 +78,10 @@ export function DashboardLayout({
   const isOrderDetails = location.pathname.startsWith('/order-details');
 
     useEffect(() => {
-        if (isManager) {
-            return undefined;
+        if (!isManager) {
+            getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
         }
-        getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
         getNewOrdersCount().then(setNewOrderCount).catch(() => setNewOrderCount(0));
-        return undefined;
     }, [isManager]);
 
     const navData = getNavData(newOrderCount, getCurrentUser()?.role);

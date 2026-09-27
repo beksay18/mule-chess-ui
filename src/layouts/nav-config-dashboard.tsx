@@ -15,17 +15,7 @@ export type NavItem = {
 };
 
 export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
-  if (role === 'ROLE_MANAGER') {
-    return [
-      {
-        title: 'Users',
-        path: '/user',
-        icon: icon('ic-user'),
-      },
-    ];
-  }
-
-  return [
+  const items: NavItem[] = [
   {
     title: 'Dashboard',
     path: '/dashboard',
@@ -67,5 +57,12 @@ export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
     path: '/products-types',
     icon: <ExtensionIcon />,
   },
-];
+  ];
+
+  if (role === 'ROLE_MANAGER') {
+    const allowed = new Set(['/dashboard', '/orders', '/user', '/blog-posts']);
+    return items.filter((item) => allowed.has(item.path));
+  }
+
+  return items;
 };

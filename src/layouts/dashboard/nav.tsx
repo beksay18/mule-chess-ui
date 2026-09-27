@@ -13,6 +13,7 @@ import Drawer, { drawerClasses } from '@mui/material/Drawer';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
+import { getCurrentUser } from 'src/api';
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -111,8 +112,15 @@ export function NavMobile({
 
 // ----------------------------------------------------------------------
 
+function roleChipLabel(role?: string) {
+  if (role === 'ROLE_MANAGER') return 'Manager';
+  if (role === 'ROLE_ADMIN') return 'Admin';
+  return '';
+}
+
 export function NavContent({ data, slots, sx }: NavContentProps) {
   const pathname = usePathname();
+  const roleLabel = roleChipLabel(getCurrentUser()?.role);
 
   return (
     <>
@@ -131,8 +139,9 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
               },
             }}
           />
+          {roleLabel && (
           <Chip
-            label="Admin"
+            label={roleLabel}
             size="small"
             sx={{
               flexShrink: 0,
@@ -145,6 +154,7 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
               border: `1px solid ${alpha(BRAND_BLUE, 0.18)}`,
             }}
           />
+          )}
         </Stack>
 
         <Divider sx={{ mt: 2.5, borderColor: alpha(BRAND_BLUE, 0.1) }} />
@@ -173,7 +183,9 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
             }}
           >
             {data.map((item) => {
-              const isActived = item.path === pathname;
+              const isActived =
+                item.path === pathname ||
+                (item.path === '/orders' && pathname.startsWith('/order-details'));
 
               return (
                 <ListItem disableGutters disablePadding key={item.title}>

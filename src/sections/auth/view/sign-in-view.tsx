@@ -50,7 +50,7 @@ export function SignInView() {
                 });
 
                 router.push(
-                    res.role === 'ROLE_ADMIN' ? '/dashboard' : res.role === 'ROLE_MANAGER' ? '/user' : '/'
+                    res.role === 'ROLE_ADMIN' || res.role === 'ROLE_MANAGER' ? '/dashboard' : '/'
                 );
             } catch (error: any) {
                 const message =

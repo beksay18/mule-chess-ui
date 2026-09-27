@@ -13,6 +13,7 @@ import {OrderSummary} from "../order-summary";
 import {CustomerInfo} from "../customer-info";
 import {ShippingInfo} from "../shipping-info";
 import {ProductList} from "../product-list";
+import {OrderTimeline} from "../order-timeline";
 import Dialog from "@mui/material/Dialog";
 
 const STATUS_DISPLAY: Record<string, { label: string; color: string; bg: string }> = {
@@ -170,6 +171,15 @@ export function OrderDetailsView({setOrderStatus, setOrderNumber}: OrderDetailPr
                         </Button>
                     )}
                 </Box>
+            </Box>
+
+            <Box mb={3}>
+                <OrderTimeline
+                    status={order.orderStatus}
+                    placedAt={order.dateCreated}
+                    placedBy={[order.customerFirstName, order.customerLastName].filter(Boolean).join(' ')}
+                    events={order.timeline}
+                />
             </Box>
 
             <Box display="flex" flexDirection={{xs: 'column', lg: 'row'}} gap={3}>

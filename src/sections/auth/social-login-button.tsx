@@ -63,7 +63,7 @@ export function SocialLoginButton({ onError }: SocialLoginButtonProps) {
             });
 
             router.push(
-                res.role === 'ROLE_ADMIN' ? '/dashboard' : res.role === 'ROLE_MANAGER' ? '/user' : '/'
+                res.role === 'ROLE_ADMIN' || res.role === 'ROLE_MANAGER' ? '/dashboard' : '/'
             );
         } catch (error: unknown) {
             const message =
