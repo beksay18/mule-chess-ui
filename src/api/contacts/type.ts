@@ -17,6 +17,15 @@ export interface ContactsResponse {
 
 export type ContactResponsePage = PaginatedResponse<ContactsContent>;
 
+export interface ContactReply {
+    id: number;
+    message: string;
+    fileUrl?: string;
+    fileName?: string;
+    sentAt: string;
+    authorName?: string;
+}
+
 export interface ContactsRequest {
     name: string;
     email: string;

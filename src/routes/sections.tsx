@@ -113,7 +113,7 @@ export const routesSection: RouteObject[] = [
             {
                 path: 'contacts',
                 element: (
-                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
                         <ContactsPage/>
                     </RoleGuard>
                 ),
@@ -157,7 +157,7 @@ export const routesSection: RouteObject[] = [
             {
                 path: 'faq',
                 element: (
-                    <RoleGuard allowedRoles={['ROLE_ADMIN']}>
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
                         <Outlet/>
                     </RoleGuard>
                 ),

@@ -1,6 +1,6 @@
 import { axios } from "../http";
 import { ENDPOINTS } from "../constant";
-import {ContactResponsePage, ContactsRequest, ContactsResponse} from "./type";
+import {ContactReply, ContactResponsePage, ContactsRequest, ContactsResponse} from "./type";
 
 export const createContacts = (payload: ContactsRequest): Promise<ContactsResponse> => {
         const formData = new FormData();
@@ -33,3 +33,20 @@ export const markContactAsDone = (id: number): Promise<void> =>
 
 export const getNewContactCount = (): Promise<number> =>
     axios.get<number>(ENDPOINTS.CONTACTS.NEW_COUNT).then(({ data }) => data);
+
+export const getContactReplies = (id: number): Promise<ContactReply[]> =>
+    axios.get<ContactReply[]>(ENDPOINTS.CONTACTS.REPLIES(id)).then(({ data }) => data);
+
+export const replyToContact = (id: number, message: string, file?: File): Promise<ContactReply> => {
+    const formData = new FormData();
+    formData.append('message', message);
+    if (file) {
+        formData.append('file', file);
+    }
+    return axios
+        .post<ContactReply>(ENDPOINTS.CONTACTS.REPLY(id), formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            timeout: 30000,
+        })
+        .then(({ data }) => data);
+};

@@ -62,6 +62,8 @@ export const ENDPOINTS = {
         CREATE_CONTACT: "/cg-stickers/api/contacts/save-contacts",
         MARK_DONE: (id: number) => `/cg-stickers/api/contacts/mark-done/${id}`,
         NEW_COUNT: "/cg-stickers/api/contacts/new-count",
+        REPLIES: (id: number) => `/cg-stickers/api/contacts/${id}/replies`,
+        REPLY: (id: number) => `/cg-stickers/api/contacts/${id}/reply`,
     },
     BLOG: {
         GET_PUBLISHED: "/cg-stickers/api/blog/public",

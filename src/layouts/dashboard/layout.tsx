@@ -56,7 +56,6 @@ export function DashboardLayout({
 }: DashboardLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
-  const isManager = getCurrentUser()?.role === 'ROLE_MANAGER';
   const [newContactCount, setNewContactCount] = useState(0);
   const [newOrderCount, setNewOrderCount] = useState(0);
 
@@ -78,11 +77,9 @@ export function DashboardLayout({
   const isOrderDetails = location.pathname.startsWith('/order-details');
 
     useEffect(() => {
-        if (!isManager) {
-            getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
-        }
+        getNewContactCount().then(setNewContactCount).catch(() => setNewContactCount(0));
         getNewOrdersCount().then(setNewOrderCount).catch(() => setNewOrderCount(0));
-    }, [isManager]);
+    }, []);
 
     const navData = getNavData(newOrderCount, getCurrentUser()?.role);
 
@@ -131,7 +128,7 @@ export function DashboardLayout({
       ),
       rightArea: (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 2, sm: 4 } }}>
-              {!isManager && <IconButton
+              <IconButton
                   onClick={() => router.push('/contacts')}
                   sx={{
                       p: 0,
@@ -148,7 +145,7 @@ export function DashboardLayout({
                           }}
                       />
                   </Badge>
-              </IconButton>}
+              </IconButton>
             <AccountPopover data={_account} />
           </Box>
       ),

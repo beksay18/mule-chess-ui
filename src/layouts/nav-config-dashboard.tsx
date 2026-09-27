@@ -60,7 +60,7 @@ export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
   ];
 
   if (role === 'ROLE_MANAGER') {
-    const allowed = new Set(['/dashboard', '/orders', '/user', '/blog-posts']);
+    const allowed = new Set(['/dashboard', '/orders', '/user', '/contacts', '/faq', '/blog-posts']);
     return items.filter((item) => allowed.has(item.path));
   }
 
