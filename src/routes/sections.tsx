@@ -29,6 +29,7 @@ export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const ContactsPage = lazy(() => import('src/pages/contacts'));
 export const OrderDetailsPage = lazy(() => import('src/pages/order-details'));
 export const SignInPage = lazy(() => import('src/pages/sign-in'));
+export const ForgotPasswordPage = lazy(() => import('src/pages/forgot-password'));
 export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const ProfilePage = lazy(() => import('src/pages/profile/profile'));
 export const MyOrdersPage = lazy(() => import('src/pages/profile/my-orders'));
@@ -228,6 +229,12 @@ export const routesSection: RouteObject[] = [
         path: 'sign-in',
         element: (
             <SignInPage/>
+        ),
+    },
+    {
+        path: 'forgot-password',
+        element: (
+            <ForgotPasswordPage/>
         ),
     },
     {

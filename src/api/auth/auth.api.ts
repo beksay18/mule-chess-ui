@@ -38,6 +38,30 @@ export const loginWithGoogle = (
         )
         .then(({ data }) => data);
 
+const authMailConfig = { headers: { 'x-skip-auth': 'true' }, timeout: 30000 };
+
+export const requestPasswordReset = (username: string, lastName: string): Promise<MessageResponse> =>
+    axios
+        .postWithRetries<MessageResponse, { username: string; lastName: string }>(
+            ENDPOINTS.AUTH.FORGOT_PASSWORD,
+            { username, lastName },
+            authMailConfig
+        )
+        .then(({ data }) => data);
+
+export const confirmPasswordReset = (
+    username: string,
+    lastName: string,
+    code: string
+): Promise<MessageResponse> =>
+    axios
+        .postWithRetries<MessageResponse, { username: string; lastName: string; code: string }>(
+            ENDPOINTS.AUTH.FORGOT_PASSWORD_CONFIRM,
+            { username, lastName, code },
+            authMailConfig
+        )
+        .then(({ data }) => data);
+
 export const getGoogleClientId = (): Promise<string> =>
     axios
         .getWithRetries<GoogleClientIdResponse>(ENDPOINTS.AUTH.GOOGLE_CLIENT_ID, skipAuthHeader)

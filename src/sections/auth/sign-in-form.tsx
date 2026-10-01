@@ -86,7 +86,7 @@ export function SignInForm({
                 }}
             >
                 <Link
-                    href="/contact-us"
+                    href="/forgot-password"
                     variant="body2"
                     underline="hover"
                     sx={{ color: BRAND_BLUE, fontWeight: 600, fontSize: '0.8125rem' }}
