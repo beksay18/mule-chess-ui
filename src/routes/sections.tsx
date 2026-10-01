@@ -22,6 +22,8 @@ import FaqForm from "../sections/faq/faq-form";
 // ----------------------------------------------------------------------
 
 export const DashboardPage = lazy(() => import('src/pages/dashboard'));
+export const AccountProfilePage = lazy(() => import('src/pages/account-profile'));
+export const AccountSettingsPage = lazy(() => import('src/pages/account-settings'));
 export const UserPage = lazy(() => import('src/pages/user'));
 export const OrdersPage = lazy(() => import('src/pages/orders'));
 export const ContactsPage = lazy(() => import('src/pages/contacts'));
@@ -91,6 +93,22 @@ export const routesSection: RouteObject[] = [
                 element: (
                     <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
                         <DashboardPage/>
+                    </RoleGuard>
+                ),
+            },
+            {
+                path: 'account/profile',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
+                        <AccountProfilePage/>
+                    </RoleGuard>
+                ),
+            },
+            {
+                path: 'account/settings',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
+                        <AccountSettingsPage/>
                     </RoleGuard>
                 ),
             },

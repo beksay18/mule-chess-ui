@@ -1,4 +1,5 @@
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
@@ -28,6 +29,7 @@ export function SignUpView() {
     const theme = useTheme();
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
+    const [createdEmail, setCreatedEmail] = useState('');
 
     const handleSignUp = async (form: {
         firstName: string;
@@ -38,9 +40,8 @@ export function SignUpView() {
     }) => {
         setErrorMessage('');
         try {
-            const res = await signUp(form);
-            console.log(res.message);
-            router.push('/sign-in');
+            await signUp(form);
+            setCreatedEmail(form.username);
         } catch (error: any) {
             const message =
                 error?.response?.data?.message || 'Sign-up failed. Please try again.';
@@ -75,10 +76,16 @@ export function SignUpView() {
                                 mb: 1,
                             }}
                         >
-                            Create your{' '}
-                            <Box component="span" sx={stickerChipSx}>
-                                account
-                            </Box>
+                            {createdEmail ? (
+                                'Account created'
+                            ) : (
+                                <>
+                                    Create your{' '}
+                                    <Box component="span" sx={stickerChipSx}>
+                                        account
+                                    </Box>
+                                </>
+                            )}
                         </Typography>
                         <Typography
                             sx={{
@@ -87,7 +94,9 @@ export function SignUpView() {
                                 lineHeight: 1.6,
                             }}
                         >
-                            Join to design custom stickers and keep track of your orders.
+                            {createdEmail
+                                ? 'Sign in with the email and password you just used.'
+                                : 'Join to design custom stickers and keep track of your orders.'}
                         </Typography>
                     </Box>
 
@@ -102,9 +111,41 @@ export function SignUpView() {
                             boxShadow: `0 8px 32px ${alpha(BRAND_BLUE, 0.08)}`,
                         }}
                     >
-                        <SignUpForm onSubmit={handleSignUp} />
+                        {createdEmail ? (
+                            <Stack spacing={2.5} alignItems="center" sx={{ textAlign: 'center' }}>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 800,
+                                        fontSize: '1.25rem',
+                                        color: theme.palette.grey[900],
+                                    }}
+                                >
+                                    Your account is ready
+                                </Typography>
+                                <Typography sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
+                                    We created an account for {createdEmail}. Sign in with that email
+                                    and the password you just chose to start designing stickers.
+                                </Typography>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => router.push('/sign-in')}
+                                    sx={{
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        bgcolor: BRAND_BLUE,
+                                        borderRadius: 2,
+                                        px: 3,
+                                        '&:hover': { bgcolor: '#124578' },
+                                    }}
+                                >
+                                    Sign in
+                                </Button>
+                            </Stack>
+                        ) : (
+                            <SignUpForm onSubmit={handleSignUp} />
+                        )}
 
-                        {errorMessage && (
+                        {errorMessage && !createdEmail && (
                             <Typography
                                 variant="body2"
                                 color="error"
@@ -115,6 +156,7 @@ export function SignUpView() {
                             </Typography>
                         )}
 
+                        {!createdEmail && (
                         <Typography
                             variant="body2"
                             sx={{ color: 'text.secondary', textAlign: 'center', mt: 3 }}
@@ -128,6 +170,7 @@ export function SignUpView() {
                                 Sign in
                             </Link>
                         </Typography>
+                        )}
                     </Box>
                 </Stack>
             </Container>

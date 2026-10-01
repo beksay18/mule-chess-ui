@@ -1,4 +1,4 @@
-import {useState, useCallback} from 'react';
+import {useState, useEffect, useCallback} from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -12,8 +12,7 @@ import PersonIcon from '@mui/icons-material/Person';
 
 import {useRouter, usePathname} from 'src/routes/hooks';
 
-import {getCurrentUser} from "../../api";
-import {logoutSession} from "../../api";
+import {logoutSession, getCurrentUser} from "../../api";
 import type {ButtonProps} from '@mui/material/Button';
 
 // ----------------------------------------------------------------------
@@ -33,6 +32,13 @@ export function AccountPopover({data = [], sx, ...other}: AccountPopoverProps) {
     const pathname = usePathname();
 
     const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
+    const [user, setUser] = useState(getCurrentUser);
+
+    useEffect(() => {
+        const refresh = () => setUser(getCurrentUser());
+        window.addEventListener('current-user-updated', refresh);
+        return () => window.removeEventListener('current-user-updated', refresh);
+    }, []);
 
     const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
         setOpenPopover(event.currentTarget);
@@ -53,8 +59,6 @@ export function AccountPopover({data = [], sx, ...other}: AccountPopoverProps) {
     const handleLogout = useCallback(() => {
         void logoutSession().finally(() => router.push('/sign-in'));
     }, [router]);
-
-    const user = getCurrentUser();
 
     return (
         <>
