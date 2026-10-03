@@ -51,7 +51,7 @@ export default function ContactFormSection() {
     }, [searchParams]);
 
     const [submitting, setSubmitting] = useState(false);
-    const [success, setSuccess] = useState(false);
+    const [sentTo, setSentTo] = useState('');
     const [error, setError] = useState<string | null>(null);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -72,11 +72,10 @@ export default function ContactFormSection() {
         e.preventDefault();
         setSubmitting(true);
         setError(null);
-        setSuccess(false);
 
         try {
             await createContacts(form);
-            setSuccess(true);
+            setSentTo(form.email.trim());
             setForm({
                 name: '',
                 email: '',
@@ -153,10 +152,73 @@ export default function ContactFormSection() {
                                 lineHeight: 1.6,
                             }}
                         >
-                            Questions about stickers, orders, or samples? Write to us below.
+                            {sentTo
+                                ? 'Your message is with our team.'
+                                : 'Questions about stickers, orders, or samples? Write to us below.'}
                         </Typography>
                     </Box>
 
+                    {sentTo ? (
+                        <Box
+                            sx={{
+                                width: '100%',
+                                p: { xs: 3, md: 4 },
+                                borderRadius: 3,
+                                textAlign: 'center',
+                                bgcolor: alpha(BRAND_BLUE, 0.04),
+                                border: `1px solid ${alpha(BRAND_BLUE, 0.12)}`,
+                            }}
+                        >
+                            <Stack spacing={2} alignItems="center">
+                                <Box
+                                    sx={{
+                                        width: 56,
+                                        height: 56,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        borderRadius: '50%',
+                                        bgcolor: alpha('#2e7d32', 0.1),
+                                        color: 'success.main',
+                                    }}
+                                >
+                                    <CheckCircleOutlineIcon sx={{ fontSize: 32 }} />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontWeight: 800,
+                                        fontSize: '1.35rem',
+                                        color: theme.palette.grey[900],
+                                    }}
+                                >
+                                    Message received
+                                </Typography>
+                                <Typography sx={{ color: 'text.secondary', lineHeight: 1.7, maxWidth: 420 }}>
+                                    Thanks for writing. We will reply to {sentTo}. If you included an
+                                    order number, we will look that order up before we write back.
+                                </Typography>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => setSentTo('')}
+                                    sx={{
+                                        mt: 1,
+                                        textTransform: 'none',
+                                        fontWeight: 700,
+                                        color: BRAND_BLUE,
+                                        borderColor: alpha(BRAND_BLUE, 0.4),
+                                        borderRadius: 50,
+                                        px: 3,
+                                        '&:hover': {
+                                            borderColor: BRAND_BLUE,
+                                            bgcolor: alpha(BRAND_BLUE, 0.04),
+                                        },
+                                    }}
+                                >
+                                    Send another message
+                                </Button>
+                            </Stack>
+                        </Box>
+                    ) : (
                     <Box
                         component="form"
                         onSubmit={handleSubmit}
@@ -334,21 +396,6 @@ export default function ContactFormSection() {
                                 )}
                             </Button>
 
-                            {success && (
-                                <Stack
-                                    direction="row"
-                                    spacing={1}
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    sx={{ pt: 1 }}
-                                >
-                                    <CheckCircleOutlineIcon sx={{ color: 'success.main', fontSize: 20 }} />
-                                    <Typography variant="body2" sx={{ color: 'success.dark', fontWeight: 600 }}>
-                                        Message sent — we&apos;ll reply soon!
-                                    </Typography>
-                                </Stack>
-                            )}
-
                             {error && (
                                 <Typography variant="body2" color="error" textAlign="center" sx={{ pt: 1 }}>
                                     {error}
@@ -356,6 +403,7 @@ export default function ContactFormSection() {
                             )}
                         </Stack>
                     </Box>
+                    )}
                 </Stack>
             </Container>
         </Box>
