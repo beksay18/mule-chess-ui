@@ -1,5 +1,6 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { readLocalCart, readStoredCart, writeStoredCart } from './cart-storage';
 
 export interface SerializedFile {
     name: string;
@@ -96,32 +97,50 @@ const fileToBase64 = (file: File): Promise<SerializedFile> =>
 
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [cartItems, setCartItems] = useState<CartItem[]>(() => {
-        const stored = localStorage.getItem('cart');
-        if (!stored) return [];
-        try {
-            return JSON.parse(stored);
-        } catch {
-            return [];
-        }
-    });
+    const [cartItems, setCartItems] = useState<CartItem[]>(readLocalCart);
+    const [ready, setReady] = useState(false);
+    const userEdited = useRef(false);
 
     useEffect(() => {
-        console.log("Cart saved to localStorage:", cartItems);
-        localStorage.setItem('cart', JSON.stringify(cartItems));
-    }, [cartItems]);
+        let cancelled = false;
+
+        readStoredCart()
+            .then((stored) => {
+                if (cancelled || userEdited.current || !stored) return;
+                setCartItems(stored);
+            })
+            .finally(() => {
+                if (!cancelled) setReady(true);
+            });
+
+        return () => {
+            cancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!ready) return;
+        writeStoredCart(cartItems).catch(() => undefined);
+    }, [cartItems, ready]);
 
     const addItem = (item: CartItem) => {
+        userEdited.current = true;
         setCartItems((prev) => [...prev, item]);
     };
 
     const removeItem = (index: number) => {
+        userEdited.current = true;
         setCartItems((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const replaceItems = (items: CartItem[]) => {
+        userEdited.current = true;
+        setCartItems(items);
     };
 
     const updateArtworkFilesForItem = async (productId: number, files: File[]) => {
         const serializedFiles = await Promise.all(files.map(fileToBase64));
-        console.log("Saving serialized files:", serializedFiles);
+        userEdited.current = true;
         setCartItems((prev) =>
             prev.map((item) =>
                 item.productId === productId
@@ -132,7 +151,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     return (
-        <CartContext.Provider value={{ cartItems, addItem, setCartItems, removeItem, updateArtworkFilesForItem }}>
+        <CartContext.Provider
+            value={{ cartItems, addItem, setCartItems: replaceItems, removeItem, updateArtworkFilesForItem }}
+        >
             {children}
         </CartContext.Provider>
     );

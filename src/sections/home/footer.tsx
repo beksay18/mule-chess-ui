@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -33,16 +34,59 @@ const sectionTitleSx = {
     mb: 0.5,
 };
 
+const SCROLL_THRESHOLD = 48;
+
 export default function Footer() {
     const logoImage = '/assets/images/home-products/cg-sticker-house.png';
+    const footerRef = useRef<HTMLElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const footer = footerRef.current;
+        if (!footer) {
+            return () => undefined;
+        }
+
+        const placeBelowFold = () => {
+            const currentMargin = Number.parseFloat(footer.style.marginTop) || 0;
+            const naturalTop = footer.getBoundingClientRect().top + window.scrollY - currentMargin;
+            const gap = window.innerHeight - naturalTop;
+            const next = gap > 1 ? gap : 0;
+            if (Math.abs(next - currentMargin) > 1) {
+                footer.style.marginTop = next ? `${next}px` : '0px';
+            }
+        };
+
+        const onScroll = () => {
+            setVisible(window.scrollY > SCROLL_THRESHOLD);
+        };
+
+        placeBelowFold();
+        onScroll();
+        const observer = new ResizeObserver(placeBelowFold);
+        observer.observe(document.body);
+        window.addEventListener('resize', placeBelowFold);
+        window.addEventListener('scroll', onScroll, { passive: true });
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('resize', placeBelowFold);
+            window.removeEventListener('scroll', onScroll);
+        };
+    }, []);
 
     return (
         <Box
+            ref={footerRef}
             component="footer"
             sx={{
                 bgcolor: FOOTER_DARK,
                 backgroundImage: `linear-gradient(180deg, ${FOOTER_DARK} 0%, ${FOOTER_DARKER} 100%)`,
                 borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+                opacity: visible ? 1 : 0,
+                transform: visible ? 'none' : 'translateY(16px)',
+                transition: 'opacity 0.35s ease, transform 0.35s ease',
+                pointerEvents: visible ? 'auto' : 'none',
             }}
         >
             <Container maxWidth="lg" sx={{ py: { xs: 6, md: 8 } }}>

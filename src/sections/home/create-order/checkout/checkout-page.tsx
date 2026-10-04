@@ -14,7 +14,7 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
-import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
+import { CardCvcElement, CardExpiryElement, CardNumberElement, useElements, useStripe } from '@stripe/react-stripe-js';
 
 import { getCurrentUser } from '../../../../api';
 import {
@@ -97,6 +97,30 @@ const toStripeState = (state: string) => {
     return US_STATE_CODES[trimmed] ?? trimmed;
 };
 
+const cardElementOptions = {
+    style: {
+        base: {
+            fontSize: '16px',
+            color: '#0f172a',
+            fontFamily: 'DM Sans, system-ui, sans-serif',
+            '::placeholder': { color: '#94a3b8' },
+        },
+        invalid: { color: '#b42318' },
+    },
+};
+
+const cardFieldSx = {
+    border: '1px solid rgba(15, 23, 42, 0.2)',
+    borderRadius: '12px',
+    px: 1.75,
+    py: '14px',
+    bgcolor: '#fff',
+    '&:focus-within': {
+        borderColor: BRAND_BLUE,
+        boxShadow: `0 0 0 1px ${BRAND_BLUE}`,
+    },
+};
+
 const sectionCardSx = {
     p: { xs: 2.5, md: 3 },
     borderRadius: 3,
@@ -104,7 +128,7 @@ const sectionCardSx = {
     boxShadow: `0 4px 24px ${alpha(BRAND_BLUE, 0.05)}`,
 };
 
-export default function CheckoutPage() {
+export default function CheckoutPage({ clientSecret }: { clientSecret: string }) {
     const router = useRouter();
     const { cartItems, setCartItems } = useCart();
     const user = getCurrentUser();
@@ -129,6 +153,7 @@ export default function CheckoutPage() {
         country: 'United States',
     });
 
+    const [placeError, setPlaceError] = useState('');
     const [errors, setErrors] = useState({
         email: false,
         phone: false,
@@ -161,7 +186,12 @@ export default function CheckoutPage() {
 
         const hasError = Object.values(newErrors).some(Boolean);
         setErrors(newErrors);
-        if (hasError || isPlacingOrder || artworkMissing) return;
+        setPlaceError('');
+        if (hasError) {
+            setPlaceError('Complete the highlighted contact and shipping fields.');
+            return;
+        }
+        if (isPlacingOrder || artworkMissing) return;
 
         const lineItems: LineItemRequest[] = await Promise.all(
             cartItems.map(async (item) => ({
@@ -175,10 +205,19 @@ export default function CheckoutPage() {
             }))
         );
 
-        if (lineItems.some((item) => !item.artworkFiles?.length)) return;
+        if (lineItems.some((item) => !item.artworkFiles?.length)) {
+            setPlaceError('Upload artwork for every item before placing the order.');
+            return;
+        }
 
         if (!stripe || !elements) {
-            alert('Stripe is not ready.');
+            setPlaceError('Payment is still loading. Wait a moment and try again.');
+            return;
+        }
+
+        const cardNumber = elements.getElement(CardNumberElement);
+        if (!cardNumber) {
+            setPlaceError('Enter the card number.');
             return;
         }
 
@@ -186,31 +225,27 @@ export default function CheckoutPage() {
 
         try {
             const phoneDigits = stripPhoneDigits(customerPhone);
-            const { error, paymentIntent } = await stripe.confirmPayment({
-                elements,
-                redirect: 'if_required',
-                confirmParams: {
-                    return_url: window.location.href,
-                    payment_method_data: {
-                        billing_details: {
-                            name: `${customerFirstName.trim()} ${customerLastName.trim()}`.trim(),
-                            email: customerEmail.trim(),
-                            phone: phoneDigits ? `+1${phoneDigits}` : undefined,
-                            address: {
-                                line1: shipping.addressLine1.trim(),
-                                line2: shipping.addressLine2.trim() || undefined,
-                                city: shipping.city.trim(),
-                                state: toStripeState(shipping.state),
-                                postal_code: shipping.postalCode.trim(),
-                                country: 'US',
-                            },
+            const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                payment_method: {
+                    card: cardNumber,
+                    billing_details: {
+                        name: `${customerFirstName.trim()} ${customerLastName.trim()}`.trim(),
+                        email: customerEmail.trim(),
+                        phone: phoneDigits ? `+1${phoneDigits}` : undefined,
+                        address: {
+                            line1: shipping.addressLine1.trim(),
+                            line2: shipping.addressLine2.trim() || undefined,
+                            city: shipping.city.trim(),
+                            state: toStripeState(shipping.state),
+                            postal_code: shipping.postalCode.trim(),
+                            country: 'US',
                         },
                     },
                 },
             });
 
             if (error || !paymentIntent || paymentIntent.status !== 'succeeded') {
-                alert(error?.message || 'Payment failed.');
+                setPlaceError(error?.message || 'Payment failed. Check the card details and try again.');
                 return;
             }
 
@@ -238,11 +273,11 @@ export default function CheckoutPage() {
                 setCartItems([]);
                 router.push(`/order-confirmation?orderNumber=${order.orderNumber}`);
             } else {
-                alert('Order created, but confirmation delayed.');
+                setPlaceError('The payment went through, but the order confirmation is delayed.');
             }
         } catch (err: any) {
             console.error('Order placement failed', err);
-            alert('Order failed: ' + (err?.response?.data?.message || 'Try again.'));
+            setPlaceError(err?.response?.data?.message || 'The order could not be placed. Try again.');
         } finally {
             setIsPlacingOrder(false);
         }
@@ -275,6 +310,11 @@ export default function CheckoutPage() {
             {artworkMissing && (
                 <Typography color="error" sx={{ fontWeight: 700, fontSize: '0.875rem', textAlign: 'center' }}>
                     Upload artwork for every item before placing the order.
+                </Typography>
+            )}
+            {placeError && (
+                <Typography color="error" sx={{ fontWeight: 700, fontSize: '0.875rem', textAlign: 'center' }}>
+                    {placeError}
                 </Typography>
             )}
         <Button
@@ -431,39 +471,63 @@ export default function CheckoutPage() {
                                 </Stack>
                             )}
 
-                            <Paper elevation={0} sx={sectionCardSx}>
+                            <Paper
+                                elevation={0}
+                                sx={{ ...sectionCardSx, position: 'relative', zIndex: 1, isolation: 'isolate' }}
+                            >
                                 <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
                                     <CreditCardOutlinedIcon sx={{ color: BRAND_BLUE }} />
                                     <Typography sx={{ fontWeight: 800, fontSize: '1.0625rem', color: '#0f172a' }}>
                                         Payment
                                     </Typography>
                                 </Stack>
-                                <PaymentElement
-                                    options={{
-                                        layout: 'tabs',
-                                        wallets: {
-                                            applePay: 'never',
-                                            googlePay: 'never',
-                                        },
-                                        fields: {
-                                            billingDetails: {
-                                                name: 'never',
-                                                email: 'never',
-                                                phone: 'never',
-                                                address: 'never',
-                                            },
-                                        },
-                                    }}
-                                />
+                                <Stack spacing={2}>
+                                    <Box>
+                                        <Typography sx={{ fontWeight: 600, fontSize: '0.8125rem', mb: 0.75, color: '#334155' }}>
+                                            Card number
+                                        </Typography>
+                                        <Box sx={cardFieldSx}>
+                                            <CardNumberElement options={{ ...cardElementOptions, showIcon: true }} />
+                                        </Box>
+                                    </Box>
+                                    <Box
+                                        sx={{
+                                            display: 'grid',
+                                            gridTemplateColumns: '1fr 1fr',
+                                            gap: 2,
+                                        }}
+                                    >
+                                        <Box>
+                                            <Typography sx={{ fontWeight: 600, fontSize: '0.8125rem', mb: 0.75, color: '#334155' }}>
+                                                Expiration date
+                                            </Typography>
+                                            <Box sx={cardFieldSx}>
+                                                <CardExpiryElement options={cardElementOptions} />
+                                            </Box>
+                                        </Box>
+                                        <Box>
+                                            <Typography sx={{ fontWeight: 600, fontSize: '0.8125rem', mb: 0.75, color: '#334155' }}>
+                                                Security code
+                                            </Typography>
+                                            <Box sx={cardFieldSx}>
+                                                <CardCvcElement options={cardElementOptions} />
+                                            </Box>
+                                        </Box>
+                                    </Box>
+                                </Stack>
                             </Paper>
 
-                            <Box sx={{ display: { xs: 'block', lg: 'none' } }}>{placeOrderButton}</Box>
+                            <Box sx={{ display: { xs: 'block', lg: 'none' }, position: 'relative', zIndex: 2 }}>
+                                {placeOrderButton}
+                            </Box>
                         </Stack>
 
                         <Box sx={{ position: { lg: 'sticky' }, top: { lg: 24 } }}>
                             <Stack spacing={2}>
                                 <OrderSummary items={cartItems} />
-                                <Box sx={{ display: { xs: 'none', lg: 'block' } }}>{placeOrderButton}</Box>
+                                <Box sx={{ display: { xs: 'none', lg: 'block' }, position: 'relative', zIndex: 2 }}>
+                                    {placeOrderButton}
+                                </Box>
                                 <Typography
                                     variant="caption"
                                     color="text.secondary"
