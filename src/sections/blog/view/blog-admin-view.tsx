@@ -64,13 +64,10 @@ export function BlogAdminView() {
                         display: 'flex',
                         flexDirection: { xs: 'column', sm: 'row' },
                         alignItems: { xs: 'flex-start', sm: 'center' },
-                        justifyContent: 'space-between',
+                        justifyContent: 'flex-end',
                         gap: 2,
                     }}
                 >
-                    <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 520 }}>
-                        Create and edit articles shown on the public blog. Drafts stay hidden until you publish them.
-                    </Typography>
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}

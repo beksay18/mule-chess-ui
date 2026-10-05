@@ -89,15 +89,10 @@ export function ProductTypesView() {
                         display: 'flex',
                         flexDirection: { xs: 'column', sm: 'row' },
                         alignItems: { xs: 'flex-start', sm: 'center' },
-                        justifyContent: 'space-between',
+                        justifyContent: 'flex-end',
                         gap: 2,
                     }}
                 >
-                    <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 480 }}>
-                        Sticker categories shown on the storefront. Click a type to manage its
-                        products.
-                    </Typography>
-
                     <Button
                         variant="contained"
                         startIcon={<AddIcon />}

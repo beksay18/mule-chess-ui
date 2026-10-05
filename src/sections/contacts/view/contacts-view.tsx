@@ -107,10 +107,6 @@ export function ContactsView() {
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
-                <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    Customer messages from the contact form. A contact stays Waiting until someone replies.
-                </Typography>
-
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap alignItems="center">
                     {STATUS_FILTERS.map((status) => {
                         const isActive = activeStatus === status;

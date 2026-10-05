@@ -192,11 +192,11 @@ export function UserView() {
     return (
         <DashboardContent maxWidth="xl" sx={{ mb: 4 }}>
             <Stack spacing={3}>
-                <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
-                    {customersOnly
-                        ? 'Customer accounts.'
-                        : 'Registered accounts, including admins. Filter by role, then change a customer\u2019s role or status.'}
-                </Typography>
+                {customersOnly && (
+                    <Typography sx={{ color: 'text.secondary', fontSize: '0.9375rem', maxWidth: 560 }}>
+                        Customer accounts.
+                    </Typography>
+                )}
 
                 <Card
                     sx={{
