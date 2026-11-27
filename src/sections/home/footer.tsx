@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -37,7 +37,7 @@ const sectionTitleSx = {
 const SCROLL_THRESHOLD = 48;
 
 export default function Footer() {
-    const logoImage = '/assets/images/home-products/cg-sticker-house.png';
+    const logoImage = '/assets/images/mule-chess-logo.png';
     const footerRef = useRef<HTMLElement>(null);
     const [visible, setVisible] = useState(false);
 
@@ -113,18 +113,22 @@ export default function Footer() {
                                     '&:hover': { opacity: 0.88 },
                                 }}
                             >
-                                <Box
-                                    component="img"
-                                    src={logoImage}
-                                    alt="Mule Chess"
-                                    sx={{
-                                        height: { xs: 44, md: 52 },
-                                        width: 'auto',
-                                        maxWidth: { xs: 200, md: 240 },
-                                        objectFit: 'contain',
-                                        display: 'block',
-                                    }}
-                                />
+                                <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center' }}>
+                                    <Box
+                                        component="img"
+                                        src={logoImage}
+                                        alt=""
+                                        sx={{
+                                            height: { xs: 48, md: 56 },
+                                            width: 'auto',
+                                            objectFit: 'contain',
+                                            display: 'block',
+                                        }}
+                                    />
+                                    <Typography sx={{ color: '#fff', fontWeight: 800, fontSize: '1.15rem', letterSpacing: '-0.03em' }}>
+                                        Mule Chess
+                                    </Typography>
+                                </Stack>
                             </Box>
 
                             <Box sx={{ maxWidth: 300, textAlign: { xs: 'center', md: 'left' } }}>
@@ -137,7 +141,7 @@ export default function Footer() {
                                         mb: 0.75,
                                     }}
                                 >
-                                    Design online and we&apos;ll handle the rest.
+                                    Find a tournament and reserve your seat.
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -146,7 +150,7 @@ export default function Footer() {
                                         lineHeight: 1.7,
                                     }}
                                 >
-                                    Custom stickers printed with care.
+                                    Open, scholastic, and team events across the region.
                                 </Typography>
                             </Box>
                         </Stack>
@@ -177,24 +181,27 @@ export default function Footer() {
 
                     <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', sm: 'flex-start' } }}>
                         <Typography sx={sectionTitleSx}>Company</Typography>
-                        <Link href="/about-us" sx={linkSx}>
-                            About us
+                        <Link href="/tournaments" sx={linkSx}>
+                            Tournaments
                         </Link>
-                        <Link href="/blog" sx={linkSx}>
-                            Blog
+                        <Link href="/results" sx={linkSx}>
+                            Results
                         </Link>
-                        <Link href="/contact-us" sx={linkSx}>
-                            Contact us
+                        <Link href="/about" sx={linkSx}>
+                            About
+                        </Link>
+                        <Link href="/contact" sx={linkSx}>
+                            Contact
                         </Link>
                     </Stack>
 
                     <Stack spacing={1.25} sx={{ alignItems: { xs: 'center', sm: 'flex-start' } }}>
-                        <Typography sx={sectionTitleSx}>Support</Typography>
-                        <Link href="/help" sx={linkSx}>
-                            Help
+                        <Typography sx={sectionTitleSx}>More</Typography>
+                        <Link href="/past-events" sx={linkSx}>
+                            Past events
                         </Link>
-                        <Link href="/returns" sx={linkSx}>
-                            Returns
+                        <Link href="/organize" sx={linkSx}>
+                            Organize
                         </Link>
                     </Stack>
                 </Box>
@@ -213,20 +220,7 @@ export default function Footer() {
                     }}
                 >
                     <Typography sx={{ color: alpha('#ffffff', 0.5), fontSize: '0.8125rem' }}>
-                        © {new Date().getFullYear()}{' '}
-                        <Link
-                            href="https://www.completegraphics.us/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                                ...linkSx,
-                                fontSize: '0.8125rem',
-                                color: alpha('#ffffff', 0.65),
-                            }}
-                        >
-                            Complete Graphics
-                        </Link>
-                        . All rights reserved.
+                        © {new Date().getFullYear()} Mule Chess. All rights reserved.
                     </Typography>
                     <Stack direction="row" spacing={2}>
                         <Link href="/privacy" sx={{ ...linkSx, fontSize: '0.8125rem' }}>

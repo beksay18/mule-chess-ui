@@ -91,7 +91,7 @@ export function TournamentsView() {
           Upcoming Tournaments
         </Typography>
 
-        <Box sx={{ bgcolor: chessColors.panel, borderRadius: 1.5, mb: 2 }}>
+        <Box sx={{ bgcolor: '#fff', border: `1px solid ${chessColors.line}`, borderRadius: 3, mb: 2.5, overflow: 'hidden' }}>
           <Button fullWidth onClick={() => setFiltersOpen((open) => !open)} sx={{ justifyContent: 'space-between', color: chessColors.ink }}>
             Search and filters
             <span>{filtersOpen ? '▴' : '▾'}</span>
@@ -261,8 +261,13 @@ function TournamentRow({
         gridTemplateColumns: { xs: '72px minmax(0, 1fr)', md: '76px minmax(0, 1fr) 150px auto' },
         gap: { xs: 1.5, md: 2 },
         alignItems: 'center',
-        py: 2,
-        borderBottom: `1px solid ${chessColors.line}`,
+        p: 2,
+        mb: 1.25,
+        bgcolor: '#fff',
+        borderRadius: 3,
+        border: `1px solid ${chessColors.line}`,
+        transition: 'box-shadow 0.15s ease',
+        '&:hover': { boxShadow: '0 10px 24px rgba(20, 40, 32, 0.06)' },
       }}
     >
       <DateBadge startDate={tournament.startDate} endDate={tournament.endDate} />

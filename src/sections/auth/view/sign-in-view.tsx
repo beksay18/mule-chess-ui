@@ -53,9 +53,11 @@ export function SignInView() {
                     res.role === 'ROLE_ADMIN' || res.role === 'ROLE_MANAGER' ? '/dashboard' : '/'
                 );
             } catch (error: any) {
+                const apiMessage = error?.response?.data?.message;
                 const message =
-                    error?.response?.data?.message ||
-                    'Incorrect email or password. Please try again.';
+                    apiMessage === 'Bad credentials' || apiMessage === 'User not found'
+                        ? 'Incorrect email or password. Please try again.'
+                        : apiMessage || 'Incorrect email or password. Please try again.';
                 setErrorMessage(message);
                 console.error('Sign-in failed:', error);
             } finally {
@@ -103,7 +105,7 @@ export function SignInView() {
                                 lineHeight: 1.6,
                             }}
                         >
-                            Sign in to manage orders and continue designing stickers.
+                            Sign in to register for tournaments and keep your entries under your name.
                         </Typography>
                     </Box>
 

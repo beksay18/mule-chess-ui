@@ -96,7 +96,7 @@ export function SignUpView() {
                         >
                             {createdEmail
                                 ? 'Sign in with the email and password you just used.'
-                                : 'Join to design custom stickers and keep track of your orders.'}
+                                : 'Create an account to register for Mule Chess events.'}
                         </Typography>
                     </Box>
 
@@ -124,7 +124,7 @@ export function SignUpView() {
                                 </Typography>
                                 <Typography sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                                     We created an account for {createdEmail}. Sign in with that email
-                                    and the password you just chose to start designing stickers.
+                                    and the password you just chose.
                                 </Typography>
                                 <Button
                                     variant="contained"

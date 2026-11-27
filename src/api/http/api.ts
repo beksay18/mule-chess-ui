@@ -1,15 +1,16 @@
-import axios, {
+import type {
     AxiosError,
     AxiosInstance,
-    AxiosRequestConfig,
     AxiosResponse,
+    AxiosRequestConfig,
 } from "axios";
+import axios from "axios";
 import pRetry, {AbortError} from "p-retry";
 import {get} from "lodash";
-import {requestInterceptor, responseErrorInterceptor, responseInterceptor} from "./interceptors";
+import {requestInterceptor, responseInterceptor, responseErrorInterceptor} from "./interceptors";
 
 type AllowedActions = "get" | "post" | "put" | "delete";
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 interface RetryableAxiosInstance extends AxiosInstance {
     getWithRetries: <T>(
@@ -39,7 +40,7 @@ const MAX_RETRIES = 2;
 
 const instance: RetryableAxiosInstance = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 2000,
+    timeout: 15000,
     headers: {"Content-Type": "application/json"},
 }) as RetryableAxiosInstance;
 

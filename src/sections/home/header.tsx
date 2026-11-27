@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useState, useCallback } from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -17,9 +17,9 @@ import Popover from '@mui/material/Popover';
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import Badge from '@mui/material/Badge';
-import { getCurrentUser, logoutSession } from '../../api';
+import { logoutSession, getCurrentUser } from '../../api';
 import { useRouter } from '../../routes/hooks';
-import { useCart } from './create-order/cart/cart-context';
+import { useChessState } from '../chess/store';
 
 const BRAND_BLUE = '#175195';
 
@@ -42,12 +42,12 @@ export default function Header() {
     const user = getCurrentUser();
     const router = useRouter();
     const theme = useTheme();
-    const { cartItems } = useCart();
+    const registrationCount = useChessState().cart.length;
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [userAnchor, setUserAnchor] = useState<HTMLButtonElement | null>(null);
 
-    const logoImage = '/assets/images/home-products/cg-sticker-house.png';
+    const logoImage = '/assets/images/mule-chess-logo.png';
 
     const handleNavigate = useCallback(
         (path: string) => {
@@ -61,15 +61,6 @@ export default function Header() {
     const handleLogout = useCallback(() => {
         void logoutSession().finally(() => router.push('/sign-in'));
     }, [router]);
-
-    const scrollToProducts = () => {
-        setDrawerOpen(false);
-        if (window.location.pathname === '/') {
-            document.getElementById('home-products')?.scrollIntoView({ behavior: 'smooth' });
-        } else {
-            router.push('/#home-products');
-        }
-    };
 
     return (
         <Box
@@ -106,6 +97,7 @@ export default function Header() {
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
+                                gap: 1.25,
                                 textDecoration: 'none',
                                 flexShrink: 0,
                                 transition: 'opacity 0.2s ease',
@@ -115,33 +107,45 @@ export default function Header() {
                             <Box
                                 component="img"
                                 src={logoImage}
-                                alt="Mule Chess"
+                                alt=""
                                 sx={{
-                                    height: { xs: 44, sm: 50, md: 56 },
+                                    height: { xs: 48, sm: 54, md: 60 },
                                     width: 'auto',
-                                    maxWidth: { xs: 160, sm: 200, md: 240 },
                                     objectFit: 'contain',
                                     display: 'block',
                                 }}
                             />
+                            <Typography
+                                sx={{
+                                    fontWeight: 800,
+                                    letterSpacing: '-0.03em',
+                                    fontSize: { xs: '1.1rem', sm: '1.2rem' },
+                                    color: '#12325f',
+                                    lineHeight: 1,
+                                }}
+                            >
+                                Mule Chess
+                            </Typography>
                         </Box>
 
                         <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
-                            <Button sx={navLinkSx} onClick={scrollToProducts}>
-                                Build Stickers
+                            <Button sx={navLinkSx} onClick={() => router.push('/tournaments')}>
+                                Tournaments
                             </Button>
-
-                            <Button sx={navLinkSx} onClick={() => router.push('/for-business')}>
-                                For Businesses
+                            <Button sx={navLinkSx} onClick={() => router.push('/results')}>
+                                Results
+                            </Button>
+                            <Button sx={navLinkSx} onClick={() => router.push('/past-events')}>
+                                Past events
                             </Button>
                         </Stack>
                     </Stack>
 
                     <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, md: 1 }}>
                         <IconButton
-                            onClick={() => router.push('/cart')}
-                            disabled={cartItems.length === 0}
-                            aria-label="Shopping cart"
+                            onClick={() => router.push('/registration-cart')}
+                            disabled={registrationCount === 0}
+                            aria-label="Registration cart"
                             sx={{
                                 color: theme.palette.grey[700],
                                 '&:hover': { bgcolor: alpha(BRAND_BLUE, 0.06), color: BRAND_BLUE },
@@ -149,7 +153,7 @@ export default function Header() {
                             }}
                         >
                             <Badge
-                                badgeContent={cartItems.length}
+                                badgeContent={registrationCount}
                                 color="warning"
                                 sx={{ '& .MuiBadge-badge': { fontWeight: 700, fontSize: '0.7rem' } }}
                             >
@@ -270,14 +274,14 @@ export default function Header() {
                         </IconButton>
                     </Stack>
 
-                    <MenuItem onClick={scrollToProducts} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
-                        Build Stickers
+                    <MenuItem onClick={() => handleNavigate('/tournaments')} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
+                        Tournaments
                     </MenuItem>
-                    <MenuItem
-                        onClick={() => handleNavigate('/for-business')}
-                        sx={{ borderRadius: 1.5, fontWeight: 500 }}
-                    >
-                        For Businesses
+                    <MenuItem onClick={() => handleNavigate('/results')} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
+                        Results
+                    </MenuItem>
+                    <MenuItem onClick={() => handleNavigate('/past-events')} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
+                        Past events
                     </MenuItem>
 
                     {user ? (
@@ -291,9 +295,6 @@ export default function Header() {
                                     {user.username}
                                 </Typography>
                             </Box>
-                            <MenuItem onClick={() => handleNavigate('/profile')}>Profile</MenuItem>
-                            <MenuItem onClick={() => handleNavigate('/my-orders')}>My Orders</MenuItem>
-                            <MenuItem onClick={() => handleNavigate('/my-designs')}>My Designs</MenuItem>
                             {user.role === 'ROLE_ADMIN' && (
                                 <MenuItem onClick={() => handleNavigate('/dashboard')}>Dashboard</MenuItem>
                             )}
@@ -369,31 +370,34 @@ export default function Header() {
                     </Typography>
                 </Box>
 
-                <Divider sx={{ borderStyle: 'dashed' }} />
-
-                <MenuList
-                    disablePadding
-                    sx={{
-                        p: 1,
-                        gap: 0.5,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        [`& .${menuItemClasses.root}`]: {
-                            px: 1.5,
-                            py: 1,
-                            borderRadius: 1.5,
-                            fontWeight: 500,
-                            '&:hover': { bgcolor: alpha(BRAND_BLUE, 0.06) },
-                        },
-                    }}
-                >
-                    <MenuItem onClick={() => handleNavigate('/profile')}>Profile</MenuItem>
-                    <MenuItem onClick={() => handleNavigate('/my-orders')}>My Orders</MenuItem>
-                    <MenuItem onClick={() => handleNavigate('/my-designs')}>My Designs</MenuItem>
-                    <MenuItem onClick={() => handleNavigate('/my-shipping-addresses')}>
-                        Shipping Addresses
-                    </MenuItem>
-                </MenuList>
+                {(user?.role === 'ROLE_ADMIN' || user?.role === 'ROLE_MANAGER') && (
+                    <>
+                        <Divider sx={{ borderStyle: 'dashed' }} />
+                        <MenuList
+                            disablePadding
+                            sx={{
+                                p: 1,
+                                gap: 0.5,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                [`& .${menuItemClasses.root}`]: {
+                                    px: 1.5,
+                                    py: 1,
+                                    borderRadius: 1.5,
+                                    fontWeight: 500,
+                                    '&:hover': { bgcolor: alpha(BRAND_BLUE, 0.06) },
+                                },
+                            }}
+                        >
+                            {user?.role === 'ROLE_ADMIN' && (
+                                <MenuItem onClick={() => handleNavigate('/dashboard')}>Dashboard</MenuItem>
+                            )}
+                            {user?.role === 'ROLE_MANAGER' && (
+                                <MenuItem onClick={() => handleNavigate('/user')}>Customers</MenuItem>
+                            )}
+                        </MenuList>
+                    </>
+                )}
 
                 <Divider sx={{ borderStyle: 'dashed' }} />
 

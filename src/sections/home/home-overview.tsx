@@ -4,288 +4,218 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
-import UploadOutlinedIcon from '@mui/icons-material/UploadOutlined';
-import LocalPrintshopOutlinedIcon from '@mui/icons-material/LocalPrintshopOutlined';
-import { useTheme, alpha } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
+import { RouterLink } from 'src/routes/components';
 import { useRouter } from '../../routes/hooks';
+import { DateBadge } from '../chess/date-badge';
+import { isPast, feeRange, isHappening, locationLabel, formatShortRange } from '../chess/format';
+import { useChessState } from '../chess/store';
 
 const BRAND_BLUE = '#175195';
+const MARK = '#2888A0';
 
 const STEPS = [
-    { icon: PaletteOutlinedIcon, title: 'Choose a style', desc: 'Pick from our sticker options' },
-    { icon: UploadOutlinedIcon, title: 'Design or upload', desc: 'Build online or send artwork' },
-    { icon: LocalPrintshopOutlinedIcon, title: 'We print & ship', desc: 'Quality stickers delivered' },
+    { title: 'Find a tournament', text: 'Search by date, city, and section.' },
+    { title: 'Reserve a seat', text: 'Pick an open section and confirm the entry.' },
+    { title: 'Show up on the list', text: 'Your name is on the entry list before round one.' },
 ] as const;
 
 export default function HomeOverview() {
     const router = useRouter();
     const theme = useTheme();
-
-    const headerImage = '/assets/images/home-products/cg-sticker-house.png';
+    const chess = useChessState();
+    const upcoming = chess.tournaments
+        .filter((tournament) => !isPast(tournament))
+        .sort((a, b) => a.startDate.localeCompare(b.startDate))
+        .slice(0, 4);
 
     return (
-        <Box
-            id="hero"
-            sx={{
-                position: 'relative',
-                width: '100%',
-                overflow: 'hidden',
-                bgcolor: '#ffffff',
-            }}
-        >
+        <Box sx={{ bgcolor: '#ffffff' }}>
             <Box
-                sx={{
-                    position: 'absolute',
-                    top: '10%',
-                    right: { xs: '-20%', md: '5%' },
-                    width: { xs: 300, md: 480 },
-                    height: { xs: 300, md: 480 },
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${alpha(BRAND_BLUE, 0.07)} 0%, transparent 70%)`,
-                    pointerEvents: 'none',
-                }}
-            />
-
-            <Container
-                maxWidth="lg"
+                id="hero"
                 sx={{
                     position: 'relative',
-                    zIndex: 1,
-                    pt: { xs: 5, md: 8 },
-                    pb: { xs: 4, md: 6 },
+                    overflow: 'hidden',
+                    background: `linear-gradient(180deg, ${alpha(MARK, 0.08)} 0%, #ffffff 58%)`,
                 }}
             >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', md: 'row' },
-                        alignItems: 'center',
-                        gap: { xs: 5, md: 8 },
-                    }}
-                >
-                    <Stack spacing={3.5} sx={{ flex: 1, maxWidth: { md: 520 } }}>
-                        <Box component="h1" sx={{ maxWidth: 620, m: 0 }}>
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    alignItems: 'center',
-                                    gap: { xs: 0.75, sm: 1.25 },
-                                }}
-                            >
-                                <Typography
-                                    component="span"
-                                    sx={{
-                                        fontWeight: 800,
-                                        letterSpacing: '-0.04em',
-                                        fontSize: { xs: '1.875rem', sm: '2.375rem', md: '2.875rem' },
-                                        lineHeight: 1.1,
-                                        color: theme.palette.grey[900],
-                                    }}
-                                >
-                                    Design
-                                </Typography>
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: 'inline-flex',
-                                        px: { xs: 1.25, md: 1.75 },
-                                        py: { xs: 0.4, md: 0.6 },
-                                        fontWeight: 800,
-                                        letterSpacing: '-0.02em',
-                                        fontSize: { xs: '1.75rem', sm: '2.125rem', md: '2.625rem' },
-                                        lineHeight: 1.1,
-                                        color: BRAND_BLUE,
-                                        bgcolor: alpha(BRAND_BLUE, 0.06),
-                                        border: `2px dashed ${alpha(BRAND_BLUE, 0.35)}`,
-                                        borderRadius: 2.5,
-                                        transform: 'rotate(-1.5deg)',
-                                        boxShadow: `4px 4px 0 ${alpha(BRAND_BLUE, 0.12)}`,
-                                    }}
-                                >
-                                    custom stickers
-                                </Box>
-                            </Box>
-
-                            <Typography
-                                component="span"
-                                sx={{
-                                    display: 'block',
-                                    mt: { xs: 0.75, md: 1 },
-                                    fontWeight: 800,
-                                    letterSpacing: '-0.04em',
-                                    fontSize: { xs: '1.875rem', sm: '2.375rem', md: '2.875rem' },
-                                    lineHeight: 1.1,
-                                    color: theme.palette.grey[900],
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                your customers will keep
-                            </Typography>
-                        </Box>
-
-                        <Typography
-                            sx={{
-                                color: 'text.secondary',
-                                fontSize: { xs: '1.05rem', md: '1.125rem' },
-                                lineHeight: 1.75,
-                            }}
-                        >
-                            Set the size, cut, and finish, drop in your artwork, and we print
-                            and ship it. What you design is what shows up at the door.
-                        </Typography>
-
-                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                            <Button
-                                variant="contained"
-                                size="large"
-                                endIcon={<ArrowForwardIcon />}
-                                onClick={() => router.push('/sticker-builder')}
-                                sx={{
-                                    px: 4,
-                                    py: 1.6,
-                                    fontWeight: 700,
-                                    fontSize: '1rem',
-                                    borderRadius: 2.5,
-                                    bgcolor: BRAND_BLUE,
-                                    textTransform: 'none',
-                                    boxShadow: `0 8px 24px ${alpha(BRAND_BLUE, 0.28)}`,
-                                    transition: 'all 0.25s ease',
-                                    '&:hover': {
-                                        bgcolor: '#124578',
-                                        boxShadow: `0 12px 28px ${alpha(BRAND_BLUE, 0.38)}`,
-                                        transform: 'translateY(-2px)',
-                                    },
-                                }}
-                            >
-                                Start Designing
-                            </Button>
-
-                            <Button
-                                variant="outlined"
-                                size="large"
-                                onClick={() => router.push('/contact-us')}
-                                sx={{
-                                    px: 4,
-                                    py: 1.6,
-                                    fontWeight: 700,
-                                    fontSize: '1rem',
-                                    borderRadius: 2.5,
-                                    color: BRAND_BLUE,
-                                    borderColor: alpha(BRAND_BLUE, 0.3),
-                                    textTransform: 'none',
-                                    transition: 'all 0.25s ease',
-                                    '&:hover': {
-                                        borderColor: BRAND_BLUE,
-                                        bgcolor: alpha(BRAND_BLUE, 0.04),
-                                        transform: 'translateY(-2px)',
-                                    },
-                                }}
-                            >
-                                Get Samples
-                            </Button>
-                        </Stack>
-                    </Stack>
-
-                    <Box
-                        sx={{
-                            flex: 1,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            width: '100%',
-                            maxWidth: { md: 460 },
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: '100%',
-                                maxWidth: 400,
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    inset: -12,
-                                    borderRadius: 4,
-                                    background: `linear-gradient(135deg, ${alpha(BRAND_BLUE, 0.08)}, ${alpha(BRAND_BLUE, 0.02)})`,
-                                    transform: 'rotate(3deg)',
-                                }}
-                            />
-                            <Box
-                                component="img"
-                                src={headerImage}
-                                alt="Custom printed stickers"
-                                sx={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    height: 'auto',
-                                    display: 'block',
-                                    borderRadius: 3,
-                                    boxShadow: `0 20px 60px ${alpha(BRAND_BLUE, 0.15)}`,
-                                }}
-                            />
-                        </Box>
-                    </Box>
-                </Box>
-
-                <Box
-                    sx={{
-                        mt: { xs: 6, md: 8 },
-                        pt: { xs: 4, md: 5 },
-                        borderTop: `1px solid ${theme.palette.grey[200]}`,
-                    }}
-                >
+                <Container maxWidth="lg" sx={{ position: 'relative', pt: { xs: 6, md: 9 }, pb: { xs: 5, md: 7 } }}>
                     <Box
                         sx={{
                             display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(3, 1fr)' },
-                            gap: { xs: 3, md: 4 },
+                            gridTemplateColumns: { xs: '1fr', md: '1.15fr 0.85fr' },
+                            alignItems: 'center',
+                            gap: { xs: 4, md: 6 },
                         }}
                     >
-                        {STEPS.map(({ icon: Icon, title, desc }, index) => (
-                            <Stack
-                                key={title}
-                                direction="row"
-                                spacing={2}
-                                alignItems="flex-start"
+                        <Stack spacing={3} sx={{ maxWidth: 620 }}>
+                            <Typography sx={{ color: MARK, fontWeight: 800, letterSpacing: 1.4, fontSize: 13, textTransform: 'uppercase' }}>
+                                Tournament registration
+                            </Typography>
+                            <Typography
+                                component="h1"
+                                sx={{
+                                    m: 0,
+                                    fontWeight: 800,
+                                    letterSpacing: '-0.045em',
+                                    fontSize: { xs: '2.4rem', sm: '3.1rem', md: '3.6rem' },
+                                    lineHeight: 1.02,
+                                    color: theme.palette.grey[900],
+                                }}
                             >
-                                <Box
+                                Find your next tournament and reserve a seat.
+                            </Typography>
+                            <Typography sx={{ color: 'text.secondary', fontSize: { xs: '1.05rem', md: '1.15rem' }, lineHeight: 1.7, maxWidth: 520 }}>
+                                Open, scholastic, and team sections each have their own fee and capacity. Register in a few minutes and your name is on the entry list.
+                            </Typography>
+                            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    endIcon={<ArrowForwardIcon />}
+                                    onClick={() => router.push('/tournaments')}
                                     sx={{
-                                        width: 44,
-                                        height: 44,
-                                        flexShrink: 0,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        borderRadius: 2,
-                                        bgcolor: alpha(BRAND_BLUE, 0.08),
-                                        color: BRAND_BLUE,
+                                        px: 3.5,
+                                        py: 1.4,
+                                        fontWeight: 700,
+                                        fontSize: '1rem',
+                                        borderRadius: 2.5,
+                                        bgcolor: BRAND_BLUE,
+                                        textTransform: 'none',
+                                        boxShadow: `0 10px 24px ${alpha(BRAND_BLUE, 0.24)}`,
+                                        '&:hover': { bgcolor: '#124578' },
                                     }}
                                 >
-                                    <Icon sx={{ fontSize: 22 }} />
-                                </Box>
-                                <Box>
-                                    <Typography
-                                        sx={{
-                                            fontWeight: 700,
-                                            fontSize: '0.9375rem',
-                                            color: theme.palette.grey[900],
-                                            mb: 0.25,
-                                        }}
-                                    >
-                                        {index + 1}. {title}
-                                    </Typography>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                                        {desc}
-                                    </Typography>
-                                </Box>
+                                    Browse tournaments
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    size="large"
+                                    onClick={() => router.push('/sign-up')}
+                                    sx={{
+                                        px: 3.5,
+                                        py: 1.4,
+                                        fontWeight: 700,
+                                        fontSize: '1rem',
+                                        borderRadius: 2.5,
+                                        color: BRAND_BLUE,
+                                        borderColor: alpha(BRAND_BLUE, 0.35),
+                                        textTransform: 'none',
+                                        '&:hover': { borderColor: BRAND_BLUE, bgcolor: alpha(BRAND_BLUE, 0.04) },
+                                    }}
+                                >
+                                    Create account
+                                </Button>
                             </Stack>
+                        </Stack>
+
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <Box
+                                sx={{
+                                    width: { xs: 280, md: 420 },
+                                    height: { xs: 320, md: 460 },
+                                    borderRadius: '50%',
+                                    bgcolor: alpha(MARK, 0.12),
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                <Box
+                                    component="img"
+                                    src="/assets/images/mule-chess-logo.png"
+                                    alt="Mule Chess"
+                                    sx={{ height: '78%', width: 'auto', objectFit: 'contain', display: 'block' }}
+                                />
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            mt: { xs: 5, md: 7 },
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                            gap: 2,
+                        }}
+                    >
+                        {STEPS.map((step, index) => (
+                            <Box
+                                key={step.title}
+                                sx={{
+                                    p: 2.5,
+                                    borderRadius: 3,
+                                    bgcolor: '#fff',
+                                    border: `1px solid ${alpha(MARK, 0.18)}`,
+                                }}
+                            >
+                                <Typography sx={{ color: MARK, fontWeight: 800, fontSize: 13, letterSpacing: 0.6 }}>
+                                    0{index + 1}
+                                </Typography>
+                                <Typography sx={{ mt: 0.75, fontWeight: 800 }}>{step.title}</Typography>
+                                <Typography variant="body2" sx={{ mt: 0.5, color: 'text.secondary' }}>
+                                    {step.text}
+                                </Typography>
+                            </Box>
                         ))}
                     </Box>
-                </Box>
-            </Container>
+                </Container>
+            </Box>
+
+            <Box id="upcoming" sx={{ bgcolor: '#f6f8fb', py: { xs: 6, md: 8 } }}>
+                <Container maxWidth="lg">
+                    <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'baseline', mb: 3 }}>
+                        <Typography component="h2" sx={{ fontWeight: 800, fontSize: { xs: '1.5rem', md: '1.875rem' }, letterSpacing: '-0.03em' }}>
+                            Upcoming tournaments
+                        </Typography>
+                        <Button component={RouterLink} href="/tournaments" sx={{ fontWeight: 700, textTransform: 'none', color: BRAND_BLUE }}>
+                            See all
+                        </Button>
+                    </Stack>
+                    <Stack spacing={1.5}>
+                        {upcoming.map((tournament) => (
+                            <Stack
+                                key={tournament.id}
+                                direction={{ xs: 'column', sm: 'row' }}
+                                spacing={2}
+                                sx={{
+                                    alignItems: { sm: 'center' },
+                                    p: 1.5,
+                                    bgcolor: '#fff',
+                                    borderRadius: 3,
+                                    border: `1px solid ${alpha(BRAND_BLUE, 0.1)}`,
+                                    transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+                                    '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 12px 28px ${alpha(BRAND_BLUE, 0.08)}` },
+                                }}
+                            >
+                                <DateBadge startDate={tournament.startDate} endDate={tournament.endDate} />
+                                <Stack sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography
+                                        component={RouterLink}
+                                        href={`/tournaments/${tournament.slug}`}
+                                        sx={{ fontWeight: 800, color: BRAND_BLUE, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                                    >
+                                        {tournament.name}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                        {tournament.organizer} · {locationLabel(tournament)} · {formatShortRange(tournament)}
+                                        {isHappening(tournament) ? ' · Happening now' : ''}
+                                    </Typography>
+                                </Stack>
+                                <Typography sx={{ fontWeight: 800, minWidth: 72 }}>{feeRange(tournament)}</Typography>
+                                <Button
+                                    component={RouterLink}
+                                    href={`/register/${tournament.slug}`}
+                                    variant="contained"
+                                    sx={{ bgcolor: BRAND_BLUE, textTransform: 'none', fontWeight: 700, borderRadius: 2, '&:hover': { bgcolor: '#124578' } }}
+                                >
+                                    Register
+                                </Button>
+                            </Stack>
+                        ))}
+                    </Stack>
+                </Container>
+            </Box>
         </Box>
     );
 }

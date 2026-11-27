@@ -1,14 +1,14 @@
 export const chessColors = {
-  headerBg: '#f6f3ec',
-  headerBorder: '#e7e1d6',
-  ink: '#1c1c1c',
-  muted: '#5e6772',
-  line: '#e6e8ec',
-  link: '#1565c0',
-  green: '#1e7a34',
-  greenHover: '#17632b',
-  panel: '#f3f4f6',
-  hero: '#1c2a24',
+  headerBg: '#f9fafb',
+  headerBorder: 'rgba(23, 81, 149, 0.1)',
+  ink: '#141A21',
+  muted: '#637381',
+  line: '#DFE3E8',
+  link: '#175195',
+  green: '#175195',
+  greenHover: '#124578',
+  panel: '#F9FAFB',
+  hero: '#ffffff',
 };
 
 export const registerButtonSx = {

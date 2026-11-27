@@ -9,7 +9,7 @@ import { RouterLink } from 'src/routes/components';
 import { getCurrentUser } from '../../api';
 import { logoClasses } from './classes';
 
-const LOGO_SRC = '/assets/images/home-products/cg-sticker-house.png';
+const LOGO_SRC = '/assets/images/mule-chess-logo.png';
 
 export type LogoProps = LinkProps & {
     isSingle?: boolean;
@@ -48,9 +48,8 @@ export function Logo({
                 src={LOGO_SRC}
                 alt="Mule Chess"
                 sx={{
-                    height: isSingle ? 44 : 52,
+                    height: isSingle ? 40 : 48,
                     width: 'auto',
-                    maxWidth: isSingle ? 200 : 240,
                     objectFit: 'contain',
                     display: 'block',
                 }}

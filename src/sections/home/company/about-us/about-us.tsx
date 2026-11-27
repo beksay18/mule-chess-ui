@@ -146,14 +146,15 @@ export default function AboutUs() {
                                 />
                                 <Box
                                     component="img"
-                                    src="/assets/images/home-products/cg-sticker-house.png"
-                                    alt="Complete Graphics Sticker House"
+                                    src="/assets/images/mule-chess-logo.png"
+                                    alt="Mule Chess"
                                     sx={{
                                         position: 'relative',
                                         width: '100%',
-                                        borderRadius: 3,
+                                        maxHeight: 360,
+                                        objectFit: 'contain',
                                         display: 'block',
-                                        boxShadow: `0 20px 50px ${alpha(BRAND_BLUE, 0.15)}`,
+                                        filter: `drop-shadow(0 18px 28px ${alpha(BRAND_BLUE, 0.28)})`,
                                     }}
                                 />
                             </Box>

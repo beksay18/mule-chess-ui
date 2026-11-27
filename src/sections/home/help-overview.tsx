@@ -42,7 +42,7 @@ export default function HelpOverview() {
                                     lineHeight: 1.2,
                                 }}
                             >
-                                Have questions? We&apos;re here to help!
+                                Have a question about an event?
                             </Typography>
 
                             <Typography
@@ -53,7 +53,7 @@ export default function HelpOverview() {
                                     maxWidth: 480,
                                 }}
                             >
-                                Send us a message and our team will get back to you as soon as possible.
+                                Ask about a section, a fee, or a registration and we will write back.
                             </Typography>
                         </Stack>
 
@@ -68,7 +68,7 @@ export default function HelpOverview() {
                                     }}
                                 />
                             }
-                            onClick={() => router.push('/contact-us')}
+                            onClick={() => router.push('/contact')}
                             sx={{
                                 flexShrink: 0,
                                 minWidth: { xs: '100%', sm: 220 },

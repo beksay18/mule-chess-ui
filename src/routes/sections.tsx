@@ -10,8 +10,8 @@ import LinearProgress, {linearProgressClasses} from '@mui/material/LinearProgres
 import {DashboardLayout} from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
 import {CartView as RegistrationCartView} from "../sections/chess/cart-view";
-import {HomeView as ChessHomeView} from "../sections/chess/home-view";
-import {AboutView, ContactView, TermsView as ChessTermsView} from "../sections/chess/info-views";
+import {AboutView, ContactView} from "../sections/chess/info-views";
+import {HomeView} from "../sections/home/view";
 import {ManageView} from "../sections/chess/manage-view";
 import {EntryListView} from "../sections/chess/entry-list-view";
 import {PastEventsView} from "../sections/chess/past-events-view";
@@ -40,6 +40,7 @@ export const SignInPage = lazy(() => import('src/pages/sign-in'));
 export const ForgotPasswordPage = lazy(() => import('src/pages/forgot-password'));
 export const SignUpPage = lazy(() => import('src/pages/sign-up'));
 export const ProfilePage = lazy(() => import('src/pages/profile/profile'));
+export const TermsPage = lazy(() => import('src/pages/terms'));
 export const MyOrdersPage = lazy(() => import('src/pages/profile/my-orders'));
 export const MyShippingAddressesPage = lazy(() => import('src/pages/profile/my-shipping-addresses'));
 export const ProductsPage = lazy(() => import('src/pages/products'));
@@ -258,7 +259,7 @@ export const routesSection: RouteObject[] = [
     },
     {
         index: true,
-        element: <ChessHomeView/>,
+        element: <HomeView/>,
     },
     {
         path: 'tournaments',
@@ -366,7 +367,7 @@ export const routesSection: RouteObject[] = [
     },
     {
         path: 'terms',
-        element: <ChessTermsView/>,
+        element: <TermsPage/>,
     },
     {
         path: 'blog',

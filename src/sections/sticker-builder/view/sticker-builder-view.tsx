@@ -191,7 +191,7 @@ export function StickerBuilderView() {
                     >
                         <Box
                             component="img"
-                            src="/assets/images/home-products/cg-sticker-house.png"
+                            src="/assets/images/mule-chess-logo.png"
                             alt="Mule Chess"
                             sx={{
                                 height: { xs: 32, sm: 40 },
