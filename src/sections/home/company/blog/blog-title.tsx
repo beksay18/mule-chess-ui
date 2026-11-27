@@ -35,7 +35,7 @@ export default function BlogTitle() {
                             color: BRAND_BLUE,
                         }}
                     >
-                        From the CG Sticker House
+                        From Mule Chess
                     </Typography>
                     <Box component="h1" sx={{ m: 0, maxWidth: 540 }}>
                         <Typography

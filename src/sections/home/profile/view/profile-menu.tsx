@@ -27,7 +27,7 @@ const menuItems = [
     },
     {
         label: 'My Designs',
-        description: 'Saved CG Sticker House Builder files',
+        description: 'Saved Mule Chess Builder files',
         path: '/my-designs',
         icon: PaletteOutlinedIcon,
     },

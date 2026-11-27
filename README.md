@@ -1,3 +1,5 @@
+# Mule Chess UI
+
 ## Quick start
 
 - Clone the repo

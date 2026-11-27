@@ -102,7 +102,7 @@ export default function Header() {
                         <Box
                             component="a"
                             href="/"
-                            aria-label="CG Stickers home"
+                            aria-label="Mule Chess home"
                             sx={{
                                 display: 'flex',
                                 alignItems: 'center',
@@ -115,7 +115,7 @@ export default function Header() {
                             <Box
                                 component="img"
                                 src={logoImage}
-                                alt="CG Stickers"
+                                alt="Mule Chess"
                                 sx={{
                                     height: { xs: 44, sm: 50, md: 56 },
                                     width: 'auto',

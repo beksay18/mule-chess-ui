@@ -180,7 +180,7 @@ export function StickerBuilderView() {
                     <Box
                         component="a"
                         href="/"
-                        aria-label="CG Sticker House home"
+                        aria-label="Mule Chess home"
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
@@ -192,7 +192,7 @@ export function StickerBuilderView() {
                         <Box
                             component="img"
                             src="/assets/images/home-products/cg-sticker-house.png"
-                            alt="CG Sticker House"
+                            alt="Mule Chess"
                             sx={{
                                 height: { xs: 32, sm: 40 },
                                 width: 'auto',

@@ -116,7 +116,7 @@ export default function Footer() {
                                 <Box
                                     component="img"
                                     src={logoImage}
-                                    alt="CG Stickers"
+                                    alt="Mule Chess"
                                     sx={{
                                         height: { xs: 44, md: 52 },
                                         width: 'auto',

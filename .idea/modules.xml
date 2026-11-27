@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/cg-stickers-ui.iml" filepath="$PROJECT_DIR$/.idea/cg-stickers-ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mule-chess-ui.iml" filepath="$PROJECT_DIR$/.idea/mule-chess-ui.iml" />
     </modules>
   </component>
 </project>

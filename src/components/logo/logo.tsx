@@ -31,7 +31,7 @@ export function Logo({
         <LogoRoot
             component={RouterLink}
             href={href}
-            aria-label="CG Sticker House home"
+            aria-label="Mule Chess home"
             underline="none"
             className={mergeClasses([logoClasses.root, className])}
             sx={[
@@ -46,7 +46,7 @@ export function Logo({
             <Box
                 component="img"
                 src={LOGO_SRC}
-                alt="CG Sticker House"
+                alt="Mule Chess"
                 sx={{
                     height: isSingle ? 44 : 52,
                     width: 'auto',

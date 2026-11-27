@@ -1,6 +1,6 @@
 import type { CartItem } from './cart-context';
 
-const DB_NAME = 'cg-sticker-cart';
+const DB_NAME = 'mule-chess-cart';
 const STORE = 'cart';
 const KEY = 'items';
 const LOCAL_KEY = 'cart';

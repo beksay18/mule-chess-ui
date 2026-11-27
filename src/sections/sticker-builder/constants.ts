@@ -18,7 +18,7 @@ export const MIN_ELEMENT_SIZE = 24;
 export const DEFAULT_ZOOM = 0.72;
 export const MIN_ZOOM = 0.25;
 export const MAX_ZOOM = 2.5;
-export const DESIGNS_STORAGE_KEY = 'cg-sticker-designs';
+export const DESIGNS_STORAGE_KEY = 'mule-chess-designs';
 
 export const FONT_FAMILIES = [
     'DM Sans',
