@@ -9,7 +9,15 @@ import LinearProgress, {linearProgressClasses} from '@mui/material/LinearProgres
 
 import {DashboardLayout} from 'src/layouts/dashboard';
 import AuthGuard from "./auth-guard";
-import {HomeView} from "../sections/home/view";
+import {CartView as RegistrationCartView} from "../sections/chess/cart-view";
+import {HomeView as ChessHomeView} from "../sections/chess/home-view";
+import {AboutView, ContactView, TermsView as ChessTermsView} from "../sections/chess/info-views";
+import {ManageView} from "../sections/chess/manage-view";
+import {EntryListView} from "../sections/chess/entry-list-view";
+import {PastEventsView} from "../sections/chess/past-events-view";
+import {RegisterView} from "../sections/chess/register-view";
+import {ResultsView} from "../sections/chess/results-view";
+import {TournamentsView, TournamentDetailView} from "../sections/chess/tournaments-view";
 import {ProductsView} from "../sections/home/create-order/products/view";
 import {ProductDetailsView} from "../sections/home/create-order/product-details/view";
 import {ProductUploadView} from "../sections/home/create-order/product-upload/view";
@@ -48,7 +56,6 @@ export const ReturnsPage = lazy(() => import('src/pages/returns'));
 export const AboutUsPage = lazy(() => import('src/pages/about-us'));
 export const ForBusinessPage = lazy(() => import('src/pages/for-business'));
 export const PrivacyPage = lazy(() => import('src/pages/privacy'));
-export const TermsPage = lazy(() => import('src/pages/terms'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const BlogArticlePage = lazy(() => import('src/pages/blog-article'));
 export const StickerBuilderPage = lazy(() => import('src/pages/sticker-builder'));
@@ -251,7 +258,47 @@ export const routesSection: RouteObject[] = [
     },
     {
         index: true,
-        element: <HomeView/>,
+        element: <ChessHomeView/>,
+    },
+    {
+        path: 'tournaments',
+        element: <TournamentsView/>,
+    },
+    {
+        path: 'tournaments/:slug',
+        element: <TournamentDetailView/>,
+    },
+    {
+        path: 'register/:slug',
+        element: <RegisterView/>,
+    },
+    {
+        path: 'entry-list/:slug',
+        element: <EntryListView/>,
+    },
+    {
+        path: 'results',
+        element: <ResultsView/>,
+    },
+    {
+        path: 'past-events',
+        element: <PastEventsView/>,
+    },
+    {
+        path: 'contact',
+        element: <ContactView/>,
+    },
+    {
+        path: 'about',
+        element: <AboutView/>,
+    },
+    {
+        path: 'organize',
+        element: <ManageView/>,
+    },
+    {
+        path: 'registration-cart',
+        element: <RegistrationCartView/>,
     },
     {
         path: 'custom-products/:typeId',
@@ -319,7 +366,7 @@ export const routesSection: RouteObject[] = [
     },
     {
         path: 'terms',
-        element: <TermsPage/>,
+        element: <ChessTermsView/>,
     },
     {
         path: 'blog',

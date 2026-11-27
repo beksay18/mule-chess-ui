@@ -8,6 +8,6 @@ export type ConfigValue = {
 };
 
 export const CONFIG: ConfigValue = {
-  appName: 'Mule Chess UI',
+  appName: 'Mule Chess',
   appVersion: packageJson.version,
 };
