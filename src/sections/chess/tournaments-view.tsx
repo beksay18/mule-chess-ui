@@ -12,6 +12,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
+import { toEditorHtml, looksLikeHtml, sanitizeArticleHtml } from 'src/sections/blog/article-html';
+import { articleBodySx } from 'src/sections/blog/description-editor';
 import { RouterLink } from 'src/routes/components';
 import { useParams } from 'react-router';
 
@@ -21,17 +23,21 @@ import {
   isPast,
   feeRange,
   monthKey,
+  activeFee,
   monthLabel,
   formatRange,
   isHappening,
   matchesWhen,
+  withEntryFees,
   TIME_CONTROLS,
   audienceLabel,
   locationLabel,
+  ENTRY_FEE_FORM,
   AUDIENCE_FILTERS,
   formatShortRange,
   registrationNote,
   timeControlLabel,
+  entryDeadlineLabel,
   isRegistrationOpen,
 } from './format';
 import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
@@ -65,7 +71,7 @@ export function TournamentsView() {
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
     const next = listed.filter((tournament) => {
-      const haystack = `${tournament.name} ${tournament.organizer} ${tournament.city} ${tournament.state}`.toLowerCase();
+      const haystack = `${tournament.name} ${tournament.organizer} ${tournament.street || ''} ${tournament.city} ${tournament.state}`.toLowerCase();
       if (needle && !haystack.includes(needle)) return false;
       if (stateCode && tournament.state !== stateCode) return false;
       if (organizer && tournament.organizer !== organizer) return false;
@@ -133,7 +139,7 @@ export function TournamentsView() {
             >
               <TextField
                 size="small"
-                placeholder="Search by name, city, or organizer"
+                placeholder="Search by name, street, city, or organizer"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 slotProps={{
@@ -386,7 +392,7 @@ function TournamentRow({
             <Stack spacing={0.25} sx={{ mt: 0.5 }}>
               {tournament.sections.map((section) => (
                 <Typography key={section.id} variant="body2" sx={{ color: alpha(NAVY, 0.8) }}>
-                  {section.name} — {money(section.fee)}
+                  {section.name} — {money(activeFee(section))}
                 </Typography>
               ))}
             </Stack>
@@ -471,12 +477,14 @@ export function TournamentDetailView() {
             ))}
           </Stack>
 
-          <Box sx={{ bgcolor: '#fff', borderRadius: 3, border: `1px solid ${alpha(NAVY, 0.08)}`, p: { xs: 2, md: 3 }, mb: 2 }}>
-            <Typography sx={{ whiteSpace: 'pre-line', lineHeight: 1.7, color: alpha(NAVY, 0.88) }}>{tournament.description}</Typography>
-            {tournament.prizeSummary && (
-              <Typography sx={{ mt: 2, fontWeight: 700, color: NAVY }}>{tournament.prizeSummary}</Typography>
-            )}
-          </Box>
+          <Box
+            sx={{ bgcolor: '#fff', borderRadius: 3, border: `1px solid ${alpha(NAVY, 0.08)}`, p: { xs: 2, md: 3 }, mb: 2, color: alpha(NAVY, 0.88), ...articleBodySx }}
+            dangerouslySetInnerHTML={{
+              __html: sanitizeArticleHtml(
+                looksLikeHtml(tournament.description) ? tournament.description : toEditorHtml(tournament.description)
+              ),
+            }}
+          />
 
           <Typography sx={{ color: MARK, fontWeight: 800, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', mb: 1.25 }}>
             Sections
@@ -500,9 +508,36 @@ export function TournamentDetailView() {
                     py: 1.5,
                   }}
                 >
-                  <Typography sx={{ fontWeight: 700, color: NAVY }}>{section.name}</Typography>
+                  <Box>
+                    <Typography sx={{ fontWeight: 700, color: NAVY }}>{section.name}</Typography>
+                    <Box
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(auto-fit, minmax(140px, 1fr))' },
+                        gap: 1,
+                        mt: 1,
+                      }}
+                    >
+                      {ENTRY_FEE_FORM.filter((item) => withEntryFees(section)[item.enabled]).map((item) => {
+                        const priced = withEntryFees(section);
+                        return (
+                          <Box key={item.key}>
+                            <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, color: NAVY }}>
+                              {item.label}
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 700, color: NAVY }}>
+                              {money(priced[item.fee])}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: alpha(NAVY, 0.65) }}>
+                              {entryDeadlineLabel(priced[item.deadline]) || 'Deadline not set'}
+                            </Typography>
+                          </Box>
+                        );
+                      })}
+                    </Box>
+                  </Box>
                   <Typography sx={{ color: full ? 'error.main' : alpha(NAVY, 0.75), fontWeight: 600 }}>
-                    {money(section.fee)} · {full ? 'Full' : `${left} open`}
+                    {money(activeFee(section))} now · {full ? 'Full' : `${left} open`}
                   </Typography>
                 </Stack>
               );

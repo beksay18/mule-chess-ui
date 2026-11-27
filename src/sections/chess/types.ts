@@ -16,6 +16,18 @@ export type TournamentSection = {
   name: string;
   fee: number;
   capacity: number;
+  earlyFee: number;
+  earlyDeadline: string;
+  regularFee: number;
+  regularDeadline: string;
+  lateFee: number;
+  lateDeadline: string;
+  onsiteFee: number;
+  onsiteDeadline: string;
+  earlyEnabled?: boolean;
+  regularEnabled?: boolean;
+  lateEnabled?: boolean;
+  onsiteEnabled?: boolean;
 };
 
 export type Tournament = {
@@ -23,17 +35,19 @@ export type Tournament = {
   slug: string;
   name: string;
   organizer: string;
+  street: string;
   city: string;
   state: string;
   startDate: string;
+  startTime: string;
   endDate: string;
   registrationCloses: string;
+  registrationClosesTime: string;
   description: string;
   timeControl: TimeControl;
   format: TournamentFormat;
   audiences: AudienceTag[];
   sections: TournamentSection[];
-  prizeSummary: string;
 };
 
 export type TournamentDraft = Omit<Tournament, 'id' | 'slug'>;

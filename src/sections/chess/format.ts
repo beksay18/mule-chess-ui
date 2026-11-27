@@ -1,4 +1,4 @@
-import type { Tournament, AudienceTag, TimeControl } from './types';
+import type { Tournament, AudienceTag, TimeControl, TournamentSection } from './types';
 
 import dayjs from 'dayjs';
 
@@ -48,8 +48,86 @@ export function money(amount: number) {
   return Number.isInteger(amount) ? `$${amount}` : `$${amount.toFixed(2)}`;
 }
 
+export const ENTRY_FEES = [
+  { key: 'early', label: 'Early Entry', fee: 'earlyFee', deadline: 'earlyDeadline', enabled: 'earlyEnabled' },
+  { key: 'regular', label: 'Regular Entry', fee: 'regularFee', deadline: 'regularDeadline', enabled: 'regularEnabled' },
+  { key: 'late', label: 'Late Entry', fee: 'lateFee', deadline: 'lateDeadline', enabled: 'lateEnabled' },
+  { key: 'onsite', label: 'Onsite Entry', fee: 'onsiteFee', deadline: 'onsiteDeadline', enabled: 'onsiteEnabled' },
+] as const;
+
+export const ENTRY_FEE_FORM = [
+  ENTRY_FEES[1],
+  ENTRY_FEES[0],
+  ENTRY_FEES[2],
+  ENTRY_FEES[3],
+];
+
+function dateOnly(value?: string) {
+  if (!value) return '';
+  return value.slice(0, 10);
+}
+
+export function withEntryFees(section: TournamentSection): TournamentSection {
+  const base = Number(section.fee) || 0;
+  const regularFee = section.regularFee ?? base;
+  const earlyDeadline = dateOnly(section.earlyDeadline);
+  const regularDeadline = dateOnly(section.regularDeadline);
+  const lateDeadline = dateOnly(section.lateDeadline);
+  const onsiteDeadline = dateOnly(section.onsiteDeadline);
+  const otherDeadlines = Boolean(earlyDeadline || lateDeadline || onsiteDeadline);
+  return {
+    ...section,
+    earlyFee: section.earlyFee ?? base,
+    earlyDeadline,
+    regularFee,
+    regularDeadline,
+    lateFee: section.lateFee ?? base,
+    lateDeadline,
+    onsiteFee: section.onsiteFee ?? base,
+    onsiteDeadline,
+    earlyEnabled: section.earlyEnabled ?? Boolean(earlyDeadline),
+    regularEnabled: section.regularEnabled ?? (Boolean(regularDeadline) || !otherDeadlines),
+    lateEnabled: section.lateEnabled ?? Boolean(lateDeadline),
+    onsiteEnabled: section.onsiteEnabled ?? Boolean(onsiteDeadline),
+    fee: regularFee,
+  };
+}
+
+export function activeFee(section: TournamentSection, now = dayjs()) {
+  const priced = withEntryFees(section);
+  const open = ENTRY_FEES.filter((item) => priced[item.enabled]);
+  for (const item of open) {
+    const deadline = priced[item.deadline];
+    if (!deadline || !dayjs(deadline).endOf('day').isBefore(now)) return priced[item.fee];
+  }
+  const last = open[open.length - 1];
+  return last ? priced[last.fee] : priced.fee;
+}
+
+export function entryPayload(section: TournamentSection): TournamentSection {
+  const priced = withEntryFees(section);
+  const next = { ...priced };
+  ENTRY_FEES.forEach((item) => {
+    if (priced[item.enabled]) return;
+    next[item.fee] = 0;
+    next[item.deadline] = null as unknown as string;
+  });
+  const primary = ENTRY_FEE_FORM.find((item) => priced[item.enabled]);
+  next.fee = primary ? next[primary.fee] : 0;
+  return next;
+}
+
+export function entryDeadlineLabel(value?: string) {
+  if (!value) return '';
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.format('MMM D, YYYY') : value;
+}
+
 export function feeRange(tournament: Tournament) {
-  const fees = (tournament.sections ?? []).map((section) => section.fee);
+  const fees = (tournament.sections ?? []).flatMap((section) => {
+    const priced = withEntryFees(section);
+    return ENTRY_FEES.filter((item) => priced[item.enabled]).map((item) => priced[item.fee]);
+  });
   if (!fees.length) return '';
   const min = Math.min(...fees);
   const max = Math.max(...fees);
@@ -57,33 +135,48 @@ export function feeRange(tournament: Tournament) {
 }
 
 export function locationLabel(tournament: Tournament) {
-  return [tournament.city, tournament.state].filter(Boolean).join(', ');
+  const place = [tournament.city, tournament.state].filter(Boolean).join(', ');
+  return [tournament.street, place].filter(Boolean).join(', ');
+}
+
+function clockLabel(value?: string) {
+  if (!value) return '';
+  const parsed = dayjs(`2000-01-01T${value}`);
+  return parsed.isValid() ? parsed.format('h:mm A') : '';
 }
 
 export function formatRange(tournament: Tournament) {
   const start = dayjs(tournament.startDate);
   const end = dayjs(tournament.endDate);
-  if (start.isSame(end, 'day')) return start.format('dddd, MMMM D, YYYY');
-  return `${start.format('ddd, MMM D')} – ${end.format('ddd, MMM D, YYYY')}`;
+  const range = start.isSame(end, 'day')
+    ? start.format('dddd, MMMM D, YYYY')
+    : `${start.format('ddd, MMM D')} – ${end.format('ddd, MMM D, YYYY')}`;
+  const time = clockLabel(tournament.startTime);
+  return time ? `${range} at ${time}` : range;
 }
 
 export function formatShortRange(tournament: Tournament) {
   const start = dayjs(tournament.startDate);
   const end = dayjs(tournament.endDate);
-  if (start.isSame(end, 'day')) return start.format('ddd, MMM D');
-  return `${start.format('ddd, MMM D')} – ${end.format('ddd, MMM D')}`;
+  const range = start.isSame(end, 'day') ? start.format('ddd, MMM D') : `${start.format('ddd, MMM D')} – ${end.format('ddd, MMM D')}`;
+  const time = clockLabel(tournament.startTime);
+  return time ? `${range} · ${time}` : range;
 }
 
 export function registrationNote(tournament: Tournament) {
   const days = dayjs(tournament.registrationCloses).startOf('day').diff(dayjs().startOf('day'), 'day');
+  const at = clockLabel(tournament.registrationClosesTime);
+  const suffix = at ? ` at ${at}` : '';
   if (days < 0) return 'Registration closed';
-  if (days === 0) return 'Registration closes today';
-  if (days === 1) return 'Registration closes tomorrow';
-  return '';
+  if (days === 0) return `Registration closes today${suffix}`;
+  if (days === 1) return `Registration closes tomorrow${suffix}`;
+  return at ? `Registration closes ${dayjs(tournament.registrationCloses).format('MMM D')}${suffix}` : '';
 }
 
 export function isRegistrationOpen(tournament: Tournament) {
-  return tournament.registrationCloses >= todayISO();
+  if (!tournament.registrationCloses) return false;
+  if (!tournament.registrationClosesTime) return tournament.registrationCloses >= todayISO();
+  return !dayjs(`${tournament.registrationCloses}T${tournament.registrationClosesTime}`).isBefore(dayjs());
 }
 
 export function isHappening(tournament: Tournament) {

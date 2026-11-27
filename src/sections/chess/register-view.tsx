@@ -16,7 +16,7 @@ import { RouterLink } from 'src/routes/components';
 import { useRouter } from 'src/routes/hooks';
 
 import { FormPanel, LabeledRow } from './form';
-import { money, formatRange, isRegistrationOpen } from './format';
+import { money, activeFee, formatRange, isRegistrationOpen } from './format';
 import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
 import { addToCart, takenSeats, getSnapshot, useChessState } from './store';
 import { chessColors, registerButtonSx } from './theme';
@@ -155,7 +155,7 @@ export function RegisterView() {
                   control={<Radio />}
                   label={
                     <Typography component="span" sx={{ color: full ? 'error.main' : chessColors.ink }}>
-                      {section.name} — {money(section.fee)}
+                      {section.name} — {money(activeFee(section))}
                       {full ? ' — Section closed: capacity reached' : ` — ${section.capacity - taken} open`}
                     </Typography>
                   }

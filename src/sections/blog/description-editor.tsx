@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useRef, useEffect, type ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -10,13 +10,18 @@ import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 import FormatUnderlinedIcon from '@mui/icons-material/FormatUnderlined';
 import LinkIcon from '@mui/icons-material/Link';
 import { alpha } from '@mui/material/styles';
-import { articlePlainText, toEditorHtml } from './article-html';
+import { toEditorHtml, articlePlainText } from './article-html';
 
 const BRAND_BLUE = '#175195';
 
 type DescriptionEditorProps = {
     value: string;
     onChange: (value: string) => void;
+    label?: string;
+    placeholder?: string;
+    caption?: string;
+    required?: boolean;
+    error?: string;
 };
 
 type Tool = {
@@ -53,7 +58,15 @@ const bodySx = {
     '& a': { color: BRAND_BLUE },
 };
 
-export function DescriptionEditor({ value, onChange }: DescriptionEditorProps) {
+export function DescriptionEditor({
+    value,
+    onChange,
+    label = 'Article',
+    placeholder = 'Write the full article. Headings, lists, quotes, and links are available above.',
+    caption = 'This is the full article visitors will read. It can be as long as you need.',
+    required = false,
+    error,
+}: DescriptionEditorProps) {
     const editorRef = useRef<HTMLDivElement>(null);
     const ready = useRef(false);
 
@@ -88,8 +101,19 @@ export function DescriptionEditor({ value, onChange }: DescriptionEditorProps) {
     const empty = articlePlainText(value).length === 0;
 
     return (
-        <Box>
-            <Typography sx={{ fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>Article</Typography>
+        <Box id={error !== undefined || required ? 'tournament-description' : undefined}>
+            <Typography sx={{ fontWeight: 700, fontSize: '0.875rem', mb: 1 }}>
+                {label}
+                {required && (
+                    <Box component="span" sx={{ color: '#d32f2f', ml: 0.4 }}>*</Box>
+                )}
+            </Typography>
+            {error && (
+                <Typography sx={{ color: '#d32f2f', fontSize: 12, fontWeight: 700, mb: 0.75, lineHeight: 1.4 }}>
+                    <Box component="span" sx={{ mr: 0.4 }}>*</Box>
+                    {error}
+                </Typography>
+            )}
             <Stack
                 direction="row"
                 spacing={0.5}
@@ -98,7 +122,7 @@ export function DescriptionEditor({ value, onChange }: DescriptionEditorProps) {
                 sx={{
                     p: 0.75,
                     mb: 0,
-                    border: `1px solid ${alpha(BRAND_BLUE, 0.2)}`,
+                    border: `1px solid ${error ? '#d32f2f' : alpha(BRAND_BLUE, 0.2)}`,
                     borderBottom: 'none',
                     borderRadius: '10px 10px 0 0',
                     bgcolor: alpha(BRAND_BLUE, 0.03),
@@ -168,30 +192,30 @@ export function DescriptionEditor({ value, onChange }: DescriptionEditorProps) {
                             pointerEvents: 'none',
                         }}
                     >
-                        Write the full article. Headings, lists, quotes, and links are available above.
+                        {placeholder}
                     </Typography>
                 )}
                 <Box
                     ref={editorRef}
                     contentEditable
                     role="textbox"
-                    aria-label="Article"
+                    aria-label={label}
                     aria-multiline="true"
                     onInput={emit}
                     sx={{
                         minHeight: 420,
                         p: 2,
-                        border: `1px solid ${alpha(BRAND_BLUE, 0.2)}`,
+                        border: `1px solid ${error ? '#d32f2f' : alpha(BRAND_BLUE, 0.2)}`,
                         borderRadius: '0 0 10px 10px',
                         outline: 'none',
                         bgcolor: '#ffffff',
-                        '&:focus': { borderColor: BRAND_BLUE },
+                        '&:focus': { borderColor: error ? '#d32f2f' : BRAND_BLUE },
                         ...bodySx,
                     }}
                 />
             </Box>
             <Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 1 }}>
-                This is the full article visitors will read. It can be as long as you need.
+                {caption}
             </Typography>
         </Box>
     );

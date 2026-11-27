@@ -11,7 +11,7 @@ import { useSyncExternalStore } from 'react';
 
 import { listTournaments } from 'src/api/tournament/tournament.api';
 
-import { isEmail, todayISO } from './format';
+import { isEmail, activeFee, withEntryFees, isRegistrationOpen } from './format';
 import { sampleState } from './seed';
 
 // ----------------------------------------------------------------------
@@ -85,23 +85,32 @@ function cleanDraft(input: TournamentDraft): TournamentDraft {
     ...input,
     name: input.name.trim(),
     organizer: input.organizer.trim(),
+    street: input.street.trim(),
     city: input.city.trim(),
     state: input.state.trim().toUpperCase(),
     description: input.description.trim(),
-    prizeSummary: input.prizeSummary.trim(),
-    sections: input.sections.map((section) => ({
-      ...section,
-      name: section.name.trim(),
-      fee: Number(section.fee) || 0,
-      capacity: Math.max(1, Number(section.capacity) || 1),
-    })),
+    sections: input.sections.map((section) => {
+      const priced = withEntryFees({
+        ...section,
+        name: section.name.trim(),
+        earlyFee: Number(section.earlyFee) || 0,
+        regularFee: Number(section.regularFee) || 0,
+        lateFee: Number(section.lateFee) || 0,
+        onsiteFee: Number(section.onsiteFee) || 0,
+        earlyDeadline: (section.earlyDeadline || '').trim(),
+        regularDeadline: (section.regularDeadline || '').trim(),
+        lateDeadline: (section.lateDeadline || '').trim(),
+        onsiteDeadline: (section.onsiteDeadline || '').trim(),
+      });
+      return { ...priced, capacity: Math.max(1, Number(section.capacity) || 1) };
+    }),
   };
 }
 
 export function addToCart(input: Omit<CartItem, 'id'>): string | null {
   const tournament = state.tournaments.find((item) => item.id === input.tournamentId);
   if (!tournament) return 'That tournament is no longer listed.';
-  if (tournament.registrationCloses < todayISO()) return 'Registration is closed.';
+  if (!isRegistrationOpen(tournament)) return 'Registration is closed.';
   const section = tournament.sections.find((item) => item.id === input.sectionId);
   if (!section) return 'Choose a section.';
   if (!input.firstName.trim() || !input.lastName.trim()) return "Enter the player's first and last name.";
@@ -126,7 +135,7 @@ export function addToCart(input: Omit<CartItem, 'id'>): string | null {
     rating: input.rating.trim(),
     federationId: input.federationId.trim(),
     sectionName: section.name,
-    fee: section.fee,
+    fee: activeFee(section),
   };
   persist({ ...state, cart: [...state.cart, item] });
   return null;
@@ -142,7 +151,7 @@ export function confirmCart() {
     const tournament = state.tournaments.find((entry) => entry.id === item.tournamentId);
     const section = tournament?.sections.find((entry) => entry.id === item.sectionId);
     if (!tournament || !section) continue;
-    confirmed.push({ ...item, sectionName: section.name, fee: section.fee, createdAt: new Date().toISOString() });
+    confirmed.push({ ...item, sectionName: section.name, fee: activeFee(section), createdAt: new Date().toISOString() });
   }
   persist({
     ...state,
@@ -201,7 +210,11 @@ export function sendMessage(input: Omit<ContactMessage, 'id' | 'createdAt'>) {
 }
 
 export async function refreshTournamentsFromApi() {
-  const tournaments = await listTournaments();
+  const tournaments = (await listTournaments()).map((tournament) => ({
+    ...tournament,
+    street: tournament.street || '',
+    sections: (tournament.sections || []).map(withEntryFees),
+  }));
   persist({ ...state, tournaments });
   return tournaments;
 }
