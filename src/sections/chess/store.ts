@@ -9,6 +9,8 @@ import type {
 
 import { useSyncExternalStore } from 'react';
 
+import { listTournaments } from 'src/api/tournament/tournament.api';
+
 import { isEmail, todayISO } from './format';
 import { sampleState } from './seed';
 
@@ -196,6 +198,16 @@ export function sendMessage(input: Omit<ContactMessage, 'id' | 'createdAt'>) {
     createdAt: new Date().toISOString(),
   };
   persist({ ...state, messages: [message, ...state.messages] });
+}
+
+export async function refreshTournamentsFromApi() {
+  const tournaments = await listTournaments();
+  persist({ ...state, tournaments });
+  return tournaments;
+}
+
+if (typeof window !== 'undefined') {
+  refreshTournamentsFromApi().catch(() => undefined);
 }
 
 export function restoreSampleEvents() {

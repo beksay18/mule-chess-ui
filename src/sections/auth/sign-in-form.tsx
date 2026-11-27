@@ -1,19 +1,21 @@
-import { Box, Button, IconButton, InputAdornment, Link, TextField } from '@mui/material';
+import { Box, Link, Button, TextField, IconButton, InputAdornment } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify';
-import { useState, FormEvent } from 'react';
+import type { FormEvent } from 'react';
+import { useState } from 'react';
 import { isValidEmail } from '../../utils/validator';
 
-const BRAND_BLUE = '#175195';
+const NAVY = '#12325f';
+const MARK = '#2888A0';
 
 const fieldSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: 2,
         '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: alpha(BRAND_BLUE, 0.4),
+            borderColor: alpha(MARK, 0.5),
         },
         '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: BRAND_BLUE,
+            borderColor: MARK,
         },
     },
 };
@@ -89,7 +91,7 @@ export function SignInForm({
                     href="/forgot-password"
                     variant="body2"
                     underline="hover"
-                    sx={{ color: BRAND_BLUE, fontWeight: 600, fontSize: '0.8125rem' }}
+                    sx={{ color: MARK, fontWeight: 600, fontSize: '0.8125rem' }}
                 >
                     Forgot password?
                 </Link>
@@ -142,12 +144,11 @@ export function SignInForm({
                     fontWeight: 700,
                     fontSize: '1rem',
                     borderRadius: 50,
-                    bgcolor: BRAND_BLUE,
+                    bgcolor: NAVY,
                     textTransform: 'none',
-                    boxShadow: `0 8px 24px ${alpha(BRAND_BLUE, 0.25)}`,
+                    boxShadow: 'none',
                     '&:hover': {
-                        bgcolor: '#124578',
-                        transform: 'translateY(-1px)',
+                        bgcolor: MARK,
                     },
                 }}
             >

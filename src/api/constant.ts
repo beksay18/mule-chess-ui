@@ -75,6 +75,13 @@ export const ENDPOINTS = {
         UPDATE: (id: number | string) => `/mule-chess/api/blog/${id}`,
         DELETE: (id: number | string) => `/mule-chess/api/blog/${id}`,
     },
+    TOURNAMENT: {
+        LIST: "/mule-chess/api/tournaments",
+        CREATE: "/mule-chess/api/tournaments",
+        UPDATE: (id: number | string) => `/mule-chess/api/tournaments/${id}`,
+        DELETE: (id: number | string) => `/mule-chess/api/tournaments/${id}`,
+        TYPES: "/mule-chess/api/tournament-types",
+    },
     FAQ: {
         CREATE_TITLE: "/mule-chess/api/faq/create-title",
         UPDATE_TITLE: (id: number) => `/mule-chess/api/faq/${id}`,

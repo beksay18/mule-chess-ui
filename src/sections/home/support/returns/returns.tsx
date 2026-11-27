@@ -13,19 +13,6 @@ import { useRouter } from '../../../../routes/hooks';
 
 const BRAND_BLUE = '#175195';
 
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    borderRadius: 2.5,
-    transform: 'rotate(-2deg)',
-};
-
 const SECTIONS = [
     {
         icon: ReplayOutlinedIcon,
@@ -78,10 +65,7 @@ export default function Returns() {
                                     mb: 1.5,
                                 }}
                             >
-                                Returns &{' '}
-                                <Box component="span" sx={stickerChipSx}>
-                                    refunds
-                                </Box>
+                                Returns & refunds
                             </Typography>
                             <Typography
                                 sx={{

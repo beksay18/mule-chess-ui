@@ -50,6 +50,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-12-13',
     registrationCloses: '2026-12-06',
     timeControl: 'regular',
+    format: 'swiss',
     audiences: ['adults', 'fide'],
     prizeSummary: '$600 prize fund based on 40 paid entries, split by section.',
     description:
@@ -71,6 +72,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-11-27',
     registrationCloses: '2026-11-27',
     timeControl: 'quick',
+    format: 'swiss',
     audiences: ['adults'],
     prizeSummary: 'Trophies for first and top under 1600.',
     description:
@@ -88,6 +90,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-11-29',
     registrationCloses: '2026-11-28',
     timeControl: 'blitz',
+    format: 'swiss',
     audiences: ['adults'],
     prizeSummary: '$300 guaranteed, plus a class prize.',
     description:
@@ -105,6 +108,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-12-12',
     registrationCloses: '2026-12-12',
     timeControl: 'blitz',
+    format: 'swiss',
     audiences: ['adults'],
     prizeSummary: 'Club gift cards for the top two scores.',
     description:
@@ -122,6 +126,7 @@ const tournaments: Tournament[] = [
     endDate: '2027-01-16',
     registrationCloses: '2027-01-14',
     timeControl: 'quick',
+    format: 'swiss',
     audiences: ['scholastic'],
     prizeSummary: 'Trophies for the top three in each grade band.',
     description:
@@ -143,6 +148,7 @@ const tournaments: Tournament[] = [
     endDate: '2027-02-07',
     registrationCloses: '2027-02-06',
     timeControl: 'regular',
+    format: 'swiss',
     audiences: ['senior'],
     prizeSummary: 'Trophy and free entry to the next Senior Sunday.',
     description:
@@ -160,6 +166,7 @@ const tournaments: Tournament[] = [
     endDate: '2027-02-21',
     registrationCloses: '2027-02-18',
     timeControl: 'regular',
+    format: 'swiss',
     audiences: ['team', 'adults'],
     prizeSummary: 'Traveling trophy for the winning team.',
     description:
@@ -177,6 +184,7 @@ const tournaments: Tournament[] = [
     endDate: '2027-03-14',
     registrationCloses: '2027-03-12',
     timeControl: 'regular',
+    format: 'swiss',
     audiences: ['adults', 'fide'],
     prizeSummary: '$1,200 based on 60 entries. First in the Open is $300.',
     description:
@@ -198,6 +206,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-10-17',
     registrationCloses: '2026-10-16',
     timeControl: 'quick',
+    format: 'swiss',
     audiences: ['adults'],
     prizeSummary: 'Paid out on site. Nora Hale won the title.',
     description:
@@ -215,6 +224,7 @@ const tournaments: Tournament[] = [
     endDate: '2026-08-09',
     registrationCloses: '2026-08-07',
     timeControl: 'regular',
+    format: 'swiss',
     audiences: ['adults', 'fide'],
     prizeSummary: 'Prizes were paid at the event.',
     description:

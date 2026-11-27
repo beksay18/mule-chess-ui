@@ -46,7 +46,7 @@ export function Logo({
             <Box
                 component="img"
                 src={LOGO_SRC}
-                alt="Mule Chess"
+                alt=""
                 sx={{
                     height: isSingle ? 40 : 48,
                     width: 'auto',
@@ -54,6 +54,20 @@ export function Logo({
                     display: 'block',
                 }}
             />
+            <Box
+                component="span"
+                sx={{
+                    ml: 1.25,
+                    color: '#12325f',
+                    fontWeight: 800,
+                    fontSize: isSingle ? '1.05rem' : '1.15rem',
+                    letterSpacing: '-0.03em',
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                }}
+            >
+                Mule Chess
+            </Box>
         </LogoRoot>
     );
 }

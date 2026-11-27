@@ -2,6 +2,15 @@ export type AudienceTag = 'scholastic' | 'adults' | 'senior' | 'team' | 'fide';
 
 export type TimeControl = 'regular' | 'quick' | 'blitz';
 
+export type TournamentFormat =
+  | 'swiss'
+  | 'swiss-team-tiebreak'
+  | 'swiss-team'
+  | 'round-robin'
+  | 'round-robin-team'
+  | 'knockout'
+  | 'knockout-team';
+
 export type TournamentSection = {
   id: string;
   name: string;
@@ -21,6 +30,7 @@ export type Tournament = {
   registrationCloses: string;
   description: string;
   timeControl: TimeControl;
+  format: TournamentFormat;
   audiences: AudienceTag[];
   sections: TournamentSection[];
   prizeSummary: string;

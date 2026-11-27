@@ -30,37 +30,6 @@ const VALUES = [
     },
 ] as const;
 
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    bgcolor: '#ffffff',
-    border: `2px solid ${alpha(BRAND_BLUE, 0.15)}`,
-    outline: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    outlineOffset: 3,
-    borderRadius: 2.5,
-    transform: 'rotate(-3deg)',
-    boxShadow: `
-        4px 4px 0 ${alpha(BRAND_BLUE, 0.15)},
-        0 8px 20px ${alpha(BRAND_BLUE, 0.12)}
-    `,
-    '&::after': {
-        content: '""',
-        position: 'absolute',
-        bottom: -6,
-        right: -6,
-        width: 14,
-        height: 14,
-        bgcolor: alpha(BRAND_BLUE, 0.08),
-        borderRadius: '0 0 6px 0',
-        transform: 'rotate(12deg)',
-    },
-};
-
 export default function AboutUs() {
     const theme = useTheme();
     const router = useRouter();
@@ -91,10 +60,7 @@ export default function AboutUs() {
                                     mb: 1.5,
                                 }}
                             >
-                                We help your ideas{' '}
-                                <Box component="span" sx={stickerChipSx}>
-                                    stick
-                                </Box>
+                                We help your ideas stick
                             </Typography>
                             <Typography
                                 sx={{

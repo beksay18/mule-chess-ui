@@ -7,8 +7,8 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { alpha } from '@mui/material/styles';
 import { useRouter } from '../../routes/hooks';
 
-const BRAND_BLUE = '#175195';
-const BRAND_BLUE_LIGHT = '#2d8fd5';
+const NAVY = '#12325f';
+const MARK = '#2888A0';
 
 export default function HelpOverview() {
     const router = useRouter();
@@ -18,39 +18,74 @@ export default function HelpOverview() {
             <Container maxWidth="lg">
                 <Box
                     sx={{
+                        position: 'relative',
+                        overflow: 'hidden',
                         borderRadius: 4,
-                        px: { xs: 3, sm: 5, md: 6 },
-                        py: { xs: 4, sm: 5 },
-                        background: `linear-gradient(135deg, ${BRAND_BLUE} 0%, ${BRAND_BLUE_LIGHT} 100%)`,
-                        boxShadow: `0 16px 40px ${alpha(BRAND_BLUE, 0.22)}`,
+                        px: { xs: 3, sm: 4, md: 5 },
+                        py: { xs: 3.5, md: 4.5 },
+                        bgcolor: '#f7fbfc',
+                        border: `1px solid ${alpha(MARK, 0.28)}`,
+                        boxShadow: `0 12px 32px ${alpha(NAVY, 0.06)}`,
+                        '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            left: 0,
+                            top: 0,
+                            bottom: 0,
+                            width: 6,
+                            bgcolor: MARK,
+                        },
                     }}
                 >
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            right: -80,
+                            top: -90,
+                            width: 220,
+                            height: 220,
+                            borderRadius: '50%',
+                            bgcolor: alpha(MARK, 0.1),
+                            pointerEvents: 'none',
+                        }}
+                    />
+
                     <Stack
                         direction={{ xs: 'column', md: 'row' }}
-                        alignItems={{ xs: 'center', md: 'center' }}
+                        alignItems={{ xs: 'flex-start', md: 'center' }}
                         justifyContent="space-between"
-                        spacing={{ xs: 3, md: 4 }}
+                        spacing={{ xs: 2.5, md: 4 }}
+                        sx={{ position: 'relative', pl: { xs: 1, sm: 1.5 } }}
                     >
-                        <Stack spacing={1.25} sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+                        <Stack spacing={0.75} sx={{ maxWidth: 560 }}>
+                            <Typography
+                                sx={{
+                                    color: MARK,
+                                    fontWeight: 800,
+                                    fontSize: 12,
+                                    letterSpacing: 1.4,
+                                    textTransform: 'uppercase',
+                                }}
+                            >
+                                We are here to help
+                            </Typography>
                             <Typography
                                 component="h2"
                                 sx={{
-                                    color: '#ffffff',
+                                    color: NAVY,
                                     fontWeight: 800,
-                                    fontSize: { xs: '1.5rem', sm: '1.875rem', md: '2rem' },
+                                    fontSize: { xs: '1.45rem', sm: '1.7rem', md: '1.85rem' },
                                     letterSpacing: '-0.02em',
                                     lineHeight: 1.2,
                                 }}
                             >
                                 Have a question about an event?
                             </Typography>
-
                             <Typography
                                 sx={{
-                                    color: alpha('#ffffff', 0.9),
-                                    fontSize: { xs: '0.95rem', sm: '1.05rem' },
-                                    lineHeight: 1.65,
-                                    maxWidth: 480,
+                                    color: alpha(NAVY, 0.72),
+                                    fontSize: { xs: '0.95rem', sm: '1.02rem' },
+                                    lineHeight: 1.6,
                                 }}
                             >
                                 Ask about a section, a fee, or a registration and we will write back.
@@ -60,39 +95,24 @@ export default function HelpOverview() {
                         <Button
                             variant="contained"
                             size="large"
-                            endIcon={
-                                <ArrowForwardIcon
-                                    sx={{
-                                        fontSize: 20,
-                                        transition: 'transform 0.25s ease',
-                                    }}
-                                />
-                            }
+                            endIcon={<ArrowForwardIcon sx={{ fontSize: 18 }} />}
                             onClick={() => router.push('/contact')}
                             sx={{
                                 flexShrink: 0,
-                                minWidth: { xs: '100%', sm: 220 },
-                                px: 4,
-                                py: 1.75,
+                                alignSelf: { xs: 'stretch', sm: 'flex-start', md: 'center' },
+                                minWidth: { sm: 168 },
+                                px: 3,
+                                py: 1.35,
                                 fontWeight: 800,
-                                fontSize: '1.0625rem',
-                                letterSpacing: '0.01em',
+                                fontSize: '1rem',
                                 borderRadius: 50,
-                                bgcolor: '#ffffff',
-                                color: BRAND_BLUE,
+                                bgcolor: MARK,
+                                color: '#ffffff',
                                 textTransform: 'none',
-                                boxShadow: `0 6px 20px ${alpha('#000000', 0.18)}`,
-                                transition: 'all 0.25s ease',
-                                '& .MuiButton-endIcon': {
-                                    ml: 1,
-                                },
+                                boxShadow: 'none',
                                 '&:hover': {
-                                    bgcolor: '#ffffff',
-                                    transform: 'translateY(-3px)',
-                                    boxShadow: `0 12px 28px ${alpha('#000000', 0.22)}`,
-                                    '& .MuiButton-endIcon': {
-                                        transform: 'translateX(4px)',
-                                    },
+                                    bgcolor: NAVY,
+                                    boxShadow: `0 10px 24px ${alpha(NAVY, 0.18)}`,
                                 },
                             }}
                         >

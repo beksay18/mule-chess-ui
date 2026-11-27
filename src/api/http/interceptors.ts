@@ -25,7 +25,7 @@ export const requestInterceptor = (
 export const responseInterceptor = (res: AxiosResponse): AxiosResponse => res;
 
 const AUTH_ENDPOINTS = ['/auth/signin', '/auth/signup', '/auth/login-with-google', '/auth/google-client-id', '/auth/logout'];
-const PUBLIC_ENDPOINTS = ['/api/blog/public'];
+const PUBLIC_ENDPOINTS = ['/api/blog/public', '/api/tournament-types'];
 
 function skipsSessionReset(url?: string) {
     if (!url) {

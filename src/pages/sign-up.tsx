@@ -1,3 +1,5 @@
+import Box from '@mui/material/Box';
+
 import { CONFIG } from 'src/config-global';
 
 import { SignUpView } from '../sections/auth/signUp/view';
@@ -10,9 +12,11 @@ export default function Page() {
   return (
     <>
       <title>{`Sign up - ${CONFIG.appName}`}</title>
-      <Header />
-      <SignUpView />
-      <ScrollRevealFooter />
+      <Box sx={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', bgcolor: '#f6f8fb' }}>
+        <Header />
+        <SignUpView />
+        <ScrollRevealFooter />
+      </Box>
     </>
   );
 }

@@ -69,6 +69,7 @@ export function DashboardLayout({
     if (pathname.startsWith('/blog-posts')) return 'Blog';
     if (pathname.startsWith('/products-types')) return 'Product Types';
     if (pathname.startsWith('/products')) return 'Products';
+    if (pathname.startsWith('/manage-tournaments')) return 'Tournaments';
     if (pathname.startsWith('/dashboard')) return 'Dashboard';
     if (pathname.startsWith('/account/profile')) return 'Profile';
     if (pathname.startsWith('/account/settings')) return 'Settings';

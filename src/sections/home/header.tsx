@@ -135,9 +135,6 @@ export default function Header() {
                             <Button sx={navLinkSx} onClick={() => router.push('/results')}>
                                 Results
                             </Button>
-                            <Button sx={navLinkSx} onClick={() => router.push('/past-events')}>
-                                Past events
-                            </Button>
                         </Stack>
                     </Stack>
 
@@ -279,9 +276,6 @@ export default function Header() {
                     </MenuItem>
                     <MenuItem onClick={() => handleNavigate('/results')} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
                         Results
-                    </MenuItem>
-                    <MenuItem onClick={() => handleNavigate('/past-events')} sx={{ borderRadius: 1.5, fontWeight: 500 }}>
-                        Past events
                     </MenuItem>
 
                     {user ? (

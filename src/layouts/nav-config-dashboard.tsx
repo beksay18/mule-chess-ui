@@ -4,6 +4,7 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 import EmailIcon from '@mui/icons-material/Email';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 
 const icon = (name: string) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} />;
 
@@ -20,6 +21,11 @@ export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
     title: 'Dashboard',
     path: '/dashboard',
     icon: icon('ic-analytics'),
+  },
+  {
+    title: 'Tournaments',
+    path: '/manage-tournaments',
+    icon: <EmojiEventsOutlinedIcon />,
   },
   {
     title: 'Orders',
@@ -60,7 +66,7 @@ export const getNavData = (newOrderCount: number, role?: string): NavItem[] => {
   ];
 
   if (role === 'ROLE_MANAGER') {
-    const allowed = new Set(['/dashboard', '/orders', '/user', '/contacts', '/faq', '/blog-posts']);
+    const allowed = new Set(['/dashboard', '/manage-tournaments', '/orders', '/user', '/contacts', '/faq', '/blog-posts']);
     return items.filter((item) => allowed.has(item.path));
   }
 

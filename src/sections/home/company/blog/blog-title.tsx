@@ -2,22 +2,9 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 const BRAND_BLUE = '#175195';
-
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    borderRadius: 2.5,
-    transform: 'rotate(-2deg)',
-};
 
 export default function BlogTitle() {
     const theme = useTheme();
@@ -50,10 +37,7 @@ export default function BlogTitle() {
                                 mb: 1.5,
                             }}
                         >
-                            Tips, ideas &{' '}
-                            <Box component="span" sx={stickerChipSx}>
-                                inspiration
-                            </Box>
+                            Tips, ideas & inspiration
                         </Typography>
                         <Typography
                             sx={{

@@ -4,32 +4,19 @@ import Container from '@mui/material/Container';
 import Divider from '@mui/material/Divider';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useCallback, useState } from 'react';
+import { useState, useCallback } from 'react';
 import Link from '@mui/material/Link';
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 import { useRouter } from 'src/routes/hooks';
 import { signIn } from '../../../api/auth';
 import { SessionStorage } from '../../../api';
 import { SignInForm } from '../sign-in-form';
 import { SocialLoginButton } from '../social-login-button';
 
-const BRAND_BLUE = '#175195';
-
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    borderRadius: 2.5,
-    transform: 'rotate(-3deg)',
-};
+const NAVY = '#12325f';
+const MARK = '#2888A0';
 
 export function SignInView() {
-    const theme = useTheme();
     const router = useRouter();
     const [errorMessage, setErrorMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,17 +57,28 @@ export function SignInView() {
     return (
         <Box
             sx={{
-                bgcolor: '#ffffff',
-                py: { xs: 5, md: 8 },
+                flex: 1,
+                bgcolor: '#f6f8fb',
                 minHeight: { xs: 'calc(100dvh - 64px)', md: 'calc(100dvh - 72px)' },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
+                pt: { xs: 6, md: 7 },
+                pb: { xs: 6, md: 8 },
             }}
         >
             <Container maxWidth="sm">
-                <Stack spacing={4} alignItems="center">
-                    <Box component="h1" sx={{ m: 0, textAlign: 'center', maxWidth: 400 }}>
+                <Stack spacing={2.5} alignItems="center">
+                    <Box component="h1" sx={{ m: 0, textAlign: 'center', maxWidth: 420 }}>
+                        <Typography
+                            sx={{
+                                color: MARK,
+                                fontWeight: 800,
+                                fontSize: 12,
+                                letterSpacing: 1.4,
+                                textTransform: 'uppercase',
+                                mb: 0.75,
+                            }}
+                        >
+                            Mule Chess
+                        </Typography>
                         <Typography
                             component="span"
                             sx={{
@@ -89,18 +87,15 @@ export function SignInView() {
                                 letterSpacing: '-0.03em',
                                 fontSize: { xs: '2rem', md: '2.25rem' },
                                 lineHeight: 1.15,
-                                color: theme.palette.grey[900],
-                                mb: 1,
+                                color: NAVY,
                             }}
                         >
-                            Welcome{' '}
-                            <Box component="span" sx={stickerChipSx}>
-                                back
-                            </Box>
+                            Sign in
                         </Typography>
                         <Typography
                             sx={{
-                                color: 'text.secondary',
+                                mt: 1,
+                                color: alpha(NAVY, 0.68),
                                 fontSize: { xs: '0.975rem', md: '1rem' },
                                 lineHeight: 1.6,
                             }}
@@ -116,8 +111,8 @@ export function SignInView() {
                             p: { xs: 3, md: 3.5 },
                             borderRadius: 3,
                             bgcolor: '#ffffff',
-                            border: `1px solid ${alpha(BRAND_BLUE, 0.12)}`,
-                            boxShadow: `0 8px 32px ${alpha(BRAND_BLUE, 0.08)}`,
+                            border: `1px solid ${alpha(MARK, 0.22)}`,
+                            boxShadow: `0 16px 40px ${alpha(NAVY, 0.06)}`,
                         }}
                     >
                         {errorMessage && (
@@ -155,7 +150,7 @@ export function SignInView() {
                             <Link
                                 href="/sign-up"
                                 underline="hover"
-                                sx={{ fontWeight: 700, color: BRAND_BLUE }}
+                                sx={{ fontWeight: 700, color: MARK }}
                             >
                                 Create one
                             </Link>

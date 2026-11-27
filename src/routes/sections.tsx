@@ -122,6 +122,14 @@ export const routesSection: RouteObject[] = [
                 ),
             },
             {
+                path: 'manage-tournaments',
+                element: (
+                    <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>
+                        <ManageView embedded />
+                    </RoleGuard>
+                ),
+            },
+            {
                 path: 'orders',
                 element: (
                     <RoleGuard allowedRoles={['ROLE_ADMIN', 'ROLE_MANAGER']}>

@@ -6,19 +6,6 @@ import { alpha, useTheme } from '@mui/material/styles';
 
 const BRAND_BLUE = '#175195';
 
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    borderRadius: 2.5,
-    transform: 'rotate(-2deg)',
-};
-
 export type LegalSection = {
     title: string;
     paragraphs: string[];
@@ -57,10 +44,7 @@ export default function LegalPage({
                                     mb: 1.5,
                                 }}
                             >
-                                {headline}{' '}
-                                <Box component="span" sx={stickerChipSx}>
-                                    {chip}
-                                </Box>
+                                {headline} {chip}
                             </Typography>
                             <Typography
                                 sx={{

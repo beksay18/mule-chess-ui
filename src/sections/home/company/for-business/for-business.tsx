@@ -19,26 +19,6 @@ import { useRouter } from '../../../../routes/hooks';
 const BRAND_BLUE = '#175195';
 const SUPPORT_EMAIL = 'support@cgstickerhouse.com';
 
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    bgcolor: '#ffffff',
-    border: `2px solid ${alpha(BRAND_BLUE, 0.15)}`,
-    outline: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    outlineOffset: 3,
-    borderRadius: 2.5,
-    transform: 'rotate(-2deg)',
-    boxShadow: `
-        4px 4px 0 ${alpha(BRAND_BLUE, 0.15)},
-        0 8px 20px ${alpha(BRAND_BLUE, 0.12)}
-    `,
-};
-
 const BENEFITS = [
     {
         icon: Inventory2OutlinedIcon,
@@ -132,10 +112,7 @@ export default function ForBusiness() {
                                     mb: 1.5,
                                 }}
                             >
-                                Stickers that scale with your{' '}
-                                <Box component="span" sx={stickerChipSx}>
-                                    business
-                                </Box>
+                                Stickers that scale with your business
                             </Typography>
                             <Typography
                                 sx={{

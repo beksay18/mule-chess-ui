@@ -17,7 +17,7 @@ const MARK = '#2888A0';
 const STEPS = [
     { title: 'Find a tournament', text: 'Search by date, city, and section.' },
     { title: 'Reserve a seat', text: 'Pick an open section and confirm the entry.' },
-    { title: 'Show up on the list', text: 'Your name is on the entry list before round one.' },
+    { title: 'Play chess', text: 'Sit down for round one and play your games.' },
 ] as const;
 
 export default function HomeOverview() {
@@ -50,7 +50,7 @@ export default function HomeOverview() {
                     >
                         <Stack spacing={3} sx={{ maxWidth: 620 }}>
                             <Typography sx={{ color: MARK, fontWeight: 800, letterSpacing: 1.4, fontSize: 13, textTransform: 'uppercase' }}>
-                                Tournament registration
+                                Chess tournaments
                             </Typography>
                             <Typography
                                 component="h1"
@@ -110,22 +110,20 @@ export default function HomeOverview() {
                         </Stack>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <Box
-                                sx={{
-                                    width: { xs: 280, md: 420 },
-                                    height: { xs: 320, md: 460 },
-                                    borderRadius: '50%',
-                                    bgcolor: alpha(MARK, 0.12),
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                }}
-                            >
+                            <Box sx={{ width: '100%', maxWidth: 520 }}>
                                 <Box
                                     component="img"
-                                    src="/assets/images/mule-chess-logo.png"
-                                    alt="Mule Chess"
-                                    sx={{ height: '78%', width: 'auto', objectFit: 'contain', display: 'block' }}
+                                    src="/assets/images/chess-and-clock.jpg?v=2"
+                                    alt="Chess pieces and a chess clock"
+                                    sx={{
+                                        width: '100%',
+                                        height: { xs: 280, md: 360 },
+                                        objectFit: 'cover',
+                                        objectPosition: 'center 45%',
+                                        display: 'block',
+                                        borderRadius: 4,
+                                        boxShadow: `0 18px 40px ${alpha('#12325f', 0.16)}`,
+                                    }}
                                 />
                             </Box>
                         </Box>

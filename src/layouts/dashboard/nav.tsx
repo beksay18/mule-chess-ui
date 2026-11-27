@@ -128,17 +128,13 @@ export function NavContent({ data, slots, sx }: NavContentProps) {
         <Stack direction="row" alignItems="center" gap={1.5}>
           <Logo
             sx={{
-              flex: 1,
-              minWidth: 0,
               '& img': {
-                width: '100%',
-                maxWidth: 'none',
                 height: 42,
-                objectFit: 'contain',
-                objectPosition: 'left center',
+                width: 'auto',
               },
             }}
           />
+          <Box sx={{ flex: 1 }} />
           {roleLabel && (
           <Chip
             label={roleLabel}

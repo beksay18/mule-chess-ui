@@ -12,19 +12,6 @@ import { SignUpForm } from '../sign-up-form';
 
 const BRAND_BLUE = '#175195';
 
-const stickerChipSx = {
-    position: 'relative' as const,
-    display: 'inline-block',
-    px: { xs: 2, md: 2.5 },
-    py: { xs: 0.5, md: 0.75 },
-    mx: 0.5,
-    fontWeight: 800,
-    color: BRAND_BLUE,
-    border: `2px dashed ${alpha(BRAND_BLUE, 0.3)}`,
-    borderRadius: 2.5,
-    transform: 'rotate(-3deg)',
-};
-
 export function SignUpView() {
     const theme = useTheme();
     const router = useRouter();
@@ -53,16 +40,15 @@ export function SignUpView() {
     return (
         <Box
             sx={{
-                bgcolor: '#ffffff',
-                py: { xs: 5, md: 8 },
+                flex: 1,
+                bgcolor: '#f6f8fb',
                 minHeight: { xs: 'calc(100dvh - 64px)', md: 'calc(100dvh - 72px)' },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
+                pt: { xs: 6, md: 7 },
+                pb: { xs: 6, md: 8 },
             }}
         >
             <Container maxWidth="sm">
-                <Stack spacing={4} alignItems="center">
+                <Stack spacing={2.5} alignItems="center">
                     <Box component="h1" sx={{ m: 0, textAlign: 'center', maxWidth: 420 }}>
                         <Typography
                             component="span"
@@ -79,12 +65,7 @@ export function SignUpView() {
                             {createdEmail ? (
                                 'Account created'
                             ) : (
-                                <>
-                                    Create your{' '}
-                                    <Box component="span" sx={stickerChipSx}>
-                                        account
-                                    </Box>
-                                </>
+                                'Create your account'
                             )}
                         </Typography>
                         <Typography
