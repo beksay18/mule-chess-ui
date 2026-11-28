@@ -16,7 +16,7 @@ import { RouterLink } from 'src/routes/components';
 import { useRouter } from 'src/routes/hooks';
 
 import { FormPanel, LabeledRow } from './form';
-import { money, activeFee, formatRange, isRegistrationOpen } from './format';
+import { money, activeFee, formatRange, tournamentStatus, isRegistrationOpen } from './format';
 import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
 import { addToCart, takenSeats, getSnapshot, useChessState } from './store';
 import { chessColors, registerButtonSx } from './theme';
@@ -48,7 +48,7 @@ export function RegisterView() {
     setSectionId(openSection?.id ?? '');
   }, [tournament]);
 
-  if (!tournament) return <MissingEvent />;
+  if (!tournament || tournamentStatus(tournament) === 'NEW') return <MissingEvent />;
 
   const open = isRegistrationOpen(tournament);
 

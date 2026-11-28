@@ -79,6 +79,7 @@ export const ENDPOINTS = {
         LIST: "/mule-chess/api/tournaments",
         CREATE: "/mule-chess/api/tournaments",
         UPDATE: (id: number | string) => `/mule-chess/api/tournaments/${id}`,
+        PUBLISH: (id: number | string) => `/mule-chess/api/tournaments/${id}/publish`,
         DELETE: (id: number | string) => `/mule-chess/api/tournaments/${id}`,
         TYPES: "/mule-chess/api/tournament-types",
     },

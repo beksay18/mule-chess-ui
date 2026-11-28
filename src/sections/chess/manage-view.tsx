@@ -1,6 +1,7 @@
 import { useState, useEffect, type ComponentProps } from 'react';
 
 import Alert from '@mui/material/Alert';
+import Snackbar from '@mui/material/Snackbar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -43,17 +44,18 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import dayjs from 'dayjs';
 
-import { articlePlainText } from 'src/sections/blog/article-html';
-import { DescriptionEditor } from 'src/sections/blog/description-editor';
-import { listTournamentTypes, createTournamentRequest, deleteTournamentRequest, updateTournamentRequest } from 'src/api/tournament/tournament.api';
+import { toEditorHtml, looksLikeHtml, articlePlainText, sanitizeArticleHtml } from 'src/sections/blog/article-html';
+import { articleBodySx, DescriptionEditor } from 'src/sections/blog/description-editor';
+import { listTournamentTypes, createTournamentRequest, deleteTournamentRequest, updateTournamentRequest, publishTournamentRequest } from 'src/api/tournament/tournament.api';
 
 import type { TournamentTypeOption } from 'src/api/tournament/tournament.api';
 import { DashboardContent } from 'src/layouts/dashboard';
 
-import { isPast, US_STATES, ENTRY_FEES, isHappening, entryPayload, withEntryFees, locationLabel, ENTRY_FEE_FORM, formatShortRange } from './format';
+import { money, US_STATES, activeFee, ENTRY_FEES, statusLabel, entryPayload, isSwissFormat, withEntryFees, locationLabel, ENTRY_FEE_FORM, formatShortRange, tournamentStatus, entryDeadlineLabel } from './format';
 import { SiteShell, usePageTitle } from './site-shell';
 import {
   useChessState,
@@ -63,10 +65,229 @@ import {
 } from './store';
 import { chessColors, registerButtonSx } from './theme';
 
-import type { Tournament, TournamentDraft, TournamentFormat, TournamentSection } from './types';
+import type { Tournament, TournamentDraft, TournamentFormat, TournamentStatus, TournamentSection } from './types';
 
 function formatLabel(types: TournamentTypeOption[], value?: string) {
   return types.find((item) => item.code === value)?.label ?? '';
+}
+
+const STATUS_COLOR: Record<TournamentStatus, string> = {
+  NEW: '#12325f',
+  PUBLISHED: '#175195',
+  IN_PROGRESS: '#2888A0',
+  COMPLETED: '#637381',
+};
+
+function EditTournamentButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      size="small"
+      variant="outlined"
+      startIcon={<EditOutlinedIcon />}
+      onClick={onClick}
+      sx={{
+        textTransform: 'none',
+        fontWeight: 700,
+        borderRadius: 2,
+        color: '#175195',
+        borderColor: '#175195',
+        '&:hover': { borderColor: '#124578', bgcolor: 'rgba(23, 81, 149, 0.06)' },
+      }}
+    >
+      Edit
+    </Button>
+  );
+}
+
+function DeleteTournamentDialog({
+  tournament,
+  onClose,
+  onConfirm,
+}: {
+  tournament: Tournament | null;
+  onClose: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <Dialog open={Boolean(tournament)} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle sx={{ fontWeight: 800, color: '#12325f' }}>Delete tournament</DialogTitle>
+      <DialogContent>
+        <Typography>Do you really want to delete this tournament?</Typography>
+        {tournament && (
+          <Box sx={{ mt: 1.5 }}>
+            <Typography sx={{ fontWeight: 700, color: '#12325f' }}>{tournament.name}</Typography>
+            <Typography variant="body2" sx={{ color: chessColors.muted }}>
+              {locationLabel(tournament)} · {formatShortRange(tournament)}
+            </Typography>
+          </Box>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2 }}>
+        <Button onClick={onClose} sx={{ textTransform: 'none', fontWeight: 700 }}>
+          Cancel
+        </Button>
+        <Button variant="contained" color="error" onClick={onConfirm} sx={{ textTransform: 'none', fontWeight: 700 }}>
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+function DeleteTournamentButton({ onClick }: { onClick: () => void }) {
+  return (
+    <Button
+      size="small"
+      color="error"
+      startIcon={<DeleteOutlineIcon />}
+      onClick={onClick}
+      sx={{ textTransform: 'none', fontWeight: 700 }}
+    >
+      Delete
+    </Button>
+  );
+}
+
+function NoticeToast({ message, onClose }: { message: string; onClose: () => void }) {
+  return (
+    <Snackbar
+      open={Boolean(message)}
+      autoHideDuration={4000}
+      onClose={(_event, reason) => {
+        if (reason === 'clickaway') return;
+        onClose();
+      }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      sx={{ top: { xs: 80, md: 88 } }}
+    >
+      <Alert severity="success" onClose={onClose} sx={{ alignItems: 'center', boxShadow: 2 }}>
+        {message}
+      </Alert>
+    </Snackbar>
+  );
+}
+
+function StatusChip({ status }: { status: TournamentStatus }) {
+  const color = STATUS_COLOR[status];
+  return <Chip size="small" label={statusLabel(status)} sx={{ bgcolor: `${color}1f`, color, fontWeight: 700 }} />;
+}
+
+function TournamentDetails({
+  tournament,
+  typeLabel,
+  entryCount,
+  onBack,
+  onEdit,
+  onPublish,
+  onDelete,
+}: {
+  tournament: Tournament;
+  typeLabel: string;
+  entryCount: number;
+  onBack: () => void;
+  onEdit: () => void;
+  onPublish: () => void;
+  onDelete: () => void;
+}) {
+  const status = tournamentStatus(tournament);
+  const [descriptionOpen, setDescriptionOpen] = useState(false);
+  const descriptionHtml = sanitizeArticleHtml(
+    looksLikeHtml(tournament.description) ? tournament.description : toEditorHtml(tournament.description)
+  );
+  return (
+    <Box>
+      <Button
+        color="inherit"
+        startIcon={<ArrowBackIcon />}
+        onClick={onBack}
+        sx={{ mb: 2, textTransform: 'none', fontWeight: 700, color: '#175195' }}
+      >
+        Back to tournaments
+      </Button>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', alignItems: { sm: 'flex-start' }, mb: 2 }}>
+        <Box>
+          <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
+            <Typography variant="h4" sx={{ fontWeight: 800, color: '#12325f' }}>{tournament.name}</Typography>
+            <StatusChip status={status} />
+          </Stack>
+          <Typography sx={{ color: chessColors.muted, mt: 0.75 }}>
+            {tournament.organizer} · {locationLabel(tournament)} · {formatShortRange(tournament)}
+          </Typography>
+          <Typography sx={{ color: chessColors.muted, mt: 0.35 }}>
+            {typeLabel || 'Tournament'} · {entryCount} entered
+          </Typography>
+          {articlePlainText(tournament.description) && (
+            <Button
+              onClick={() => setDescriptionOpen(true)}
+              sx={{ mt: 0.75, px: 0, minWidth: 0, textTransform: 'none', fontWeight: 700, color: '#175195' }}
+            >
+              Read description
+            </Button>
+          )}
+        </Box>
+        <Stack direction="row" spacing={1}>
+          {status === 'NEW' && (
+            <Button
+              variant="contained"
+              onClick={onPublish}
+              sx={{ textTransform: 'none', fontWeight: 700, bgcolor: '#175195', '&:hover': { bgcolor: '#124578' } }}
+            >
+              Publish
+            </Button>
+          )}
+          <EditTournamentButton onClick={onEdit} />
+          <DeleteTournamentButton onClick={onDelete} />
+        </Stack>
+      </Stack>
+      {status === 'NEW' && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Players cannot see this event until you publish it.
+        </Alert>
+      )}
+      <Dialog open={descriptionOpen} onClose={() => setDescriptionOpen(false)} maxWidth="md" fullWidth>
+        <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', pr: 1 }}>
+          Description
+          <IconButton aria-label="Close" onClick={() => setDescriptionOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ color: '#12325f', ...articleBodySx }} dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
+        </DialogContent>
+      </Dialog>
+      <Typography sx={{ color: '#2888A0', fontWeight: 800, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', mb: 1.25 }}>
+        Sections
+      </Typography>
+      <Stack spacing={1}>
+        {tournament.sections.map((section) => {
+          const priced = withEntryFees(section);
+          return (
+            <Card key={section.id} sx={{ p: 2 }}>
+              <Typography sx={{ fontWeight: 800, color: '#12325f' }}>
+                {section.name}
+                {isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
+                {` · ${section.capacity} seats`}
+              </Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fit, minmax(170px, 1fr))' }, gap: 1.5, mt: 1.5 }}>
+                {ENTRY_FEE_FORM.filter((item) => priced[item.enabled]).map((item) => (
+                  <Box key={item.key}>
+                    <Typography variant="caption" sx={{ display: 'block', fontWeight: 800, color: '#12325f' }}>
+                      {item.label}
+                    </Typography>
+                    <Typography sx={{ fontWeight: 700, color: '#12325f' }}>{money(priced[item.fee] ?? 0)}</Typography>
+                    <Typography variant="caption" sx={{ color: chessColors.muted }}>
+                      {entryDeadlineLabel(priced[item.deadline], priced[item.time]) || 'Deadline not set'}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+              <Typography sx={{ mt: 1.25, fontWeight: 700, color: '#175195' }}>Current fee {money(activeFee(section))}</Typography>
+            </Card>
+          );
+        })}
+      </Stack>
+    </Box>
+  );
 }
 
 function FormSectionTitle({ title, text }: { title: string; text: string }) {
@@ -163,6 +384,28 @@ function TournamentFormatDialog({
 
 // ----------------------------------------------------------------------
 
+function blankSection(): TournamentSection {
+  return withEntryFees({
+    id: crypto.randomUUID(),
+    name: '',
+    fee: null,
+    rounds: 0,
+    capacity: 0,
+    earlyFee: null,
+    earlyDeadline: '',
+    earlyDeadlineTime: '',
+    regularFee: null,
+    regularDeadline: '',
+    regularDeadlineTime: '',
+    lateFee: null,
+    lateDeadline: '',
+    lateDeadlineTime: '',
+    onsiteFee: null,
+    onsiteDeadline: '',
+    onsiteDeadlineTime: '',
+  });
+}
+
 function blankDraft(): TournamentDraft {
   return {
     name: '',
@@ -178,8 +421,8 @@ function blankDraft(): TournamentDraft {
     description: '',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['adults'],
-    sections: [withEntryFees({ id: crypto.randomUUID(), name: '', fee: 40, capacity: 0, earlyFee: 40, earlyDeadline: '', regularFee: 40, regularDeadline: '', lateFee: 40, lateDeadline: '', onsiteFee: 40, onsiteDeadline: '' })],
+    status: 'NEW',
+    sections: [blankSection()],
   };
 }
 
@@ -198,9 +441,13 @@ function toDraft(tournament: Tournament): TournamentDraft {
     description: tournament.description,
     timeControl: tournament.timeControl,
     format: tournament.format || 'swiss',
-    audiences: [...tournament.audiences],
+    status: tournamentStatus(tournament),
     sections: tournament.sections.map((section) => withEntryFees(section)),
   };
+}
+
+function calendarDay(value: string) {
+  return value.slice(0, 10);
 }
 
 function detailFieldErrors(draft: TournamentDraft) {
@@ -213,11 +460,11 @@ function detailFieldErrors(draft: TournamentDraft) {
   if (!draft.startDate) errors.startDate = 'Enter the start date.';
   if (!draft.startTime) errors.startTime = 'Enter the start time.';
   if (!draft.endDate) errors.endDate = 'Enter the end date.';
-  else if (draft.startDate && draft.endDate < draft.startDate) {
-    errors.endDate = 'The end date has to be on or after the start date.';
+  else if (draft.startDate && calendarDay(draft.endDate) < calendarDay(draft.startDate)) {
+    errors.endDate = 'The end date can be the same day as the start date, or a later day.';
   }
   if (!draft.registrationCloses) errors.registrationCloses = 'Enter the registration deadline.';
-  else if (draft.endDate && draft.registrationCloses > draft.endDate) {
+  else if (draft.endDate && calendarDay(draft.registrationCloses) > calendarDay(draft.endDate)) {
     errors.registrationCloses = 'Registration has to close on or before the last day.';
   }
   if (!draft.registrationClosesTime) errors.registrationClosesTime = 'Enter the time registration closes.';
@@ -227,16 +474,21 @@ function detailFieldErrors(draft: TournamentDraft) {
 
 type SectionProblems = Partial<Record<
   | 'name'
+  | 'rounds'
   | 'capacity'
   | 'entries'
   | 'earlyFee'
   | 'earlyDeadline'
+  | 'earlyDeadlineTime'
   | 'regularFee'
   | 'regularDeadline'
+  | 'regularDeadlineTime'
   | 'lateFee'
   | 'lateDeadline'
+  | 'lateDeadlineTime'
   | 'onsiteFee'
-  | 'onsiteDeadline',
+  | 'onsiteDeadline'
+  | 'onsiteDeadlineTime',
   string
 >>;
 
@@ -246,6 +498,7 @@ function sectionFieldErrors(draft: TournamentDraft) {
     const priced = withEntryFees(section);
     const item: SectionProblems = {};
     if (!priced.name.trim()) item.name = 'Enter a section name.';
+    if (isSwissFormat(draft.format) && (!priced.rounds || priced.rounds < 1)) item.rounds = 'Enter the number of rounds.';
     if (Number.isNaN(priced.capacity) || priced.capacity < 1) item.capacity = 'Enter room for at least one player.';
     const chosen = ENTRY_FEES.filter((entry) => priced[entry.enabled]);
     if (!chosen.length) item.entries = 'Choose at least one entry fee.';
@@ -253,15 +506,18 @@ function sectionFieldErrors(draft: TournamentDraft) {
     chosen.forEach((entry) => {
       const amount = priced[entry.fee];
       const deadline = priced[entry.deadline];
+      const time = priced[entry.time];
       const article = entry.key === 'early' ? 'an' : 'a';
-      if (Number.isNaN(amount) || amount < 0) {
+      if (amount === null || Number.isNaN(amount) || amount < 0) {
         item[entry.fee] = `Enter ${article} ${entry.label.toLowerCase()} fee of zero or more.`;
       }
       if (!deadline) item[entry.deadline] = `Enter the ${entry.label.toLowerCase()} deadline.`;
-      else if (previous && deadline < previous) {
+      if (!time) item[entry.time] = `Enter the ${entry.label.toLowerCase()} deadline time.`;
+      const stamp = deadline && time ? `${deadline}T${time}` : '';
+      if (stamp && previous && stamp < previous) {
         item[entry.deadline] = `The ${entry.label.toLowerCase()} deadline has to be on or after the previous deadline.`;
       }
-      if (deadline) previous = deadline;
+      if (stamp) previous = stamp;
     });
     if (Object.keys(item).length) errors[section.id] = item;
   });
@@ -273,16 +529,21 @@ function firstSectionField(errors: ReturnType<typeof sectionFieldErrors>) {
   if (!sectionId || !item) return '';
   const order = [
     'name',
+    'rounds',
     'capacity',
     'entries',
     'regularFee',
     'regularDeadline',
+    'regularDeadlineTime',
     'earlyFee',
     'earlyDeadline',
+    'earlyDeadlineTime',
     'lateFee',
     'lateDeadline',
+    'lateDeadlineTime',
     'onsiteFee',
     'onsiteDeadline',
+    'onsiteDeadlineTime',
   ] as const;
   const field = order.find((key) => item[key]) || 'name';
   return `tournament-section-${sectionId}-${field}`;
@@ -303,7 +564,9 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
   const [detailsChecked, setDetailsChecked] = useState(false);
   const [sectionsChecked, setSectionsChecked] = useState(false);
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<'all' | 'upcoming' | 'happening' | 'past'>('all');
+  const [listStatus, setListStatus] = useState<'all' | TournamentStatus>('all');
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Tournament | null>(null);
   const [pageIndex, setPageIndex] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -330,6 +593,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
 
   const startNew = () => {
     setEditingId(null);
+    setSelectedId(null);
     setDraft(blankDraft());
     setStep(0);
     setDetailsChecked(false);
@@ -351,6 +615,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
 
   const confirmFormat = () => {
     setEditingId(null);
+    setSelectedId(null);
     setDraft({ ...blankDraft(), format: formatChoice });
     setShowForm(true);
     setStep(0);
@@ -411,7 +676,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
         setShowForm(false);
         setStep(0);
       }
-      setNotice(editingId ? 'Tournament updated.' : 'Tournament published. Players can register from the tournaments list.');
+      setNotice(editingId ? 'Tournament updated.' : 'Tournament saved as New. Publish it from the list when players should see it.');
       setError('');
     } catch (saveError: any) {
       setNotice('');
@@ -419,12 +684,15 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
     }
   };
 
-  const remove = async (tournament: Tournament) => {
-    if (!window.confirm(`Delete ${tournament.name}? Entries for it will be removed too.`)) return;
+  const remove = async () => {
+    if (!pendingDelete) return;
+    const tournament = pendingDelete;
+    setPendingDelete(null);
     try {
       await deleteTournamentRequest(tournament.id);
       await refreshTournamentsFromApi();
       if (editingId === tournament.id) startNew();
+      if (selectedId === tournament.id) setSelectedId(null);
       setNotice('Tournament deleted.');
       setError('');
     } catch (deleteError: any) {
@@ -433,10 +701,20 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
     }
   };
 
+  const publish = async (tournament: Tournament) => {
+    try {
+      await publishTournamentRequest(tournament.id);
+      await refreshTournamentsFromApi();
+      setNotice('Tournament published. Players can register from the tournaments list.');
+      setError('');
+    } catch (publishError: any) {
+      setNotice('');
+      setError(publishError?.response?.data?.message || 'Could not publish the tournament.');
+    }
+  };
+
   const visible = tournaments.filter((tournament) => {
-    if (status === 'happening' && !isHappening(tournament)) return false;
-    if (status === 'past' && !isPast(tournament)) return false;
-    if (status === 'upcoming' && (isPast(tournament) || isHappening(tournament))) return false;
+    if (listStatus !== 'all' && tournamentStatus(tournament) !== listStatus) return false;
     const needle = query.trim().toLowerCase();
     if (!needle) return true;
     return `${tournament.name} ${tournament.street || ''} ${tournament.city} ${tournament.state} ${tournament.organizer}`.toLowerCase().includes(needle);
@@ -446,10 +724,39 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
   const to = Math.min((pageIndex + 1) * rowsPerPage, visible.length);
   const counts = {
     all: tournaments.length,
-    upcoming: tournaments.filter((tournament) => !isPast(tournament) && !isHappening(tournament)).length,
-    happening: tournaments.filter((tournament) => isHappening(tournament)).length,
-    past: tournaments.filter((tournament) => isPast(tournament)).length,
+    NEW: tournaments.filter((tournament) => tournamentStatus(tournament) === 'NEW').length,
+    PUBLISHED: tournaments.filter((tournament) => tournamentStatus(tournament) === 'PUBLISHED').length,
+    IN_PROGRESS: tournaments.filter((tournament) => tournamentStatus(tournament) === 'IN_PROGRESS').length,
+    COMPLETED: tournaments.filter((tournament) => tournamentStatus(tournament) === 'COMPLETED').length,
   };
+
+  const selectedTournament = tournaments.find((item) => item.id === selectedId) ?? null;
+
+  if (!showForm && selectedTournament) {
+    const details = (
+      <Box sx={{ mb: 4 }}>
+        <NoticeToast message={notice} onClose={() => setNotice('')} />
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <TournamentDetails
+          tournament={selectedTournament}
+          typeLabel={formatLabel(tournamentTypes, selectedTournament.format)}
+          entryCount={chess.registrations.filter((item) => item.tournamentId === selectedTournament.id).length}
+          onBack={() => setSelectedId(null)}
+          onEdit={() => startEdit(selectedTournament)}
+          onPublish={() => publish(selectedTournament)}
+          onDelete={() => setPendingDelete(selectedTournament)}
+        />
+      </Box>
+    );
+    const withDialog = (
+      <>
+        {details}
+        <DeleteTournamentDialog tournament={pendingDelete} onClose={() => setPendingDelete(null)} onConfirm={remove} />
+      </>
+    );
+    if (embedded) return <DashboardContent maxWidth="lg" sx={{ mb: 4 }}>{withDialog}</DashboardContent>;
+    return <SiteShell><Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>{withDialog}</Container></SiteShell>;
+  }
 
   if (embedded && !showForm) {
     return (
@@ -466,13 +773,13 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
             Host New Event
           </Button>
         </Stack>
-        {notice && <Alert severity="success" sx={{ mb: 2 }}>{notice}</Alert>}
+        <NoticeToast message={notice} onClose={() => setNotice('')} />
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <Card>
           <Tabs
-            value={status}
+            value={listStatus}
             onChange={(_event, value) => {
-              setStatus(value);
+              setListStatus(value);
               setPageIndex(0);
             }}
             variant="scrollable"
@@ -480,9 +787,10 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
             sx={{ px: 2, borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab value="all" label={`All (${counts.all})`} />
-            <Tab value="upcoming" label={`Upcoming (${counts.upcoming})`} />
-            <Tab value="happening" label={`Happening now (${counts.happening})`} />
-            <Tab value="past" label={`Past (${counts.past})`} />
+            <Tab value="NEW" label={`New (${counts.NEW})`} />
+            <Tab value="PUBLISHED" label={`Published (${counts.PUBLISHED})`} />
+            <Tab value="IN_PROGRESS" label={`In progress (${counts.IN_PROGRESS})`} />
+            <Tab value="COMPLETED" label={`Completed (${counts.COMPLETED})`} />
           </Tabs>
           <Toolbar sx={{ gap: 1.5, py: 2, px: 3 }}>
             <OutlinedInput
@@ -508,6 +816,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                   <TableCell>Date</TableCell>
                   <TableCell>Location</TableCell>
                   <TableCell>Tournament type</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Entered</TableCell>
                   <TableCell align="right" />
                 </TableRow>
@@ -516,26 +825,45 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                 {pageRows.map((tournament) => {
                   const count = chess.registrations.filter((item) => item.tournamentId === tournament.id).length;
                   return (
-                    <TableRow key={tournament.id} hover>
-                      <TableCell sx={{ fontWeight: 700 }}>{tournament.name}</TableCell>
+                    <TableRow
+                      key={tournament.id}
+                      hover
+                      onClick={() => setSelectedId(tournament.id)}
+                      sx={{ cursor: 'pointer' }}
+                    >
+                      <TableCell sx={{ fontWeight: 700 }}>
+                        <Button
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setSelectedId(tournament.id);
+                          }}
+                          sx={{ p: 0, minWidth: 0, justifyContent: 'flex-start', fontWeight: 700, textTransform: 'none', color: '#175195' }}
+                        >
+                          {tournament.name}
+                        </Button>
+                      </TableCell>
                       <TableCell>{formatShortRange(tournament)}</TableCell>
                       <TableCell>{locationLabel(tournament)}</TableCell>
                       <TableCell>{formatLabel(tournamentTypes, tournament.format)}</TableCell>
+                      <TableCell>
+                        <StatusChip status={tournamentStatus(tournament)} />
+                      </TableCell>
                       <TableCell>{count}</TableCell>
-                      <TableCell align="right">
-                        <Button size="small" onClick={() => startEdit(tournament)}>
-                          Edit
-                        </Button>
-                        <Button size="small" color="error" onClick={() => remove(tournament)}>
-                          Delete
-                        </Button>
+                      <TableCell align="right" onClick={(event) => event.stopPropagation()}>
+                        {tournamentStatus(tournament) === 'NEW' && (
+                          <Button size="small" onClick={() => publish(tournament)} sx={{ fontWeight: 700, color: '#175195' }}>
+                            Publish
+                          </Button>
+                        )}
+                        <EditTournamentButton onClick={() => startEdit(tournament)} />
+                        <DeleteTournamentButton onClick={() => setPendingDelete(tournament)} />
                       </TableCell>
                     </TableRow>
                   );
                 })}
                 {pageRows.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={6} sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
+                    <TableCell colSpan={7} sx={{ py: 6, textAlign: 'center', color: 'text.secondary' }}>
                       No tournaments match.
                     </TableCell>
                   </TableRow>
@@ -565,6 +893,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
           onClose={() => setFormatOpen(false)}
           onConfirm={confirmFormat}
         />
+        <DeleteTournamentDialog tournament={pendingDelete} onClose={() => setPendingDelete(null)} onConfirm={remove} />
       </DashboardContent>
     );
   }
@@ -580,7 +909,9 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
               {embedded ? (editingId ? 'Edit tournament' : 'Host new event') : 'Organize'}
             </Typography>
             <Typography sx={{ color: chessColors.muted, mt: 0.5 }}>
-              Players register from the public list after you publish.
+              {editingId
+                ? 'Players register from the public list after you publish.'
+                : 'This event is saved as New. Publish it from the list when players should see it.'}
             </Typography>
             <Chip
               size="small"
@@ -604,7 +935,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
           )}
         </Stack>
 
-        {notice && <Alert severity="success" sx={{ mb: 2 }}>{notice}</Alert>}
+        <NoticeToast message={notice} onClose={() => setNotice('')} />
 
         {!embedded && <Stack spacing={1} sx={{ mb: 4 }}>
           {tournaments.map((tournament) => {
@@ -624,18 +955,24 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                 }}
               >
                 <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontWeight: 700 }}>{tournament.name}</Typography>
+                  <Button
+                    onClick={() => setSelectedId(tournament.id)}
+                    sx={{ p: 0, minWidth: 0, fontWeight: 700, textTransform: 'none', color: '#175195' }}
+                  >
+                    {tournament.name}
+                  </Button>
                   <Typography variant="body2" sx={{ color: chessColors.muted }}>
-                    {formatShortRange(tournament)} · {locationLabel(tournament)} · {count} entered
+                    {formatShortRange(tournament)} · {locationLabel(tournament)} · {statusLabel(tournamentStatus(tournament))} · {count} entered
                   </Typography>
                 </Box>
                 <Stack direction="row" spacing={1}>
-                  <Button size="small" onClick={() => startEdit(tournament)}>
-                    Edit
-                  </Button>
-                  <Button size="small" color="error" onClick={() => remove(tournament)}>
-                    Delete
-                  </Button>
+                  {tournamentStatus(tournament) === 'NEW' && (
+                    <Button size="small" onClick={() => publish(tournament)} sx={{ fontWeight: 700, color: '#175195' }}>
+                      Publish
+                    </Button>
+                  )}
+                  <EditTournamentButton onClick={() => startEdit(tournament)} />
+                  <DeleteTournamentButton onClick={() => setPendingDelete(tournament)} />
                 </Stack>
               </Stack>
             );
@@ -819,7 +1156,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                   </Stack>
                   <Box sx={{ p: { xs: 1.5, md: 2 } }}>
                     <Grid container spacing={1.5}>
-                      <Grid size={{ xs: 12, md: 8 }}>
+                      <Grid size={{ xs: 12, md: isSwissFormat(draft.format) ? 6 : 8 }}>
                         <RequiredField
                           fieldId={`tournament-section-${section.id}-name`}
                           label="Name"
@@ -829,7 +1166,21 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                           onChange={(event) => updateSection(section.id, { name: event.target.value })}
                         />
                       </Grid>
-                      <Grid size={{ xs: 12, md: 4 }}>
+                      {isSwissFormat(draft.format) && (
+                        <Grid size={{ xs: 6, md: 3 }}>
+                          <RequiredField
+                            fieldId={`tournament-section-${section.id}-rounds`}
+                            label="Rounds"
+                            type="number"
+                            autoComplete="off"
+                            message={sectionProblems[section.id]?.rounds}
+                            value={section.rounds || ''}
+                            onChange={(event) => updateSection(section.id, { rounds: Number(event.target.value) })}
+                            slotProps={{ htmlInput: { min: 1 } }}
+                          />
+                        </Grid>
+                      )}
+                      <Grid size={{ xs: isSwissFormat(draft.format) ? 6 : 12, md: isSwissFormat(draft.format) ? 3 : 4 }}>
                         <RequiredField
                           fieldId={`tournament-section-${section.id}-capacity`}
                           label="Seats"
@@ -870,7 +1221,10 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                                     onChange={(event) => {
                                       const on = event.target.checked;
                                       const change: Partial<TournamentSection> = { [entry.enabled]: on };
-                                      if (!on) change[entry.deadline] = '';
+                                      if (!on) {
+                                        change[entry.deadline] = '';
+                                        change[entry.time] = '';
+                                      }
                                       updateSection(section.id, change);
                                     }}
                                     sx={{ color: '#175195', '&.Mui-checked': { color: '#175195' } }}
@@ -880,23 +1234,24 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                               />
                               {enabled && (
                                 <Grid container spacing={1.5} sx={{ flex: 1 }}>
-                                  <Grid size={{ xs: 12, sm: 6 }}>
+                                  <Grid size={{ xs: 12, md: 4 }}>
                                     <RequiredField
                                       fieldId={`tournament-section-${section.id}-${entry.fee}`}
                                       label="Fee"
                                       type="number"
+                                      autoComplete="off"
                                       message={sectionProblems[section.id]?.[entry.fee]}
-                                      value={section[entry.fee]}
+                                      value={section[entry.fee] ?? ''}
                                       onChange={(event) => {
-                                        const amount = Number(event.target.value);
+                                        const amount = event.target.value === '' ? null : Number(event.target.value);
                                         const patchFees: Partial<TournamentSection> = { [entry.fee]: amount };
                                         if (entry.fee === 'regularFee') patchFees.fee = amount;
                                         updateSection(section.id, patchFees);
                                       }}
-                                      slotProps={{ input: { startAdornment: <InputAdornment position="start">$</InputAdornment> } }}
+                                      slotProps={{ htmlInput: { min: 0 }, input: { startAdornment: <InputAdornment position="start">$</InputAdornment> } }}
                                     />
                                   </Grid>
-                                  <Grid size={{ xs: 12, sm: 6 }}>
+                                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                                     <RequiredField
                                       fieldId={`tournament-section-${section.id}-${entry.deadline}`}
                                       label="Deadline"
@@ -904,6 +1259,18 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                                       message={sectionProblems[section.id]?.[entry.deadline]}
                                       value={section[entry.deadline]}
                                       onChange={(event) => updateSection(section.id, { [entry.deadline]: event.target.value })}
+                                      slotProps={{ inputLabel: { shrink: true } }}
+                                    />
+                                  </Grid>
+                                  <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                                    <RequiredField
+                                      fieldId={`tournament-section-${section.id}-${entry.time}`}
+                                      label="Time"
+                                      type="time"
+                                      autoComplete="off"
+                                      message={sectionProblems[section.id]?.[entry.time]}
+                                      value={section[entry.time] || ''}
+                                      onChange={(event) => updateSection(section.id, { [entry.time]: event.target.value })}
                                       slotProps={{ inputLabel: { shrink: true } }}
                                     />
                                   </Grid>
@@ -923,7 +1290,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                 startIcon={<AddIcon />}
                 onClick={() =>
                   patch({
-                    sections: [...draft.sections, withEntryFees({ id: crypto.randomUUID(), name: '', fee: 0, capacity: 0, earlyFee: 0, earlyDeadline: '', regularFee: 0, regularDeadline: '', lateFee: 0, lateDeadline: '', onsiteFee: 0, onsiteDeadline: '' })],
+                    sections: [...draft.sections, blankSection()],
                   })
                 }
                 sx={{
@@ -972,7 +1339,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
               </Button>
             ) : (
               <Button variant="contained" onClick={save} sx={registerButtonSx}>
-                {editingId ? 'Save changes' : 'Publish tournament'}
+                      {editingId ? 'Save changes' : 'Save tournament'}
               </Button>
             )}
           </Stack>
@@ -1033,6 +1400,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
         >
           Restore sample events
         </Button>}
+        <DeleteTournamentDialog tournament={pendingDelete} onClose={() => setPendingDelete(null)} onConfirm={remove} />
       </Container>
   );
 

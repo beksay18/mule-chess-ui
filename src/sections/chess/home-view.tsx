@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { RouterLink } from 'src/routes/components';
 
 import { DateBadge } from './date-badge';
-import { isPast, isHappening, locationLabel, formatShortRange } from './format';
+import { isPublic, isHappening, locationLabel, formatShortRange } from './format';
 import { SiteShell, usePageTitle } from './site-shell';
 import { useChessState } from './store';
 import { chessColors } from './theme';
@@ -24,7 +24,7 @@ export function HomeView() {
   usePageTitle('Mule Chess');
   const chess = useChessState();
   const upcoming = chess.tournaments
-    .filter((tournament) => !isPast(tournament))
+    .filter((tournament) => isPublic(tournament))
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
     .slice(0, 4);
 

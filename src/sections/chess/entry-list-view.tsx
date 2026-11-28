@@ -8,6 +8,7 @@ import { useParams } from 'react-router';
 
 import { RouterLink } from 'src/routes/components';
 
+import { tournamentStatus } from './format';
 import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
 import { useChessState } from './store';
 import { chessColors } from './theme';
@@ -20,7 +21,7 @@ export function EntryListView() {
   const tournament = chess.tournaments.find((item) => item.slug === slug);
   usePageTitle(tournament ? `Entry list · ${tournament.name}` : 'Entry list · Mule Chess');
 
-  if (!tournament) return <MissingEvent />;
+  if (!tournament || tournamentStatus(tournament) === 'NEW') return <MissingEvent />;
 
   const entries = chess.registrations.filter((item) => item.tournamentId === tournament.id);
   const known = new Set(tournament.sections.map((section) => section.id));

@@ -20,7 +20,7 @@ import { useParams } from 'react-router';
 import { DateBadge } from './date-badge';
 import {
   money,
-  isPast,
+  isPublic,
   feeRange,
   monthKey,
   activeFee,
@@ -28,15 +28,15 @@ import {
   formatRange,
   isHappening,
   matchesWhen,
+  isSwissFormat,
   withEntryFees,
   TIME_CONTROLS,
-  audienceLabel,
   locationLabel,
   ENTRY_FEE_FORM,
-  AUDIENCE_FILTERS,
   formatShortRange,
   registrationNote,
   timeControlLabel,
+  tournamentStatus,
   entryDeadlineLabel,
   isRegistrationOpen,
 } from './format';
@@ -44,7 +44,7 @@ import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
 import { takenSeats, useChessState } from './store';
 import { chessColors, entryButtonSx, registerButtonSx } from './theme';
 
-import type { Tournament, AudienceTag } from './types';
+import type { Tournament } from './types';
 
 // ----------------------------------------------------------------------
 
@@ -59,11 +59,10 @@ export function TournamentsView() {
   const [stateCode, setStateCode] = useState('');
   const [organizer, setOrganizer] = useState('');
   const [timeControl, setTimeControl] = useState('');
-  const [audiences, setAudiences] = useState<AudienceTag[]>([]);
   const [sort, setSort] = useState<'date' | 'organizer'>('date');
   const [openSections, setOpenSections] = useState<string | null>(null);
 
-  const listed = chess.tournaments.filter((tournament) => !isPast(tournament));
+  const listed = chess.tournaments.filter((tournament) => isPublic(tournament));
   const states = [...new Set(listed.map((tournament) => tournament.state))].sort();
   const organizers = [...new Set(listed.map((tournament) => tournament.organizer))].sort();
   const months = [...new Set(listed.flatMap((tournament) => [monthKey(tournament.startDate), monthKey(tournament.endDate)]))].sort();
@@ -76,7 +75,6 @@ export function TournamentsView() {
       if (stateCode && tournament.state !== stateCode) return false;
       if (organizer && tournament.organizer !== organizer) return false;
       if (timeControl && tournament.timeControl !== timeControl) return false;
-      if (audiences.length && !audiences.some((tag) => tournament.audiences.includes(tag))) return false;
       return matchesWhen(tournament, when);
     });
     next.sort((a, b) => {
@@ -86,15 +84,11 @@ export function TournamentsView() {
       return a.startDate.localeCompare(b.startDate) || a.name.localeCompare(b.name);
     });
     return next;
-  }, [audiences, listed, organizer, query, sort, stateCode, timeControl, when]);
+  }, [listed, organizer, query, sort, stateCode, timeControl, when]);
 
   const happening = filtered.filter((tournament) => isHappening(tournament));
   const upcoming = filtered.filter((tournament) => !isHappening(tournament));
-  const filtersActive = Boolean(query || stateCode || organizer || timeControl || audiences.length || when !== 'any');
-
-  const toggleAudience = (tag: AudienceTag) => {
-    setAudiences((current) => (current.includes(tag) ? current.filter((item) => item !== tag) : [...current, tag]));
-  };
+  const filtersActive = Boolean(query || stateCode || organizer || timeControl || when !== 'any');
 
   const clearFilters = () => {
     setQuery('');
@@ -102,7 +96,6 @@ export function TournamentsView() {
     setStateCode('');
     setOrganizer('');
     setTimeControl('');
-    setAudiences([]);
   };
 
   return (
@@ -203,31 +196,6 @@ export function TournamentsView() {
                   </MenuItem>
                 ))}
               </TextField>
-            </Stack>
-
-            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mt: 1.75 }}>
-              {AUDIENCE_FILTERS.map((item) => {
-                const selected = audiences.includes(item.id);
-                return (
-                  <Button
-                    key={item.id}
-                    size="small"
-                    onClick={() => toggleAudience(item.id)}
-                    sx={{
-                      borderRadius: 5,
-                      textTransform: 'none',
-                      fontWeight: 700,
-                      px: 1.5,
-                      color: selected ? '#fff' : NAVY,
-                      bgcolor: selected ? MARK : '#fff',
-                      border: `1px solid ${selected ? MARK : alpha(MARK, 0.35)}`,
-                      '&:hover': { bgcolor: selected ? '#217890' : alpha(MARK, 0.08) },
-                    }}
-                  >
-                    {item.label}
-                  </Button>
-                );
-              })}
             </Stack>
           </Box>
 
@@ -373,9 +341,6 @@ function TournamentRow({
           </Typography>
           <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.9 }}>
             <MetaChip>{timeControlLabel(tournament.timeControl)}</MetaChip>
-            {tournament.audiences.map((tag) => (
-              <MetaChip key={tag}>{audienceLabel(tag)}</MetaChip>
-            ))}
           </Stack>
           {note && (
             <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 0.75, color: note.includes('closed') ? 'error.main' : '#8a6200' }}>
@@ -392,7 +357,7 @@ function TournamentRow({
             <Stack spacing={0.25} sx={{ mt: 0.5 }}>
               {tournament.sections.map((section) => (
                 <Typography key={section.id} variant="body2" sx={{ color: alpha(NAVY, 0.8) }}>
-                  {section.name} — {money(activeFee(section))}
+                  {section.name} — {money(activeFee(section))}{isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
                 </Typography>
               ))}
             </Stack>
@@ -448,7 +413,7 @@ export function TournamentDetailView() {
   const tournament = chess.tournaments.find((item) => item.slug === slug);
   usePageTitle(tournament ? `${tournament.name} · Mule Chess` : 'Tournament · Mule Chess');
 
-  if (!tournament) return <MissingEvent />;
+  if (!tournament || tournamentStatus(tournament) === 'NEW') return <MissingEvent />;
 
   const open = isRegistrationOpen(tournament);
 
@@ -472,9 +437,6 @@ export function TournamentDetailView() {
           </Stack>
           <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mb: 2.5 }}>
             <MetaChip>{timeControlLabel(tournament.timeControl)}</MetaChip>
-            {tournament.audiences.map((tag) => (
-              <MetaChip key={tag}>{audienceLabel(tag)}</MetaChip>
-            ))}
           </Stack>
 
           <Box
@@ -509,11 +471,14 @@ export function TournamentDetailView() {
                   }}
                 >
                   <Box>
-                    <Typography sx={{ fontWeight: 700, color: NAVY }}>{section.name}</Typography>
+                    <Typography sx={{ fontWeight: 700, color: NAVY }}>
+                      {section.name}
+                      {isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
+                    </Typography>
                     <Box
                       sx={{
                         display: 'grid',
-                        gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(auto-fit, minmax(140px, 1fr))' },
+                        gridTemplateColumns: { xs: '1fr 1fr', sm: 'repeat(auto-fit, minmax(170px, 1fr))' },
                         gap: 1,
                         mt: 1,
                       }}
@@ -526,10 +491,10 @@ export function TournamentDetailView() {
                               {item.label}
                             </Typography>
                             <Typography variant="body2" sx={{ fontWeight: 700, color: NAVY }}>
-                              {money(priced[item.fee])}
+                              {money(priced[item.fee] ?? 0)}
                             </Typography>
                             <Typography variant="caption" sx={{ color: alpha(NAVY, 0.65) }}>
-                              {entryDeadlineLabel(priced[item.deadline]) || 'Deadline not set'}
+                              {entryDeadlineLabel(priced[item.deadline], priced[item.time]) || 'Deadline not set'}
                             </Typography>
                           </Box>
                         );

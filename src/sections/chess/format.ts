@@ -1,15 +1,14 @@
-import type { Tournament, AudienceTag, TimeControl, TournamentSection } from './types';
+import type { Tournament, TimeControl, TournamentStatus, TournamentSection } from './types';
 
 import dayjs from 'dayjs';
 
 // ----------------------------------------------------------------------
 
-export const AUDIENCE_FILTERS: { id: AudienceTag; label: string }[] = [
-  { id: 'scholastic', label: 'Scholastic' },
-  { id: 'adults', label: 'Adults' },
-  { id: 'senior', label: 'Senior' },
-  { id: 'team', label: 'Team' },
-  { id: 'fide', label: 'FIDE rated' },
+export const TOURNAMENT_STATUSES: { id: TournamentStatus; label: string }[] = [
+  { id: 'NEW', label: 'New' },
+  { id: 'PUBLISHED', label: 'Published' },
+  { id: 'IN_PROGRESS', label: 'In progress' },
+  { id: 'COMPLETED', label: 'Completed' },
 ];
 
 export const TIME_CONTROLS: { id: TimeControl | ''; label: string }[] = [
@@ -36,8 +35,8 @@ export function timeControlLabel(value: TimeControl) {
   return TIME_LABEL[value];
 }
 
-export function audienceLabel(value: AudienceTag) {
-  return AUDIENCE_FILTERS.find((item) => item.id === value)?.label ?? value;
+export function isSwissFormat(format?: string) {
+  return Boolean(format?.startsWith('swiss'));
 }
 
 export function todayISO() {
@@ -49,10 +48,10 @@ export function money(amount: number) {
 }
 
 export const ENTRY_FEES = [
-  { key: 'early', label: 'Early Entry', fee: 'earlyFee', deadline: 'earlyDeadline', enabled: 'earlyEnabled' },
-  { key: 'regular', label: 'Regular Entry', fee: 'regularFee', deadline: 'regularDeadline', enabled: 'regularEnabled' },
-  { key: 'late', label: 'Late Entry', fee: 'lateFee', deadline: 'lateDeadline', enabled: 'lateEnabled' },
-  { key: 'onsite', label: 'Onsite Entry', fee: 'onsiteFee', deadline: 'onsiteDeadline', enabled: 'onsiteEnabled' },
+  { key: 'early', label: 'Early Entry', fee: 'earlyFee', deadline: 'earlyDeadline', time: 'earlyDeadlineTime', enabled: 'earlyEnabled' },
+  { key: 'regular', label: 'Regular Entry', fee: 'regularFee', deadline: 'regularDeadline', time: 'regularDeadlineTime', enabled: 'regularEnabled' },
+  { key: 'late', label: 'Late Entry', fee: 'lateFee', deadline: 'lateDeadline', time: 'lateDeadlineTime', enabled: 'lateEnabled' },
+  { key: 'onsite', label: 'Onsite Entry', fee: 'onsiteFee', deadline: 'onsiteDeadline', time: 'onsiteDeadlineTime', enabled: 'onsiteEnabled' },
 ] as const;
 
 export const ENTRY_FEE_FORM = [
@@ -67,9 +66,25 @@ function dateOnly(value?: string) {
   return value.slice(0, 10);
 }
 
+function clockOnly(value?: string) {
+  if (!value) return '';
+  return value.slice(0, 5);
+}
+
+function deadlineMoment(date?: string, time?: string) {
+  if (!date) return null;
+  if (!time) return dayjs(date).endOf('day');
+  const parsed = dayjs(`${date}T${time}`);
+  return parsed.isValid() ? parsed : dayjs(date).endOf('day');
+}
+
+function keepFee(value: number | null | undefined, fallback: number | null) {
+  return value === undefined ? fallback : value;
+}
+
 export function withEntryFees(section: TournamentSection): TournamentSection {
-  const base = Number(section.fee) || 0;
-  const regularFee = section.regularFee ?? base;
+  const base = keepFee(section.fee, null);
+  const regularFee = keepFee(section.regularFee, base);
   const earlyDeadline = dateOnly(section.earlyDeadline);
   const regularDeadline = dateOnly(section.regularDeadline);
   const lateDeadline = dateOnly(section.lateDeadline);
@@ -77,14 +92,19 @@ export function withEntryFees(section: TournamentSection): TournamentSection {
   const otherDeadlines = Boolean(earlyDeadline || lateDeadline || onsiteDeadline);
   return {
     ...section,
-    earlyFee: section.earlyFee ?? base,
+    rounds: section.rounds || 0,
+    earlyFee: keepFee(section.earlyFee, base),
     earlyDeadline,
+    earlyDeadlineTime: clockOnly(section.earlyDeadlineTime),
     regularFee,
     regularDeadline,
-    lateFee: section.lateFee ?? base,
+    regularDeadlineTime: clockOnly(section.regularDeadlineTime),
+    lateFee: keepFee(section.lateFee, base),
     lateDeadline,
-    onsiteFee: section.onsiteFee ?? base,
+    lateDeadlineTime: clockOnly(section.lateDeadlineTime),
+    onsiteFee: keepFee(section.onsiteFee, base),
     onsiteDeadline,
+    onsiteDeadlineTime: clockOnly(section.onsiteDeadlineTime),
     earlyEnabled: section.earlyEnabled ?? Boolean(earlyDeadline),
     regularEnabled: section.regularEnabled ?? (Boolean(regularDeadline) || !otherDeadlines),
     lateEnabled: section.lateEnabled ?? Boolean(lateDeadline),
@@ -97,36 +117,45 @@ export function activeFee(section: TournamentSection, now = dayjs()) {
   const priced = withEntryFees(section);
   const open = ENTRY_FEES.filter((item) => priced[item.enabled]);
   for (const item of open) {
-    const deadline = priced[item.deadline];
-    if (!deadline || !dayjs(deadline).endOf('day').isBefore(now)) return priced[item.fee];
+    const moment = deadlineMoment(priced[item.deadline], priced[item.time]);
+    const amount = priced[item.fee];
+    if (amount !== null && (!moment || !moment.isBefore(now))) return amount;
   }
   const last = open[open.length - 1];
-  return last ? priced[last.fee] : priced.fee;
+  return (last ? priced[last.fee] : priced.fee) ?? 0;
 }
 
 export function entryPayload(section: TournamentSection): TournamentSection {
   const priced = withEntryFees(section);
   const next = { ...priced };
   ENTRY_FEES.forEach((item) => {
-    if (priced[item.enabled]) return;
+    if (priced[item.enabled]) {
+      next[item.fee] = priced[item.fee] ?? 0;
+      return;
+    }
     next[item.fee] = 0;
     next[item.deadline] = null as unknown as string;
+    next[item.time] = null as unknown as string;
   });
   const primary = ENTRY_FEE_FORM.find((item) => priced[item.enabled]);
-  next.fee = primary ? next[primary.fee] : 0;
+  next.fee = primary ? (next[primary.fee] ?? 0) : 0;
   return next;
 }
 
-export function entryDeadlineLabel(value?: string) {
+export function entryDeadlineLabel(value?: string, time?: string) {
   if (!value) return '';
-  const parsed = dayjs(value);
-  return parsed.isValid() ? parsed.format('MMM D, YYYY') : value;
+  const parsed = time ? dayjs(`${value}T${time}`) : dayjs(value);
+  if (!parsed.isValid()) return value;
+  return time ? parsed.format('MMM D, YYYY h:mm A') : parsed.format('MMM D, YYYY');
 }
 
 export function feeRange(tournament: Tournament) {
   const fees = (tournament.sections ?? []).flatMap((section) => {
     const priced = withEntryFees(section);
-    return ENTRY_FEES.filter((item) => priced[item.enabled]).map((item) => priced[item.fee]);
+    return ENTRY_FEES.filter((item) => priced[item.enabled]).flatMap((item) => {
+      const amount = priced[item.fee];
+      return amount === null ? [] : [amount];
+    });
   });
   if (!fees.length) return '';
   const min = Math.min(...fees);
@@ -173,19 +202,40 @@ export function registrationNote(tournament: Tournament) {
   return at ? `Registration closes ${dayjs(tournament.registrationCloses).format('MMM D')}${suffix}` : '';
 }
 
+export function statusLabel(status: TournamentStatus) {
+  return TOURNAMENT_STATUSES.find((item) => item.id === status)?.label ?? status;
+}
+
+export function tournamentStatus(tournament: Pick<Tournament, 'status' | 'startDate' | 'endDate'>): TournamentStatus {
+  if (tournament.status === 'NEW') return 'NEW';
+  const today = todayISO();
+  if (tournament.endDate && tournament.endDate < today) return 'COMPLETED';
+  if (tournament.status === 'COMPLETED') return 'COMPLETED';
+  if (tournament.startDate && tournament.endDate && tournament.startDate <= today && tournament.endDate >= today) {
+    return 'IN_PROGRESS';
+  }
+  if (tournament.status === 'IN_PROGRESS') return 'IN_PROGRESS';
+  return 'PUBLISHED';
+}
+
+export function isPublic(tournament: Tournament) {
+  const status = tournamentStatus(tournament);
+  return status === 'PUBLISHED' || status === 'IN_PROGRESS';
+}
+
 export function isRegistrationOpen(tournament: Tournament) {
+  if (!isPublic(tournament)) return false;
   if (!tournament.registrationCloses) return false;
   if (!tournament.registrationClosesTime) return tournament.registrationCloses >= todayISO();
   return !dayjs(`${tournament.registrationCloses}T${tournament.registrationClosesTime}`).isBefore(dayjs());
 }
 
 export function isHappening(tournament: Tournament) {
-  const today = todayISO();
-  return tournament.startDate <= today && tournament.endDate >= today;
+  return tournamentStatus(tournament) === 'IN_PROGRESS';
 }
 
 export function isPast(tournament: Tournament) {
-  return tournament.endDate < todayISO();
+  return tournamentStatus(tournament) === 'COMPLETED';
 }
 
 function weekendRange() {

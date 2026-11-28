@@ -98,9 +98,13 @@ function cleanDraft(input: TournamentDraft): TournamentDraft {
         lateFee: Number(section.lateFee) || 0,
         onsiteFee: Number(section.onsiteFee) || 0,
         earlyDeadline: (section.earlyDeadline || '').trim(),
+        earlyDeadlineTime: (section.earlyDeadlineTime || '').trim(),
         regularDeadline: (section.regularDeadline || '').trim(),
+        regularDeadlineTime: (section.regularDeadlineTime || '').trim(),
         lateDeadline: (section.lateDeadline || '').trim(),
+        lateDeadlineTime: (section.lateDeadlineTime || '').trim(),
         onsiteDeadline: (section.onsiteDeadline || '').trim(),
+        onsiteDeadlineTime: (section.onsiteDeadlineTime || '').trim(),
       });
       return { ...priced, capacity: Math.max(1, Number(section.capacity) || 1) };
     }),

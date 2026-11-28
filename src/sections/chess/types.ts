@@ -1,4 +1,4 @@
-export type AudienceTag = 'scholastic' | 'adults' | 'senior' | 'team' | 'fide';
+export type TournamentStatus = 'NEW' | 'PUBLISHED' | 'IN_PROGRESS' | 'COMPLETED';
 
 export type TimeControl = 'regular' | 'quick' | 'blitz';
 
@@ -14,16 +14,21 @@ export type TournamentFormat =
 export type TournamentSection = {
   id: string;
   name: string;
-  fee: number;
+  fee: number | null;
+  rounds?: number;
   capacity: number;
-  earlyFee: number;
+  earlyFee: number | null;
   earlyDeadline: string;
-  regularFee: number;
+  earlyDeadlineTime?: string;
+  regularFee: number | null;
   regularDeadline: string;
-  lateFee: number;
+  regularDeadlineTime?: string;
+  lateFee: number | null;
   lateDeadline: string;
-  onsiteFee: number;
+  lateDeadlineTime?: string;
+  onsiteFee: number | null;
   onsiteDeadline: string;
+  onsiteDeadlineTime?: string;
   earlyEnabled?: boolean;
   regularEnabled?: boolean;
   lateEnabled?: boolean;
@@ -46,7 +51,7 @@ export type Tournament = {
   description: string;
   timeControl: TimeControl;
   format: TournamentFormat;
-  audiences: AudienceTag[];
+  status?: TournamentStatus;
   sections: TournamentSection[];
 };
 

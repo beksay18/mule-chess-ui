@@ -54,7 +54,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['adults', 'fide'],
     description:
       'Five-round Swiss played on Saturday mornings at the club. Pairings go up the evening before each round. Bring a clock if you have one; boards and sets are provided.\n\nHalf-point byes are available in rounds 1–4 when requested before Friday at noon. The premier section is limited to eight players and is filled in rating order.',
     sections: [
@@ -78,7 +77,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'quick',
     format: 'swiss',
-    audiences: ['adults'],
     description:
       'One-night quick tournament. Game in 15 minutes with a 5-second delay. Round 1 starts at 6:30 p.m. Late entries are paired if they arrive before round 1 starts.\n\nRated and unrated players are welcome in the same section.',
     sections: [{ id: 'sec-plaza-open', name: 'Open', fee: 20, capacity: 36, earlyFee: 20, earlyDeadline: '', regularFee: 20, regularDeadline: '', lateFee: 20, lateDeadline: '', onsiteFee: 20, onsiteDeadline: '' }],
@@ -98,7 +96,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'blitz',
     format: 'swiss',
-    audiences: ['adults'],
     description:
       'Six-round rapid over two afternoons. Time control is game in 10 minutes with a 5-second delay. Players who need a bye should request it when they register.\n\nThe playing hall opens 30 minutes before round 1 each day.',
     sections: [{ id: 'sec-thanks-open', name: 'Open', fee: 25, capacity: 40, earlyFee: 25, earlyDeadline: '', regularFee: 25, regularDeadline: '', lateFee: 25, lateDeadline: '', onsiteFee: 25, onsiteDeadline: '' }],
@@ -118,7 +115,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'blitz',
     format: 'swiss',
-    audiences: ['adults'],
     description:
       'Double round-robin blitz if the field is 8 or fewer, otherwise a seven-round Swiss. Game in 3 minutes with a 2-second increment.\n\nRegistration stays open until the first round is paired.',
     sections: [{ id: 'sec-blitz-open', name: 'Open', fee: 10, capacity: 24, earlyFee: 10, earlyDeadline: '', regularFee: 10, regularDeadline: '', lateFee: 10, lateDeadline: '', onsiteFee: 10, onsiteDeadline: '' }],
@@ -138,7 +134,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'quick',
     format: 'swiss',
-    audiences: ['scholastic'],
     description:
       'A one-day scholastic championship. Players compete only against others in their grade band. Five rounds, game in 25 minutes with a 5-second delay.\n\nA parent or coach may register a player. The player’s name on the entry is the name that appears on the wall chart.',
     sections: [
@@ -162,7 +157,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['senior'],
     description:
       'Four-round Swiss for players age 50 and over. Game in 60 minutes with a 10-second increment. Unrated players are welcome.\n\nCoffee is on the club. Please email the organizer if you need a ground-floor board.',
     sections: [{ id: 'sec-senior-open', name: 'Open', fee: 25, capacity: 28, earlyFee: 25, earlyDeadline: '', regularFee: 25, regularDeadline: '', lateFee: 25, lateDeadline: '', onsiteFee: 25, onsiteDeadline: '' }],
@@ -182,7 +176,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['team', 'adults'],
     description:
       'Four-board team match. Enter the team name as the player’s last name and the captain as the first name, or register each board as its own player in the notes you send the organizer.\n\nBoards are ordered by rating. The entry fee covers the whole team.',
     sections: [{ id: 'sec-team', name: 'Team entry', fee: 100, capacity: 16, earlyFee: 100, earlyDeadline: '', regularFee: 100, regularDeadline: '', lateFee: 100, lateDeadline: '', onsiteFee: 100, onsiteDeadline: '' }],
@@ -202,7 +195,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['adults', 'fide'],
     description:
       'Two-day open with three sections. Five rounds, game in 90 minutes with a 30-second increment. One half-point bye is allowed if requested before round 1.\n\nFIDE rated in the Open. US Chess rated in every section. Sets are provided; please bring a clock.',
     sections: [
@@ -226,7 +218,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'quick',
     format: 'swiss',
-    audiences: ['adults'],
     description:
       'A one-day rapid championship. Three rounds, game in 15 minutes with a 10-second increment. Final standings and pairings are posted under Results.',
     sections: [{ id: octoberOpen, name: 'Open', fee: 20, capacity: 24, earlyFee: 20, earlyDeadline: '', regularFee: 20, regularDeadline: '', lateFee: 20, lateDeadline: '', onsiteFee: 20, onsiteDeadline: '' }],
@@ -246,7 +237,6 @@ const tournaments: Tournament[] = [
     registrationClosesTime: '18:00',
     timeControl: 'regular',
     format: 'swiss',
-    audiences: ['adults', 'fide'],
     description:
       'A two-day open held in August. Pairings from this event were posted on the club wall and are not reprinted here.',
     sections: [{ id: 'sec-summer-open', name: 'Open', fee: 40, capacity: 32, earlyFee: 40, earlyDeadline: '', regularFee: 40, regularDeadline: '', lateFee: 40, lateDeadline: '', onsiteFee: 40, onsiteDeadline: '' }],

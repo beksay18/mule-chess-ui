@@ -20,5 +20,8 @@ export const createTournamentRequest = (payload: TournamentDraft): Promise<Tourn
 export const updateTournamentRequest = (id: string, payload: TournamentDraft): Promise<Tournament> =>
     axios.put<Tournament>(ENDPOINTS.TOURNAMENT.UPDATE(id), payload).then(({ data }) => data);
 
+export const publishTournamentRequest = (id: string): Promise<Tournament> =>
+    axios.post<Tournament>(ENDPOINTS.TOURNAMENT.PUBLISH(id)).then(({ data }) => data);
+
 export const deleteTournamentRequest = (id: string): Promise<void> =>
     axios.delete(ENDPOINTS.TOURNAMENT.DELETE(id)).then(() => undefined);
