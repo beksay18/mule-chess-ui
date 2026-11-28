@@ -59,7 +59,6 @@ export const ForBusinessPage = lazy(() => import('src/pages/for-business'));
 export const PrivacyPage = lazy(() => import('src/pages/privacy'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
 export const BlogArticlePage = lazy(() => import('src/pages/blog-article'));
-export const StickerBuilderPage = lazy(() => import('src/pages/sticker-builder'));
 export const MyDesignsPage = lazy(() => import('../pages/profile/my-designs'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
@@ -320,10 +319,6 @@ export const routesSection: RouteObject[] = [
     {
         path: 'product-upload/:id',
         element: <ProductUploadView/>,
-    },
-    {
-        path: 'sticker-builder',
-        element: <StickerBuilderPage/>,
     },
     {
         path: 'cart',

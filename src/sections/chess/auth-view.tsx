@@ -85,7 +85,7 @@ function AuthLayout({
                 Mule Chess
               </Typography>
               <Typography sx={{ fontSize: 36, fontWeight: 800, lineHeight: 1.1, maxWidth: 360 }}>
-                Your seat at the next tournament.
+                Join the next tournament.
               </Typography>
               <Typography sx={{ maxWidth: 360, color: 'rgba(255,255,255,0.86)' }}>{subtitle}</Typography>
             </Stack>

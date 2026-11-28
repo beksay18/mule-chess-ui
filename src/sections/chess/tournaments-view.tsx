@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,6 +18,9 @@ import { articleBodySx } from 'src/sections/blog/description-editor';
 import { RouterLink } from 'src/routes/components';
 import { useParams } from 'react-router';
 
+import { listTournamentTypes } from 'src/api/tournament/tournament.api';
+import type { TournamentTypeOption } from 'src/api/tournament/tournament.api';
+
 import { DateBadge } from './date-badge';
 import {
   money,
@@ -30,15 +34,14 @@ import {
   matchesWhen,
   isSwissFormat,
   withEntryFees,
-  TIME_CONTROLS,
   locationLabel,
   ENTRY_FEE_FORM,
   formatShortRange,
   registrationNote,
-  timeControlLabel,
   tournamentStatus,
   entryDeadlineLabel,
   isRegistrationOpen,
+  sectionTimeControlLabel,
 } from './format';
 import { SiteShell, MissingEvent, usePageTitle } from './site-shell';
 import { takenSeats, useChessState } from './store';
@@ -51,16 +54,68 @@ import type { Tournament } from './types';
 const NAVY = '#12325f';
 const MARK = '#2888A0';
 
+function formatLabel(types: TournamentTypeOption[], value?: string) {
+  return types.find((item) => item.code === value)?.label || '';
+}
+
+const filterFieldSx = {
+  '& .MuiOutlinedInput-root': {
+    bgcolor: '#f7f9fc',
+    borderRadius: 2,
+  },
+  '& .MuiOutlinedInput-notchedOutline': {
+    borderColor: alpha(NAVY, 0.1),
+  },
+  '&:hover .MuiOutlinedInput-notchedOutline': {
+    borderColor: alpha('#175195', 0.45),
+  },
+};
+
+function FilterField({
+  label,
+  value,
+  onChange,
+  children,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  children: ReactNode;
+}) {
+  return (
+    <Box>
+      <Typography sx={{ mb: 0.6, color: alpha(NAVY, 0.5), fontSize: 11, fontWeight: 800, letterSpacing: 0.6 }}>
+        {label}
+      </Typography>
+      <TextField
+        select
+        fullWidth
+        size="small"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        slotProps={{ select: { displayEmpty: true } }}
+        sx={filterFieldSx}
+      >
+        {children}
+      </TextField>
+    </Box>
+  );
+}
+
 export function TournamentsView() {
   usePageTitle('Upcoming Chess Tournaments · Mule Chess');
   const chess = useChessState();
+  const [tournamentTypes, setTournamentTypes] = useState<TournamentTypeOption[]>([]);
   const [query, setQuery] = useState('');
   const [when, setWhen] = useState('any');
   const [stateCode, setStateCode] = useState('');
   const [organizer, setOrganizer] = useState('');
-  const [timeControl, setTimeControl] = useState('');
+  const [format, setFormat] = useState('');
+
+  useEffect(() => {
+    listTournamentTypes().then(setTournamentTypes).catch(() => undefined);
+  }, []);
   const [sort, setSort] = useState<'date' | 'organizer'>('date');
-  const [openSections, setOpenSections] = useState<string | null>(null);
 
   const listed = chess.tournaments.filter((tournament) => isPublic(tournament));
   const states = [...new Set(listed.map((tournament) => tournament.state))].sort();
@@ -74,7 +129,7 @@ export function TournamentsView() {
       if (needle && !haystack.includes(needle)) return false;
       if (stateCode && tournament.state !== stateCode) return false;
       if (organizer && tournament.organizer !== organizer) return false;
-      if (timeControl && tournament.timeControl !== timeControl) return false;
+      if (format && tournament.format !== format) return false;
       return matchesWhen(tournament, when);
     });
     next.sort((a, b) => {
@@ -84,18 +139,18 @@ export function TournamentsView() {
       return a.startDate.localeCompare(b.startDate) || a.name.localeCompare(b.name);
     });
     return next;
-  }, [listed, organizer, query, sort, stateCode, timeControl, when]);
+  }, [format, listed, organizer, query, sort, stateCode, when]);
 
   const happening = filtered.filter((tournament) => isHappening(tournament));
   const upcoming = filtered.filter((tournament) => !isHappening(tournament));
-  const filtersActive = Boolean(query || stateCode || organizer || timeControl || when !== 'any');
+  const filtersActive = Boolean(query || stateCode || organizer || format || when !== 'any');
 
   const clearFilters = () => {
     setQuery('');
     setWhen('any');
     setStateCode('');
     setOrganizer('');
-    setTimeControl('');
+    setFormat('');
   };
 
   return (
@@ -110,42 +165,46 @@ export function TournamentsView() {
               Find a tournament
             </Typography>
             <Typography sx={{ color: alpha(NAVY, 0.7), fontSize: '1.02rem', lineHeight: 1.6 }}>
-              Open, scholastic, and team events. Pick a section and reserve your seat.
+              Open and team events. Pick a section and join as a player.
             </Typography>
           </Stack>
 
           <Box
             sx={{
               bgcolor: '#fff',
-              border: `1px solid ${alpha(MARK, 0.22)}`,
+              border: `1px solid ${alpha(NAVY, 0.08)}`,
               borderRadius: 3,
-              p: { xs: 2, md: 2.5 },
-              mb: 3,
+              boxShadow: `0 8px 24px ${alpha(NAVY, 0.04)}`,
+              p: { xs: 1.5, md: 2 },
+              mb: 2.5,
             }}
           >
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Search by name, street, city, or organizer"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              sx={filterFieldSx}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon sx={{ color: '#175195', fontSize: 20 }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
             <Box
               sx={{
                 display: 'grid',
                 gap: 1.5,
-                gridTemplateColumns: { xs: '1fr', md: '1.6fr 1fr 0.8fr' },
+                mt: 1.75,
+                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' },
               }}
             >
-              <TextField
-                size="small"
-                placeholder="Search by name, street, city, or organizer"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SearchIcon sx={{ color: MARK, fontSize: 20 }} />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <TextField select size="small" label="When" value={when} onChange={(event) => setWhen(event.target.value)}>
+              <FilterField label="When" value={when} onChange={setWhen}>
                 <MenuItem value="any">Any time</MenuItem>
                 <MenuItem value="weekend">This weekend</MenuItem>
                 <MenuItem value="7">Next 7 days</MenuItem>
@@ -155,60 +214,48 @@ export function TournamentsView() {
                     {monthLabel(month)}
                   </MenuItem>
                 ))}
-              </TextField>
-              <TextField select size="small" label="State" value={stateCode} onChange={(event) => setStateCode(event.target.value)}>
+              </FilterField>
+              <FilterField label="State" value={stateCode} onChange={setStateCode}>
                 <MenuItem value="">All states</MenuItem>
                 {states.map((code) => (
                   <MenuItem key={code} value={code}>
                     {code}
                   </MenuItem>
                 ))}
-              </TextField>
-            </Box>
-
-            <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} sx={{ mt: 1.5, alignItems: { md: 'center' } }}>
-              <TextField
-                select
-                size="small"
-                label="Organizer"
-                value={organizer}
-                onChange={(event) => setOrganizer(event.target.value)}
-                sx={{ minWidth: { md: 220 } }}
-              >
+              </FilterField>
+              <FilterField label="Organizer" value={organizer} onChange={setOrganizer}>
                 <MenuItem value="">All organizers</MenuItem>
                 {organizers.map((name) => (
                   <MenuItem key={name} value={name}>
                     {name}
                   </MenuItem>
                 ))}
-              </TextField>
-              <TextField
-                select
-                size="small"
-                label="Time control"
-                value={timeControl}
-                onChange={(event) => setTimeControl(event.target.value)}
-                sx={{ minWidth: { md: 200 } }}
-              >
-                {TIME_CONTROLS.map((item) => (
-                  <MenuItem key={item.label} value={item.id}>
+              </FilterField>
+              <FilterField label="Tournament type" value={format} onChange={setFormat}>
+                <MenuItem value="">All types</MenuItem>
+                {tournamentTypes.map((item) => (
+                  <MenuItem key={item.code} value={item.code}>
                     {item.label}
                   </MenuItem>
                 ))}
-              </TextField>
-            </Stack>
+              </FilterField>
+            </Box>
           </Box>
 
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, mb: 2 }}>
-            <Typography sx={{ color: alpha(NAVY, 0.7), fontWeight: 600 }}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, mb: 2 }}>
+            <Typography sx={{ color: NAVY, fontWeight: 700 }}>
               {filtered.length} upcoming tournament{filtered.length === 1 ? '' : 's'}
               {filtersActive && (
-                <Button onClick={clearFilters} sx={{ ml: 1, minWidth: 0, p: 0, textTransform: 'none', fontWeight: 700, color: MARK }}>
+                <Button onClick={clearFilters} sx={{ ml: 1.5, minWidth: 0, p: 0, textTransform: 'none', fontWeight: 700, color: MARK }}>
                   Clear filters
                 </Button>
               )}
             </Typography>
-            <Stack direction="row" spacing={0.5}>
+            <Stack
+              direction="row"
+              spacing={0.5}
+              sx={{ p: 0.5, borderRadius: 2, bgcolor: '#fff', border: `1px solid ${alpha(NAVY, 0.08)}` }}
+            >
               {([
                 ['date', 'By date'],
                 ['organizer', 'By organizer'],
@@ -222,10 +269,11 @@ export function TournamentsView() {
                     sx={{
                       textTransform: 'none',
                       fontWeight: 700,
-                      borderRadius: 5,
+                      borderRadius: 1.5,
+                      px: 1.5,
                       color: active ? '#fff' : NAVY,
-                      bgcolor: active ? NAVY : 'transparent',
-                      '&:hover': { bgcolor: active ? NAVY : alpha(NAVY, 0.06) },
+                      bgcolor: active ? '#175195' : 'transparent',
+                      '&:hover': { bgcolor: active ? '#124578' : alpha(NAVY, 0.06) },
                     }}
                   >
                     {label}
@@ -239,16 +287,14 @@ export function TournamentsView() {
             <TournamentGroup
               title="Happening now"
               tournaments={happening}
-              openSections={openSections}
-              onToggleSections={setOpenSections}
+              typeLabel={(value) => formatLabel(tournamentTypes, value)}
             />
           )}
           {upcoming.length > 0 && (
             <TournamentGroup
-              title={happening.length ? 'Coming up' : 'Upcoming'}
+              title={happening.length ? 'Coming up' : ''}
               tournaments={upcoming}
-              openSections={openSections}
-              onToggleSections={setOpenSections}
+              typeLabel={(value) => formatLabel(tournamentTypes, value)}
             />
           )}
           {filtered.length === 0 && (
@@ -268,27 +314,22 @@ export function TournamentsView() {
 function TournamentGroup({
   title,
   tournaments,
-  openSections,
-  onToggleSections,
+  typeLabel,
 }: {
   title: string;
   tournaments: Tournament[];
-  openSections: string | null;
-  onToggleSections: (id: string | null) => void;
+  typeLabel: (format?: string) => string;
 }) {
   return (
-    <Box sx={{ mt: 1, mb: 3 }}>
-      <Typography sx={{ color: MARK, fontWeight: 800, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', mb: 1.25 }}>
-        {title}
-      </Typography>
-      <Stack spacing={1.25}>
+    <Box sx={{ mb: 3 }}>
+      {title && (
+        <Typography sx={{ color: MARK, fontWeight: 800, fontSize: 12, letterSpacing: 1.2, textTransform: 'uppercase', mb: 1.25 }}>
+          {title}
+        </Typography>
+      )}
+      <Stack spacing={1.5}>
         {tournaments.map((tournament) => (
-          <TournamentRow
-            key={tournament.id}
-            tournament={tournament}
-            sectionsOpen={openSections === tournament.id}
-            onToggleSections={() => onToggleSections(openSections === tournament.id ? null : tournament.id)}
-          />
+          <TournamentRow key={tournament.id} tournament={tournament} typeLabel={typeLabel(tournament.format)} />
         ))}
       </Stack>
     </Box>
@@ -297,12 +338,10 @@ function TournamentGroup({
 
 function TournamentRow({
   tournament,
-  sectionsOpen,
-  onToggleSections,
+  typeLabel,
 }: {
   tournament: Tournament;
-  sectionsOpen: boolean;
-  onToggleSections: () => void;
+  typeLabel: string;
 }) {
   const open = isRegistrationOpen(tournament);
   const note = registrationNote(tournament);
@@ -311,78 +350,112 @@ function TournamentRow({
   return (
     <Box
       sx={{
-        p: { xs: 1.75, md: 2 },
+        p: { xs: 2, md: 2.5 },
         bgcolor: '#fff',
         borderRadius: 3,
         border: `1px solid ${alpha(NAVY, 0.08)}`,
+        boxShadow: `0 8px 24px ${alpha(NAVY, 0.04)}`,
         transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-        '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 12px 28px ${alpha(NAVY, 0.08)}` },
+        '&:hover': { transform: 'translateY(-2px)', boxShadow: `0 14px 32px ${alpha(NAVY, 0.08)}` },
       }}
     >
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ alignItems: { md: 'center' } }}>
+      <Stack direction="row" spacing={2} sx={{ alignItems: 'flex-start' }}>
         <DateBadge startDate={tournament.startDate} endDate={tournament.endDate} />
         <Box sx={{ flex: 1, minWidth: 0 }}>
           <Stack direction="row" spacing={1} useFlexGap sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
             <Typography
               component={RouterLink}
               href={`/tournaments/${tournament.slug}`}
-              sx={{ color: NAVY, fontWeight: 800, textDecoration: 'none', '&:hover': { color: MARK } }}
+              sx={{ color: NAVY, fontWeight: 800, fontSize: '1.05rem', letterSpacing: '-0.01em', textDecoration: 'none', '&:hover': { color: '#175195' } }}
             >
               {tournament.name}
             </Typography>
+            {typeLabel && <MetaChip>{typeLabel}</MetaChip>}
             {live && (
               <Box sx={{ px: 0.9, py: 0.15, borderRadius: 5, bgcolor: alpha(MARK, 0.14), color: MARK, fontSize: 11, fontWeight: 800 }}>
                 Happening now
               </Box>
             )}
           </Stack>
-          <Typography variant="body2" sx={{ color: chessColors.muted, mt: 0.35 }}>
-            {tournament.organizer} · {locationLabel(tournament)} · {formatShortRange(tournament)}
+          <Typography sx={{ color: NAVY, fontWeight: 700, fontSize: 14, mt: 0.6 }}>{tournament.organizer}</Typography>
+          <Typography variant="body2" sx={{ color: chessColors.muted, mt: 0.2 }}>
+            {locationLabel(tournament)}
           </Typography>
-          <Stack direction="row" spacing={0.5} useFlexGap sx={{ flexWrap: 'wrap', mt: 0.9 }}>
-            <MetaChip>{timeControlLabel(tournament.timeControl)}</MetaChip>
+          <Typography variant="body2" sx={{ color: chessColors.muted }}>
+            {formatShortRange(tournament)}
+          </Typography>
+        </Box>
+      </Stack>
+
+      {tournament.sections.length > 0 && (
+        <Box sx={{ mt: 2 }}>
+          <Typography sx={{ color: MARK, fontWeight: 800, fontSize: 11, letterSpacing: 1.1, mb: 0.75 }}>
+            SECTIONS
+          </Typography>
+          <Stack spacing={0.75}>
+            {tournament.sections.map((section) => (
+              <Stack
+                key={section.id}
+                direction="row"
+                spacing={2}
+                sx={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  px: 1.25,
+                  py: 0.9,
+                  borderRadius: 1.5,
+                  bgcolor: '#f6f8fb',
+                }}
+              >
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography sx={{ color: NAVY, fontWeight: 700, fontSize: 14 }}>{section.name}</Typography>
+                  <Typography variant="body2" sx={{ color: chessColors.muted }}>
+                    {[
+                      isSwissFormat(tournament.format) && section.rounds ? `${section.rounds} rounds` : '',
+                      sectionTimeControlLabel(section),
+                    ].filter(Boolean).join(' · ')}
+                  </Typography>
+                </Box>
+                <Typography sx={{ color: NAVY, fontWeight: 800, flexShrink: 0 }}>{money(activeFee(section))}</Typography>
+              </Stack>
+            ))}
           </Stack>
+        </Box>
+      )}
+
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        spacing={1.5}
+        sx={{
+          mt: 2,
+          pt: 1.75,
+          borderTop: `1px solid ${alpha(NAVY, 0.08)}`,
+          alignItems: { sm: 'center' },
+          justifyContent: 'space-between',
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
           {note && (
-            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', mt: 0.75, color: note.includes('closed') ? 'error.main' : '#8a6200' }}>
+            <Stack direction="row" spacing={0.5} sx={{ alignItems: 'center', color: note.includes('closed') ? 'error.main' : '#8a6200' }}>
               <AccessTimeIcon sx={{ fontSize: 16 }} />
-              <Typography variant="body2">{note}</Typography>
-            </Stack>
-          )}
-          {tournament.sections.length > 1 && (
-            <Button size="small" onClick={onToggleSections} sx={{ px: 0, minWidth: 0, mt: 0.25, textTransform: 'none', fontWeight: 700, color: MARK }}>
-              {sectionsOpen ? 'Hide sections' : `${tournament.sections.length} sections`}
-            </Button>
-          )}
-          {sectionsOpen && (
-            <Stack spacing={0.25} sx={{ mt: 0.5 }}>
-              {tournament.sections.map((section) => (
-                <Typography key={section.id} variant="body2" sx={{ color: alpha(NAVY, 0.8) }}>
-                  {section.name} — {money(activeFee(section))}{isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
-                </Typography>
-              ))}
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>{note}</Typography>
             </Stack>
           )}
         </Box>
-        <Stack
-          direction={{ xs: 'row', md: 'column' }}
-          spacing={1}
-          sx={{ alignItems: { xs: 'center', md: 'flex-end' }, justifyContent: 'space-between', minWidth: { md: 132 } }}
-        >
-          <Typography sx={{ fontWeight: 800, color: NAVY, fontSize: '1.05rem' }}>{feeRange(tournament)}</Typography>
-          <Stack direction="row" spacing={0.5}>
-            {open ? (
-              <Button component={RouterLink} href={`/register/${tournament.slug}`} variant="contained" sx={{ ...registerButtonSx, borderRadius: 2, textTransform: 'none' }}>
-                Register
-              </Button>
-            ) : (
-              <Button variant="contained" disabled sx={{ textTransform: 'none' }}>
-                Closed
-              </Button>
-            )}
-            <Button component={RouterLink} href={`/entry-list/${tournament.slug}`} variant="outlined" sx={{ ...entryButtonSx, borderRadius: 2, textTransform: 'none' }}>
-              Entry list
+        <Stack direction="row" spacing={1.25} sx={{ alignItems: 'center', flexShrink: 0 }}>
+          <Typography sx={{ fontWeight: 800, color: NAVY, fontSize: '1.05rem', mr: 0.5 }}>{feeRange(tournament)}</Typography>
+          {open ? (
+            <Button component={RouterLink} href={`/register/${tournament.slug}`} variant="contained" sx={{ ...registerButtonSx, borderRadius: 2, textTransform: 'none' }}>
+              Join
             </Button>
-          </Stack>
+          ) : (
+            <Button variant="contained" disabled sx={{ textTransform: 'none' }}>
+              Closed
+            </Button>
+          )}
+          <Button component={RouterLink} href={`/entry-list/${tournament.slug}`} variant="outlined" sx={{ ...entryButtonSx, borderRadius: 2, textTransform: 'none' }}>
+            Entry list
+          </Button>
         </Stack>
       </Stack>
     </Box>
@@ -410,8 +483,13 @@ function MetaChip({ children }: { children: string }) {
 export function TournamentDetailView() {
   const { slug = '' } = useParams();
   const chess = useChessState();
+  const [tournamentTypes, setTournamentTypes] = useState<TournamentTypeOption[]>([]);
   const tournament = chess.tournaments.find((item) => item.slug === slug);
   usePageTitle(tournament ? `${tournament.name} · Mule Chess` : 'Tournament · Mule Chess');
+
+  useEffect(() => {
+    listTournamentTypes().then(setTournamentTypes).catch(() => undefined);
+  }, []);
 
   if (!tournament || tournamentStatus(tournament) === 'NEW') return <MissingEvent />;
 
@@ -435,9 +513,11 @@ export function TournamentDetailView() {
               </Typography>
             </Box>
           </Stack>
-          <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mb: 2.5 }}>
-            <MetaChip>{timeControlLabel(tournament.timeControl)}</MetaChip>
-          </Stack>
+          {formatLabel(tournamentTypes, tournament.format) && (
+            <Stack direction="row" spacing={1} useFlexGap sx={{ flexWrap: 'wrap', mb: 2.5 }}>
+              <MetaChip>{formatLabel(tournamentTypes, tournament.format)}</MetaChip>
+            </Stack>
+          )}
 
           <Box
             sx={{ bgcolor: '#fff', borderRadius: 3, border: `1px solid ${alpha(NAVY, 0.08)}`, p: { xs: 2, md: 3 }, mb: 2, color: alpha(NAVY, 0.88), ...articleBodySx }}
@@ -474,6 +554,7 @@ export function TournamentDetailView() {
                     <Typography sx={{ fontWeight: 700, color: NAVY }}>
                       {section.name}
                       {isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
+                      {sectionTimeControlLabel(section) ? ` · ${sectionTimeControlLabel(section)}` : ''}
                     </Typography>
                     <Box
                       sx={{
@@ -512,7 +593,7 @@ export function TournamentDetailView() {
           <Stack direction="row" spacing={1}>
             {open && (
               <Button component={RouterLink} href={`/register/${tournament.slug}`} variant="contained" sx={{ ...registerButtonSx, borderRadius: 2, textTransform: 'none' }}>
-                Register
+                Join
               </Button>
             )}
             <Button component={RouterLink} href={`/entry-list/${tournament.slug}`} variant="outlined" sx={{ ...entryButtonSx, borderRadius: 2, textTransform: 'none' }}>

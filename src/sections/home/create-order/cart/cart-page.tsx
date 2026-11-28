@@ -1,10 +1,10 @@
 import {
     Box,
-    Button,
     Chip,
+    Stack,
+    Button,
     Container,
     IconButton,
-    Stack,
     Typography,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,28 +14,9 @@ import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useRouter } from '../../../../routes/hooks';
-import { cartItemHasArtwork, useCart, type CartItem } from './cart-context';
-import { calculatePrice } from '../../../sticker-builder/pricing';
-import type { StickerFinish, StickerMaterial, StickerShape } from '../../../sticker-builder/types';
+import { useCart, type CartItem, cartItemHasArtwork } from './cart-context';
 
 const BRAND_BLUE = '#175195';
-
-function specFromCartItem(item: CartItem, quantity: number) {
-    const finish: StickerFinish =
-        item.finish === 'glossy' || item.lamination === 'gloss' ? 'glossy' : 'matte';
-    const material = (item.material as StickerMaterial) || 'vinyl';
-    const shape = (item.cutType as StickerShape) || 'die-cut';
-
-    return {
-        shape,
-        size: 'custom' as const,
-        customWidth: item.width,
-        customHeight: item.height,
-        material,
-        finish,
-        quantity,
-    };
-}
 
 function getDiscountForQuantity(
     quantity: number,
@@ -78,7 +59,6 @@ type CartLineItemProps = {
     baseImageUrl: string;
     onQuantityChange: (index: number, quantity: number) => void;
     onRemove: (index: number) => void;
-    onEditDesign: (designId: string) => void;
 };
 
 function CartLineItem({
@@ -87,7 +67,6 @@ function CartLineItem({
     baseImageUrl,
     onQuantityChange,
     onRemove,
-    onEditDesign,
 }: CartLineItemProps) {
     const theme = useTheme();
     const router = useRouter();
@@ -199,26 +178,6 @@ function CartLineItem({
                         }}
                     >
                         Artwork is required. Upload a file.
-                    </Typography>
-                )}
-                {item.designId && (
-                    <Typography
-                        component="button"
-                        variant="body2"
-                        onClick={() => onEditDesign(item.designId!)}
-                        sx={{
-                            border: 0,
-                            p: 0,
-                            bgcolor: 'transparent',
-                            color: BRAND_BLUE,
-                            fontWeight: 600,
-                            cursor: 'pointer',
-                            textDecoration: 'underline',
-                            textUnderlineOffset: 3,
-                            '&:hover': { color: '#124578' },
-                        }}
-                    >
-                        Edit design
                     </Typography>
                 )}
             </Box>
@@ -344,21 +303,8 @@ export default function CartPage() {
 
         const updated = [...cartItems];
         const item = updated[index];
-        if (item.designId) {
-            const breakdown = calculatePrice(specFromCartItem(item, newQuantity), {
-                materials: item.materials,
-                discounts: item.discountTiers,
-            });
-            updated[index] = {
-                ...item,
-                quantity: newQuantity,
-                price: breakdown.unitPrice,
-                percentage: breakdown.discountPercent,
-            };
-        } else {
-            const newDiscount = getDiscountForQuantity(newQuantity, item.discountTiers);
-            updated[index] = { ...item, quantity: newQuantity, percentage: newDiscount };
-        }
+        const newDiscount = getDiscountForQuantity(newQuantity, item.discountTiers);
+        updated[index] = { ...item, quantity: newQuantity, percentage: newDiscount };
         setCartItems(updated);
     };
 
@@ -397,23 +343,9 @@ export default function CartPage() {
                         Your cart is empty
                     </Typography>
                     <Typography sx={{ color: 'text.secondary', mb: 3, maxWidth: 360, mx: 'auto' }}>
-                        Design a sticker in our builder or browse products to get started.
+                        Browse products to get started.
                     </Typography>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="center">
-                        <Button
-                            variant="contained"
-                            onClick={() => router.push('/sticker-builder')}
-                            sx={{
-                                textTransform: 'none',
-                                fontWeight: 700,
-                                bgcolor: BRAND_BLUE,
-                                borderRadius: 50,
-                                px: 3,
-                                '&:hover': { bgcolor: '#124578' },
-                            }}
-                        >
-                            Open sticker builder
-                        </Button>
                         <Button
                             variant="outlined"
                             onClick={() => router.push('/')}
@@ -511,9 +443,6 @@ export default function CartPage() {
                                 baseImageUrl={baseImageUrl}
                                 onQuantityChange={handleQuantityChange}
                                 onRemove={removeItem}
-                                onEditDesign={(designId) =>
-                                    router.push(`/sticker-builder?design=${designId}`)
-                                }
                             />
                         ))}
                     </Box>

@@ -16,7 +16,7 @@ const MARK = '#2888A0';
 
 const STEPS = [
     { title: 'Find a tournament', text: 'Search by date, city, and section.' },
-    { title: 'Reserve a seat', text: 'Pick an open section and confirm the entry.' },
+    { title: 'Join as a player', text: 'Pick an open section and confirm the entry.' },
     { title: 'Play chess', text: 'Sit down for round one and play your games.' },
 ] as const;
 
@@ -27,7 +27,7 @@ export default function HomeOverview() {
     const upcoming = chess.tournaments
         .filter((tournament) => !isPast(tournament))
         .sort((a, b) => a.startDate.localeCompare(b.startDate))
-        .slice(0, 4);
+        .slice(0, 5);
 
     return (
         <Box sx={{ bgcolor: '#ffffff' }}>
@@ -63,10 +63,10 @@ export default function HomeOverview() {
                                     color: theme.palette.grey[900],
                                 }}
                             >
-                                Find your next tournament and reserve a seat.
+                                Find your next tournament and join as a player.
                             </Typography>
                             <Typography sx={{ color: 'text.secondary', fontSize: { xs: '1.05rem', md: '1.15rem' }, lineHeight: 1.7, maxWidth: 520 }}>
-                                Open, scholastic, and team sections each have their own fee and capacity. Register in a few minutes and your name is on the entry list.
+                                Open and team sections each have their own fee and capacity. Register in a few minutes and your name is on the entry list.
                             </Typography>
                             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5}>
                                 <Button
@@ -207,7 +207,7 @@ export default function HomeOverview() {
                                     variant="contained"
                                     sx={{ bgcolor: BRAND_BLUE, textTransform: 'none', fontWeight: 700, borderRadius: 2, '&:hover': { bgcolor: '#124578' } }}
                                 >
-                                    Register
+                                    Join
                                 </Button>
                             </Stack>
                         ))}

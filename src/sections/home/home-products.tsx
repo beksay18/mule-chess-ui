@@ -3,9 +3,10 @@ import Container from '@mui/material/Container';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import { useTheme, alpha } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
-import { getActiveProducts, Product, sortProductsByPosition } from '../../api/product';
+import { alpha, useTheme } from '@mui/material/styles';
+import { useState, useEffect } from 'react';
+import type { Product} from '../../api/product';
+import { getActiveProducts, sortProductsByPosition } from '../../api/product';
 import { getActiveProductTypes } from '../../api/productType';
 import { useRouter } from '../../routes/hooks';
 
@@ -62,7 +63,7 @@ export default function HomeProducts() {
     };
 
     const handleProductClick = (productId: number) => {
-        router.push(`/sticker-builder?productId=${productId}`);
+        router.push(`/custom-product-details/${productId}`);
     };
 
     if (products.length === 0) {
@@ -160,7 +161,7 @@ export default function HomeProducts() {
                                 key={product.id}
                                 role="button"
                                 tabIndex={0}
-                                aria-label={`Open ${product.name} in sticker builder`}
+                                aria-label={`Open ${product.name}`}
                                 onClick={() => handleProductClick(product.id)}
                                 onKeyDown={(event) => {
                                     if (event.key === 'Enter' || event.key === ' ') {

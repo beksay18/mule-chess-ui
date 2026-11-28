@@ -16,6 +16,10 @@ export type TournamentSection = {
   name: string;
   fee: number | null;
   rounds?: number;
+  timeMinutes?: number;
+  timeSeconds?: number;
+  incrementSeconds?: number;
+  timeDays?: number;
   capacity: number;
   earlyFee: number | null;
   earlyDeadline: string;

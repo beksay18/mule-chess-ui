@@ -35,6 +35,78 @@ export function timeControlLabel(value: TimeControl) {
   return TIME_LABEL[value];
 }
 
+export type SectionTimeControl = {
+  timeMinutes: number;
+  timeSeconds: number;
+  incrementSeconds: number;
+  timeDays: number;
+};
+
+export type TimeControlPreset = SectionTimeControl & {
+  id: string;
+  group: 'blitz' | 'rapid' | 'classical';
+  label: string;
+};
+
+function clock(label: string, group: TimeControlPreset['group'], minutes: number, seconds: number, increment: number, days = 0): TimeControlPreset {
+  return {
+    id: `${group}-${label}`,
+    group,
+    label,
+    timeMinutes: minutes,
+    timeSeconds: seconds,
+    incrementSeconds: increment,
+    timeDays: days,
+  };
+}
+
+export const TIME_CONTROL_PRESETS: TimeControlPreset[] = [
+  clock('3+2', 'blitz', 3, 0, 2),
+  clock('5 min', 'blitz', 5, 0, 0),
+  clock('15+5', 'rapid', 15, 0, 5),
+  clock('15+10', 'rapid', 15, 0, 10),
+  clock('25+5', 'rapid', 25, 0, 5),
+  clock('30+5', 'rapid', 30, 0, 5),
+  clock('60+5', 'classical', 60, 0, 5),
+  clock('90+5', 'classical', 90, 0, 5),
+  clock('90+30', 'classical', 90, 0, 30),
+  clock('120+5', 'classical', 120, 0, 5),
+];
+
+export function sectionTimeParts(section: Pick<TournamentSection, 'timeMinutes' | 'timeSeconds' | 'incrementSeconds' | 'timeDays'>): SectionTimeControl {
+  return {
+    timeMinutes: Math.max(0, Number(section.timeMinutes) || 0),
+    timeSeconds: Math.max(0, Number(section.timeSeconds) || 0),
+    incrementSeconds: Math.max(0, Number(section.incrementSeconds) || 0),
+    timeDays: Math.max(0, Number(section.timeDays) || 0),
+  };
+}
+
+export function sameTimeControl(left: SectionTimeControl, right: SectionTimeControl) {
+  return left.timeMinutes === right.timeMinutes
+    && left.timeSeconds === right.timeSeconds
+    && left.incrementSeconds === right.incrementSeconds;
+}
+
+export function hasTimeControl(section: Pick<TournamentSection, 'timeMinutes' | 'timeSeconds' | 'incrementSeconds' | 'timeDays'>) {
+  const clockParts = sectionTimeParts(section);
+  return clockParts.timeMinutes > 0 || clockParts.timeSeconds > 0;
+}
+
+export function sectionTimeControlLabel(section: Pick<TournamentSection, 'timeMinutes' | 'timeSeconds' | 'incrementSeconds' | 'timeDays'>) {
+  const clockParts = sectionTimeParts(section);
+  const preset = TIME_CONTROL_PRESETS.find((item) => sameTimeControl(item, { ...clockParts, timeDays: 0 }));
+  if (preset) return preset.label;
+  if (!hasTimeControl(section)) return '';
+  const { timeMinutes: minutes, timeSeconds: seconds, incrementSeconds: increment } = clockParts;
+  if (minutes === 0 && increment === 0) return `${seconds} sec`;
+  if (minutes === 0) return `${seconds} sec + ${increment}`;
+  if (seconds === 0 && increment === 0) return `${minutes} min`;
+  if (seconds === 0) return `${minutes}+${increment}`;
+  if (increment === 0) return `${minutes} min ${seconds} sec`;
+  return `${minutes} min ${seconds} sec + ${increment}`;
+}
+
 export function isSwissFormat(format?: string) {
   return Boolean(format?.startsWith('swiss'));
 }
@@ -139,6 +211,11 @@ export function entryPayload(section: TournamentSection): TournamentSection {
   });
   const primary = ENTRY_FEE_FORM.find((item) => priced[item.enabled]);
   next.fee = primary ? (next[primary.fee] ?? 0) : 0;
+  const clockParts = sectionTimeParts(priced);
+  next.timeDays = 0;
+  next.timeMinutes = clockParts.timeMinutes;
+  next.timeSeconds = clockParts.timeSeconds;
+  next.incrementSeconds = clockParts.incrementSeconds;
   return next;
 }
 

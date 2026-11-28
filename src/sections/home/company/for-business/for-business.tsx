@@ -74,7 +74,7 @@ const STEPS = [
     {
         step: '02',
         title: 'Upload your artwork',
-        desc: 'Send your files or design online with our sticker builder.',
+        desc: 'Send your files and we will print them for your campaign.',
     },
     {
         step: '03',

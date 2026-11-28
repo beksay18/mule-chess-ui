@@ -1,13 +1,13 @@
 import * as React from 'react';
 import {
     Box,
-    Container,
-    Typography,
+    Card,
     Rating,
-    Paper, Card, CardContent,
+    Container, Typography, CardContent,
 } from '@mui/material';
-import {useEffect, useState} from 'react';
-import {getDisplayPrice, getProductById, Product} from '../../../../api/product';
+import {useState, useEffect} from 'react';
+import type { Product} from '../../../../api/product';
+import {getProductById, getDisplayPrice} from '../../../../api/product';
 import {useParams} from 'react-router-dom';
 import {useRouter} from '../../../../routes/hooks';
 import {useCart} from '../cart/cart-context';
@@ -102,7 +102,7 @@ export default function CustomProductDetails() {
             quantity: quantity.value,
             percentage: discount.percentage,
             customDimension: dimension.isCustom,
-            lamination: lamination,
+            lamination,
             discountTiers: customProduct?.discounts || [],
             imageUrl: customProduct?.imageUrl || '',
         });
@@ -197,27 +197,6 @@ export default function CustomProductDetails() {
                                     fullWidth
                                 >
                                     Next: Upload Artwork
-                                </LoadingButton>
-                                <LoadingButton
-                                    variant="outlined"
-                                    onClick={() => router.push(`/sticker-builder?productId=${customProduct?.id || ''}`)}
-                                    sx={{
-                                        mt: 1.25,
-                                        py: 1.4,
-                                        fontWeight: 'bold',
-                                        fontSize: '1rem',
-                                        borderRadius: 2,
-                                        borderColor: '#175195',
-                                        color: '#175195',
-                                        textTransform: 'none',
-                                        '&:hover': {
-                                            borderColor: '#06853D',
-                                            color: '#06853D',
-                                        },
-                                    }}
-                                    fullWidth
-                                >
-                                    Design online instead
                                 </LoadingButton>
                             </CardContent>
                         </Card>

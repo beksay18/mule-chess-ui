@@ -16,7 +16,7 @@ import { chessColors } from './theme';
 
 const steps = [
   { title: 'Create an account', text: 'Log in once, then every entry is under your name.' },
-  { title: 'Choose a section', text: 'Open, scholastic, and team sections each have their own fee and capacity.' },
+  { title: 'Choose a section', text: 'Open and team sections each have their own fee and capacity.' },
   { title: 'Show up on the list', text: 'Confirming the cart adds the player to the entry list.' },
 ];
 
@@ -26,7 +26,7 @@ export function HomeView() {
   const upcoming = chess.tournaments
     .filter((tournament) => isPublic(tournament))
     .sort((a, b) => a.startDate.localeCompare(b.startDate))
-    .slice(0, 4);
+    .slice(0, 5);
 
   return (
     <SiteShell variant="home">

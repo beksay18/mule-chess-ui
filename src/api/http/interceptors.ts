@@ -1,4 +1,4 @@
-import {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
+import type {AxiosError, AxiosResponse, InternalAxiosRequestConfig} from "axios";
 import {fetchAndValidateAccessToken} from "./utils";
 import {SessionStorage} from "../session-storage";
 
@@ -25,7 +25,7 @@ export const requestInterceptor = (
 export const responseInterceptor = (res: AxiosResponse): AxiosResponse => res;
 
 const AUTH_ENDPOINTS = ['/auth/signin', '/auth/signup', '/auth/login-with-google', '/auth/google-client-id', '/auth/logout'];
-const PUBLIC_ENDPOINTS = ['/api/blog/public', '/api/tournament-types'];
+const PUBLIC_ENDPOINTS = ['/api/blog/public', '/api/tournament-types', '/api/players'];
 
 function skipsSessionReset(url?: string) {
     if (!url) {

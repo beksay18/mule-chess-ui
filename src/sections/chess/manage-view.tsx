@@ -55,7 +55,8 @@ import { listTournamentTypes, createTournamentRequest, deleteTournamentRequest, 
 import type { TournamentTypeOption } from 'src/api/tournament/tournament.api';
 import { DashboardContent } from 'src/layouts/dashboard';
 
-import { money, US_STATES, activeFee, ENTRY_FEES, statusLabel, entryPayload, isSwissFormat, withEntryFees, locationLabel, ENTRY_FEE_FORM, formatShortRange, tournamentStatus, entryDeadlineLabel } from './format';
+import { money, US_STATES, activeFee, ENTRY_FEES, statusLabel, entryPayload, isSwissFormat, withEntryFees, locationLabel, hasTimeControl, ENTRY_FEE_FORM, formatShortRange, tournamentStatus, entryDeadlineLabel, sectionTimeControlLabel } from './format';
+import { TimeControlPicker } from './time-control-picker';
 import { SiteShell, usePageTitle } from './site-shell';
 import {
   useChessState,
@@ -190,6 +191,7 @@ function TournamentDetails({
   onDelete: () => void;
 }) {
   const status = tournamentStatus(tournament);
+  const chess = useChessState();
   const [descriptionOpen, setDescriptionOpen] = useState(false);
   const descriptionHtml = sanitizeArticleHtml(
     looksLikeHtml(tournament.description) ? tournament.description : toEditorHtml(tournament.description)
@@ -261,12 +263,15 @@ function TournamentDetails({
       <Stack spacing={1}>
         {tournament.sections.map((section) => {
           const priced = withEntryFees(section);
+          const entries = chess.registrations
+            .filter((item) => item.tournamentId === tournament.id && item.sectionId === section.id)
+            .sort((a, b) => a.lastName.localeCompare(b.lastName) || a.firstName.localeCompare(b.firstName));
           return (
             <Card key={section.id} sx={{ p: 2 }}>
               <Typography sx={{ fontWeight: 800, color: '#12325f' }}>
                 {section.name}
                 {isSwissFormat(tournament.format) && section.rounds ? ` · ${section.rounds} rounds` : ''}
-                {` · ${section.capacity} seats`}
+                {sectionTimeControlLabel(section) ? ` · ${sectionTimeControlLabel(section)}` : ''}
               </Typography>
               <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(auto-fit, minmax(170px, 1fr))' }, gap: 1.5, mt: 1.5 }}>
                 {ENTRY_FEE_FORM.filter((item) => priced[item.enabled]).map((item) => (
@@ -282,6 +287,32 @@ function TournamentDetails({
                 ))}
               </Box>
               <Typography sx={{ mt: 1.25, fontWeight: 700, color: '#175195' }}>Current fee {money(activeFee(section))}</Typography>
+              <Box sx={{ mt: 2, pt: 1.5, borderTop: `1px solid ${chessColors.line}` }}>
+                <Typography sx={{ color: '#2888A0', fontWeight: 800, fontSize: 12, letterSpacing: 1.1 }}>
+                  ENTRY LIST · {entries.length} / {section.capacity}
+                </Typography>
+                {entries.length === 0 ? (
+                  <Typography sx={{ mt: 1, color: chessColors.muted, fontSize: 14 }}>No entries yet.</Typography>
+                ) : (
+                  <Stack spacing={0.75} sx={{ mt: 1.25 }}>
+                    {entries.map((entry) => (
+                      <Stack
+                        key={entry.id}
+                        direction={{ xs: 'column', sm: 'row' }}
+                        spacing={0.5}
+                        sx={{ justifyContent: 'space-between', alignItems: { sm: 'center' }, px: 1.5, py: 1, borderRadius: 1.5, bgcolor: '#f7f9fc' }}
+                      >
+                        <Typography sx={{ fontWeight: 700, color: '#12325f' }}>
+                          {entry.lastName}, {entry.firstName}
+                        </Typography>
+                        <Typography variant="body2" sx={{ color: chessColors.muted }}>
+                          {[entry.rating || 'Unrated', entry.federationId, entry.email, dayjs(entry.createdAt).format('MMM D, YYYY')].filter(Boolean).join(' · ')}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
             </Card>
           );
         })}
@@ -390,6 +421,10 @@ function blankSection(): TournamentSection {
     name: '',
     fee: null,
     rounds: 0,
+    timeMinutes: 0,
+    timeSeconds: 0,
+    incrementSeconds: 0,
+    timeDays: 0,
     capacity: 0,
     earlyFee: null,
     earlyDeadline: '',
@@ -476,6 +511,7 @@ type SectionProblems = Partial<Record<
   | 'name'
   | 'rounds'
   | 'capacity'
+  | 'timeControl'
   | 'entries'
   | 'earlyFee'
   | 'earlyDeadline'
@@ -500,6 +536,8 @@ function sectionFieldErrors(draft: TournamentDraft) {
     if (!priced.name.trim()) item.name = 'Enter a section name.';
     if (isSwissFormat(draft.format) && (!priced.rounds || priced.rounds < 1)) item.rounds = 'Enter the number of rounds.';
     if (Number.isNaN(priced.capacity) || priced.capacity < 1) item.capacity = 'Enter room for at least one player.';
+    if ((priced.timeSeconds || 0) > 59) item.timeControl = 'Enter seconds from 0 to 59.';
+    else if (!hasTimeControl(priced)) item.timeControl = 'Choose a time control.';
     const chosen = ENTRY_FEES.filter((entry) => priced[entry.enabled]);
     if (!chosen.length) item.entries = 'Choose at least one entry fee.';
     let previous = '';
@@ -531,6 +569,7 @@ function firstSectionField(errors: ReturnType<typeof sectionFieldErrors>) {
     'name',
     'rounds',
     'capacity',
+    'timeControl',
     'entries',
     'regularFee',
     'regularDeadline',
@@ -1183,7 +1222,7 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                       <Grid size={{ xs: isSwissFormat(draft.format) ? 6 : 12, md: isSwissFormat(draft.format) ? 3 : 4 }}>
                         <RequiredField
                           fieldId={`tournament-section-${section.id}-capacity`}
-                          label="Seats"
+                          label="Players"
                           type="number"
                           autoComplete="off"
                           message={sectionProblems[section.id]?.capacity}
@@ -1192,6 +1231,17 @@ export function ManageView({ embedded = false }: { embedded?: boolean }) {
                         />
                       </Grid>
                     </Grid>
+                    <TimeControlPicker
+                      fieldId={`tournament-section-${section.id}-timeControl`}
+                      value={{
+                        timeMinutes: section.timeMinutes || 0,
+                        timeSeconds: section.timeSeconds || 0,
+                        incrementSeconds: section.incrementSeconds || 0,
+                        timeDays: section.timeDays || 0,
+                      }}
+                      message={sectionProblems[section.id]?.timeControl}
+                      onChange={(clock) => updateSection(section.id, clock)}
+                    />
                     <Typography sx={{ mt: 2.25, mb: 1, fontSize: 12, fontWeight: 800, letterSpacing: 0.6, textTransform: 'uppercase', color: '#637381' }}>
                       Entry fees
                     </Typography>

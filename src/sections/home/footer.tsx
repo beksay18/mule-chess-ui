@@ -141,7 +141,7 @@ export default function Footer() {
                                         mb: 0.75,
                                     }}
                                 >
-                                    Find a tournament and reserve your seat.
+                                    Find a tournament and join as a player.
                                 </Typography>
                                 <Typography
                                     sx={{
@@ -150,7 +150,7 @@ export default function Footer() {
                                         lineHeight: 1.7,
                                     }}
                                 >
-                                    Open, scholastic, and team events across the region.
+                                    Open and team events across the region.
                                 </Typography>
                             </Box>
                         </Stack>
